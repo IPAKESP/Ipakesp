@@ -13,6 +13,12 @@
             --google-red: #EA4335;
             --google-yellow: #FBBC05;
             --google-green: #34A853;
+            
+            --bg-blue-light: rgba(66, 133, 244, 0.1);
+            --bg-red-light: rgba(234, 67, 53, 0.1);
+            --bg-yellow-light: rgba(251, 188, 5, 0.1);
+            --bg-green-light: rgba(52, 168, 83, 0.1);
+
             --bg-light: #F8F9FA;
             --surface: #FFFFFF;
             --text-main: #202124;
@@ -84,7 +90,6 @@
             box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
         }
 
-        /* Clear Filters Button */
         .clear-btn {
             width: 100%;
             padding: 10px;
@@ -114,82 +119,62 @@
         header h1 {
             color: var(--text-main);
             margin-top: 0;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             font-size: 1.6rem;
             font-weight: 400;
         }
 
-        /* Minimal Stats Cards Grid */
-        .stats-container {
+        /* Unified Card & Graph Widget Grid */
+        .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px; 
-            margin-bottom: 25px;
-        }
-
-        .card {
-            background: var(--surface);
-            padding: 12px 15px; 
-            border-radius: 10px;
-            box-shadow: 0 1px 3px rgba(60,64,67,0.1), 0 1px 2px rgba(60,64,67,0.06);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            border-top: 3px solid var(--border-color); 
-        }
-
-        /* Cyclic Google Colors for 9 Cards */
-        .card:nth-child(4n+1) { border-top-color: var(--google-blue); }
-        .card:nth-child(4n+2) { border-top-color: var(--google-red); }
-        .card:nth-child(4n+3) { border-top-color: var(--google-yellow); }
-        .card:nth-child(4n+4) { border-top-color: var(--google-green); }
-
-        .card h3 {
-            margin: 0 0 5px 0; 
-            font-size: 0.70rem; 
-            color: var(--text-muted);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-
-        .card .value {
-            font-size: 1.3rem; 
-            font-weight: 500; 
-            color: var(--text-main);
-            margin: 0;
-        }
-
-        /* Compact Charts Grid (2x2 Layout) */
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 20px;
             margin-bottom: 40px;
         }
 
-        .chart-card {
+        .kpi-widget {
             background: var(--surface);
-            padding: 15px 20px;
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(60,64,67,0.1), 0 1px 2px rgba(60,64,67,0.06);
-            height: 280px; 
             display: flex;
             flex-direction: column;
-            border: 1px solid var(--border-color);
+            overflow: hidden;
+            border-top: 4px solid var(--border-color);
+            padding: 20px;
         }
 
-        .chart-card h3 {
-            margin-top: 0;
-            margin-bottom: 12px;
-            font-size: 0.9rem; 
-            color: var(--text-main);
+        /* Cyclic Google Colors */
+        .kpi-widget:nth-child(4n+1) { border-top-color: var(--google-blue); }
+        .kpi-widget:nth-child(4n+2) { border-top-color: var(--google-red); }
+        .kpi-widget:nth-child(4n+3) { border-top-color: var(--google-yellow); }
+        .kpi-widget:nth-child(4n+4) { border-top-color: var(--google-green); }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .kpi-title h3 {
+            margin: 0 0 5px 0;
+            font-size: 0.8rem;
+            color: var(--text-muted);
             font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .canvas-wrapper {
+        .kpi-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .chart-wrapper {
             position: relative;
-            flex-grow: 1;
+            height: 150px; /* Chart height directly inside card */
             width: 100%;
         }
 
@@ -234,62 +219,98 @@
 
         <div id="loadingMsg">Fetching live data...</div>
 
-        <div class="stats-container" id="dashboardContent" style="display: none;">
-            <div class="card">
-                <h3>TP Total OT Hrs</h3>
-                <div class="value" id="valTPOTHours">...</div>
+        <div class="dashboard-grid" id="dashboardContent" style="display: none;">
+            
+            <div class="kpi-widget">
+                <div class="kpi-header">
+                    <div class="kpi-title">
+                        <h3>TP Total OT Hours</h3>
+                        <div class="kpi-value" id="valTPOTHours">...</div>
+                    </div>
+                </div>
+                <div class="chart-wrapper"><canvas id="chartTPOTHours"></canvas></div>
             </div>
-            <div class="card">
-                <h3>TP OT %</h3>
-                <div class="value" id="valTPOTPercent">...</div>
-            </div>
-            <div class="card">
-                <h3>Absenteeism %</h3>
-                <div class="value" id="valAbsent">...</div>
-            </div>
-            <div class="card">
-                <h3>Leaves %</h3>
-                <div class="value" id="valLeave">...</div>
-            </div>
-            <div class="card">
-                <h3>Late Arrival %</h3>
-                <div class="value" id="valLate">...</div>
-            </div>
-            <div class="card">
-                <h3>Early Out %</h3>
-                <div class="value" id="valEarly">...</div>
-            </div>
-            <div class="card">
-                <h3>Active Emp %</h3>
-                <div class="value" id="valActive">...</div>
-            </div>
-            <div class="card">
-                <h3>Joiners</h3>
-                <div class="value" id="valJoiners">...</div>
-            </div>
-            <div class="card">
-                <h3>Leavers</h3>
-                <div class="value" id="valLeavers">...</div>
-            </div>
-        </div>
 
-        <div class="charts-grid" id="chartsContent" style="display: none;">
-            <div class="chart-card">
-                <h3>Act vs Std Hours %</h3>
-                <div class="canvas-wrapper"><canvas id="chartActVsStd"></canvas></div>
+            <div class="kpi-widget">
+                <div class="kpi-header">
+                    <div class="kpi-title">
+                        <h3>TP OT %</h3>
+                        <div class="kpi-value" id="valTPOTPercent">...</div>
+                    </div>
+                </div>
+                <div class="chart-wrapper"><canvas id="chartTPOTPercent"></canvas></div>
             </div>
-            <div class="chart-card">
-                <h3>Overtime Hours</h3>
-                <div class="canvas-wrapper"><canvas id="chartOTHours"></canvas></div>
+
+            <div class="kpi-widget">
+                <div class="kpi-header">
+                    <div class="kpi-title">
+                        <h3>Absenteeism %</h3>
+                        <div class="kpi-value" id="valAbsent">...</div>
+                    </div>
+                </div>
+                <div class="chart-wrapper"><canvas id="chartAbsent"></canvas></div>
             </div>
-            <div class="chart-card">
-                <h3>Overtime Cost</h3>
-                <div class="canvas-wrapper"><canvas id="chartOTCost"></canvas></div>
+
+            <div class="kpi-widget">
+                <div class="kpi-header">
+                    <div class="kpi-title">
+                        <h3>Leaves %</h3>
+                        <div class="kpi-value" id="valLeave">...</div>
+                    </div>
+                </div>
+                <div class="chart-wrapper"><canvas id="chartLeave"></canvas></div>
             </div>
-            <div class="chart-card">
-                <h3>Overtime % Trend</h3>
-                <div class="canvas-wrapper"><canvas id="chartOTPercent"></canvas></div>
+
+            <div class="kpi-widget">
+                <div class="kpi-header">
+                    <div class="kpi-title">
+                        <h3>Late Arrival %</h3>
+                        <div class="kpi-value" id="valLate">...</div>
+                    </div>
+                </div>
+                <div class="chart-wrapper"><canvas id="chartLate"></canvas></div>
             </div>
+
+            <div class="kpi-widget">
+                <div class="kpi-header">
+                    <div class="kpi-title">
+                        <h3>Early Out %</h3>
+                        <div class="kpi-value" id="valEarly">...</div>
+                    </div>
+                </div>
+                <div class="chart-wrapper"><canvas id="chartEarly"></canvas></div>
+            </div>
+
+            <div class="kpi-widget">
+                <div class="kpi-header">
+                    <div class="kpi-title">
+                        <h3>Active Employee %</h3>
+                        <div class="kpi-value" id="valActive">...</div>
+                    </div>
+                </div>
+                <div class="chart-wrapper"><canvas id="chartActive"></canvas></div>
+            </div>
+
+            <div class="kpi-widget">
+                <div class="kpi-header">
+                    <div class="kpi-title">
+                        <h3>Joiners</h3>
+                        <div class="kpi-value" id="valJoiners">...</div>
+                    </div>
+                </div>
+                <div class="chart-wrapper"><canvas id="chartJoiners"></canvas></div>
+            </div>
+
+            <div class="kpi-widget">
+                <div class="kpi-header">
+                    <div class="kpi-title">
+                        <h3>Leavers</h3>
+                        <div class="kpi-value" id="valLeavers">...</div>
+                    </div>
+                </div>
+                <div class="chart-wrapper"><canvas id="chartLeavers"></canvas></div>
+            </div>
+
         </div>
     </div>
 
@@ -297,13 +318,21 @@
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=798992094&single=true&output=csv';
 
         let sheetData = [];
-        let chartInstanceOTHours, chartInstanceOTCost, chartInstanceOTPercent, chartInstanceActVsStd;
         let headers = [];
 
+        // Store Chart Instances
+        const charts = {};
+
+        // Colors
         const G_BLUE = '#4285F4';
         const G_RED = '#EA4335';
         const G_YELLOW = '#FBBC05';
         const G_GREEN = '#34A853';
+
+        const BG_BLUE = 'rgba(66, 133, 244, 0.15)';
+        const BG_RED = 'rgba(234, 67, 53, 0.15)';
+        const BG_YELLOW = 'rgba(251, 188, 5, 0.15)';
+        const BG_GREEN = 'rgba(52, 168, 83, 0.15)';
 
         function parseCSV(str) {
             const arr = [];
@@ -342,61 +371,60 @@
             return num.toLocaleString('en-US', { maximumFractionDigits: 1 });
         }
 
-        function initCharts() {
-            const commonOptions = {
-                responsive: true,
-                maintainAspectRatio: false,
-                animation: { duration: 1000, easing: 'easeOutQuart' },
-                scales: { 
-                    y: { 
-                        beginAtZero: true, 
-                        grid: { color: '#f1f3f4', drawBorder: false },
-                        ticks: { color: '#5f6368', font: { family: 'Roboto', size: 10 } }
+        // Helper function to create charts easily
+        function createChart(canvasId, type, colorLine, colorBg) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            return new Chart(ctx, {
+                type: type,
+                data: { 
+                    labels: [], 
+                    datasets: [{ 
+                        backgroundColor: type === 'line' ? colorBg : colorLine, 
+                        borderColor: colorLine,
+                        borderWidth: 2,
+                        fill: type === 'line', // Fill only for line graphs
+                        tension: 0.4,
+                        pointRadius: 2,
+                        borderRadius: type === 'bar' ? 4 : 0,
+                        data: [] 
+                    }] 
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 800, easing: 'easeOutQuart' },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: { titleFont: { size: 10 }, bodyFont: { size: 10 } }
                     },
-                    x: {
-                        grid: { display: false, drawBorder: false },
-                        ticks: { 
-                            color: '#5f6368', font: { family: 'Roboto', size: 10 }, 
-                            maxRotation: 45, minRotation: 0
+                    scales: { 
+                        y: { 
+                            display: true, // Hide axis values for super clean look
+                            beginAtZero: true, 
+                            grid: { drawBorder: false, color: '#f1f3f4' },
+                            ticks: { font: { size: 9 }, color: '#9aa0a6' }
+                        },
+                        x: { 
+                            display: true, 
+                            grid: { display: false },
+                            ticks: { font: { size: 9 }, color: '#9aa0a6', maxRotation: 45, minRotation: 0 }
                         }
                     }
-                },
-                plugins: { 
-                    legend: { display: false },
-                    tooltip: {
-                        titleFont: { family: 'Roboto', size: 11 }, 
-                        bodyFont: { family: 'Roboto', size: 11 }   
-                    }
                 }
-            };
-
-            const ctx0 = document.getElementById('chartActVsStd').getContext('2d');
-            chartInstanceActVsStd = new Chart(ctx0, {
-                type: 'bar',
-                data: { labels: [], datasets: [{ backgroundColor: G_BLUE, borderRadius: 4, barPercentage: 0.6, data: [] }] },
-                options: commonOptions
             });
+        }
 
-            const ctx1 = document.getElementById('chartOTHours').getContext('2d');
-            chartInstanceOTHours = new Chart(ctx1, {
-                type: 'bar',
-                data: { labels: [], datasets: [{ backgroundColor: G_RED, borderRadius: 4, barPercentage: 0.6, data: [] }] },
-                options: commonOptions
-            });
-
-            const ctx2 = document.getElementById('chartOTCost').getContext('2d');
-            chartInstanceOTCost = new Chart(ctx2, {
-                type: 'bar',
-                data: { labels: [], datasets: [{ backgroundColor: G_YELLOW, borderRadius: 4, barPercentage: 0.6, data: [] }] },
-                options: commonOptions
-            });
-
-            const ctx3 = document.getElementById('chartOTPercent').getContext('2d');
-            chartInstanceOTPercent = new Chart(ctx3, {
-                type: 'line', 
-                data: { labels: [], datasets: [{ borderColor: G_GREEN, backgroundColor: 'rgba(52, 168, 83, 0.1)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 3, data: [] }] },
-                options: commonOptions
-            });
+        function initCharts() {
+            // We use standard pattern: Bar for absolute numbers, Line for Percentages
+            charts.tpotHours = createChart('chartTPOTHours', 'bar', G_BLUE, BG_BLUE);
+            charts.tpotPct = createChart('chartTPOTPercent', 'line', G_RED, BG_RED);
+            charts.absent = createChart('chartAbsent', 'line', G_YELLOW, BG_YELLOW);
+            charts.leave = createChart('chartLeave', 'line', G_GREEN, BG_GREEN);
+            charts.late = createChart('chartLate', 'line', G_BLUE, BG_BLUE);
+            charts.early = createChart('chartEarly', 'line', G_RED, BG_RED);
+            charts.active = createChart('chartActive', 'line', G_YELLOW, BG_YELLOW);
+            charts.joiners = createChart('chartJoiners', 'bar', G_GREEN, BG_GREEN);
+            charts.leavers = createChart('chartLeavers', 'bar', G_BLUE, BG_BLUE);
         }
 
         function updateSectionDropdown() {
@@ -450,7 +478,6 @@
             const addOptions = (setId, dataSet) => {
                 const select = document.getElementById(setId);
                 select.innerHTML = `<option value="All">All ${setId.replace('filter', '')}s</option>`;
-                
                 dataSet.forEach(val => {
                     let opt = document.createElement('option');
                     opt.value = val;
@@ -485,8 +512,7 @@
                 sheetData = sheetData.filter(row => Object.values(row).some(x => x !== ""));
 
                 document.getElementById('loadingMsg').style.display = 'none';
-                document.getElementById('dashboardContent').style.display = 'grid'; // Changed to grid for better 9-card layout
-                document.getElementById('chartsContent').style.display = 'grid';
+                document.getElementById('dashboardContent').style.display = 'grid'; 
 
                 populateDropdowns();
                 updateDashboard(); 
@@ -520,7 +546,7 @@
                 return match;
             });
 
-            // --- 9 KPI Columns ---
+            // KPI Columns Mapping
             const tpOTHoursCol = findColumn(sheetData[0], ['tp total ot hours', 'tp ot hour', 'tp ot hrs']);
             const tpOTPctCol = findColumn(sheetData[0], ['tp ot%', 'tp ot %']);
             const absentCol = findColumn(sheetData[0], ['absenteeism', 'absent']);
@@ -531,126 +557,118 @@
             const joinersCol = findColumn(sheetData[0], ['joiners', 'join']);
             const leaversCol = findColumn(sheetData[0], ['leavers', 'leave count']);
 
-            // --- Old Chart Columns (kept intact) ---
-            const actVsStdCol = findColumn(sheetData[0], ['actual vs standard', 'actual vs std']);
-            const otHoursCol = findColumn(sheetData[0], ['overtime hours', 'total ot hours']);
-            const otCostCol = findColumn(sheetData[0], ['ot cost', 'overtime cost']);
-            const otPercentCol = findColumn(sheetData[0], ['ot%', 'ot %', 'overtime %']);
-            
+            // Drilldown Logic
             let groupByCol = companyCol || deptCol || headers[0]; 
+            if (selectedDept !== "All" && sectionCol) groupByCol = sectionCol;
+            if (selectedSection !== "All" && monthCol) groupByCol = monthCol;
 
-            if (selectedDept !== "All" && sectionCol) {
-                groupByCol = sectionCol;
-            }
-            if (selectedSection !== "All" && monthCol) {
-                groupByCol = monthCol;
-            }
+            // Global Sums & Counts
+            let gSumTP = 0, gJoin = 0, gLeave = 0;
+            let pTP = 0, cTP = 0;
+            let pAbs = 0, cAbs = 0;
+            let pLev = 0, cLev = 0;
+            let pLat = 0, cLat = 0;
+            let pEar = 0, cEar = 0;
+            let pAct = 0, cAct = 0;
 
-            // --- Aggregation Variables ---
-            // 9 Cards
-            let sumTPOT = 0, sumJoiners = 0, sumLeavers = 0;
-            let sumTPOTPct = 0, countTPOTPct = 0;
-            let sumAbsent = 0, countAbsent = 0;
-            let sumLeave = 0, countLeave = 0;
-            let sumLate = 0, countLate = 0;
-            let sumEarly = 0, countEarly = 0;
-            let sumActive = 0, countActive = 0;
-
-            // Chart Grouping
             let groupedStats = {};
 
             filteredData.forEach(item => {
                 let label = item[groupByCol] || "Unknown";
 
-                // Read 9 KPI values
-                let valTPOT = cleanNumber(item[tpOTHoursCol]);
-                let valTPOTPct = cleanNumber(item[tpOTPctCol]);
-                let valAbsent = cleanNumber(item[absentCol]);
-                let valLeave = cleanNumber(item[leaveCol]);
-                let valLate = cleanNumber(item[lateCol]);
-                let valEarly = cleanNumber(item[earlyCol]);
-                let valActive = cleanNumber(item[activeEmpCol]);
-                let valJoiners = cleanNumber(item[joinersCol]);
-                let valLeavers = cleanNumber(item[leaversCol]);
+                let vTP = cleanNumber(item[tpOTHoursCol]);
+                let vTPPct = cleanNumber(item[tpOTPctCol]);
+                let vAbs = cleanNumber(item[absentCol]);
+                let vLev = cleanNumber(item[leaveCol]);
+                let vLat = cleanNumber(item[lateCol]);
+                let vEar = cleanNumber(item[earlyCol]);
+                let vAct = cleanNumber(item[activeEmpCol]);
+                let vJoin = cleanNumber(item[joinersCol]);
+                let vLeav = cleanNumber(item[leaversCol]);
 
-                // Calculate Totals / Counts for 9 Cards
-                sumTPOT += valTPOT;
-                sumJoiners += valJoiners;
-                sumLeavers += valLeavers;
+                // Global additions
+                gSumTP += vTP; gJoin += vJoin; gLeave += vLeav;
+                if (vTPPct > 0) { pTP += vTPPct; cTP++; }
+                if (vAbs > 0) { pAbs += vAbs; cAbs++; }
+                if (vLev > 0) { pLev += vLev; cLev++; }
+                if (vLat > 0) { pLat += vLat; cLat++; }
+                if (vEar > 0) { pEar += vEar; cEar++; }
+                if (vAct > 0) { pAct += vAct; cAct++; }
 
-                if (valTPOTPct > 0) { sumTPOTPct += valTPOTPct; countTPOTPct++; }
-                if (valAbsent > 0) { sumAbsent += valAbsent; countAbsent++; }
-                if (valLeave > 0) { sumLeave += valLeave; countLeave++; }
-                if (valLate > 0) { sumLate += valLate; countLate++; }
-                if (valEarly > 0) { sumEarly += valEarly; countEarly++; }
-                if (valActive > 0) { sumActive += valActive; countActive++; }
-
-                // --- Old Chart logic intact ---
-                let actStdVal = cleanNumber(item[actVsStdCol]);
-                let otVal = cleanNumber(item[otHoursCol]);
-                let costVal = cleanNumber(item[otCostCol]);
-                let otPctVal = cleanNumber(item[otPercentCol]);
-
+                // Grouping
                 if (!groupedStats[label]) {
-                    groupedStats[label] = { hours: 0, cost: 0, pctSum: 0, count: 0, actStdSum: 0, actStdCount: 0 };
+                    groupedStats[label] = {
+                        tp:0, jn:0, lv:0,
+                        tpP:0, tpC:0,
+                        abP:0, abC:0,
+                        leP:0, leC:0,
+                        laP:0, laC:0,
+                        eaP:0, eaC:0,
+                        acP:0, acC:0
+                    };
                 }
-                groupedStats[label].hours += otVal;
-                groupedStats[label].cost += costVal;
-                
-                if(otPctVal > 0) {
-                    groupedStats[label].pctSum += otPctVal;
-                    groupedStats[label].count += 1;
-                }
-                if(actStdVal > 0) {
-                    groupedStats[label].actStdSum += actStdVal;
-                    groupedStats[label].actStdCount += 1;
-                }
+
+                groupedStats[label].tp += vTP;
+                groupedStats[label].jn += vJoin;
+                groupedStats[label].lv += vLeav;
+
+                if (vTPPct > 0) { groupedStats[label].tpP += vTPPct; groupedStats[label].tpC++; }
+                if (vAbs > 0) { groupedStats[label].abP += vAbs; groupedStats[label].abC++; }
+                if (vLev > 0) { groupedStats[label].leP += vLev; groupedStats[label].leC++; }
+                if (vLat > 0) { groupedStats[label].laP += vLat; groupedStats[label].laC++; }
+                if (vEar > 0) { groupedStats[label].eaP += vEar; groupedStats[label].eaC++; }
+                if (vAct > 0) { groupedStats[label].acP += vAct; groupedStats[label].acC++; }
             });
 
-            // --- Update 9 Cards in UI ---
-            document.getElementById('valTPOTHours').innerText = formatNum(sumTPOT);
-            document.getElementById('valJoiners').innerText = formatNum(sumJoiners);
-            document.getElementById('valLeavers').innerText = formatNum(sumLeavers);
+            // Update Global Main Card Values
+            document.getElementById('valTPOTHours').innerText = formatNum(gSumTP);
+            document.getElementById('valJoiners').innerText = formatNum(gJoin);
+            document.getElementById('valLeavers').innerText = formatNum(gLeave);
 
-            document.getElementById('valTPOTPercent').innerText = countTPOTPct > 0 ? (sumTPOTPct / countTPOTPct).toFixed(2) + "%" : "0%";
-            document.getElementById('valAbsent').innerText = countAbsent > 0 ? (sumAbsent / countAbsent).toFixed(2) + "%" : "0%";
-            document.getElementById('valLeave').innerText = countLeave > 0 ? (sumLeave / countLeave).toFixed(2) + "%" : "0%";
-            document.getElementById('valLate').innerText = countLate > 0 ? (sumLate / countLate).toFixed(2) + "%" : "0%";
-            document.getElementById('valEarly').innerText = countEarly > 0 ? (sumEarly / countEarly).toFixed(2) + "%" : "0%";
-            document.getElementById('valActive').innerText = countActive > 0 ? (sumActive / countActive).toFixed(2) + "%" : "0%";
+            document.getElementById('valTPOTPercent').innerText = cTP > 0 ? (pTP / cTP).toFixed(2) + "%" : "0%";
+            document.getElementById('valAbsent').innerText = cAbs > 0 ? (pAbs / cAbs).toFixed(2) + "%" : "0%";
+            document.getElementById('valLeave').innerText = cLev > 0 ? (pLev / cLev).toFixed(2) + "%" : "0%";
+            document.getElementById('valLate').innerText = cLat > 0 ? (pLat / cLat).toFixed(2) + "%" : "0%";
+            document.getElementById('valEarly').innerText = cEar > 0 ? (pEar / cEar).toFixed(2) + "%" : "0%";
+            document.getElementById('valActive').innerText = cAct > 0 ? (pAct / cAct).toFixed(2) + "%" : "0%";
 
-            // --- Update Charts ---
-            let chartLabels = Object.keys(groupedStats);
-            let arrActStd = [], arrHours = [], arrCost = [], arrPct = [];
+            // Prepare Data for 9 Charts
+            let labels = Object.keys(groupedStats);
+            let dTP = [], dTPPct = [], dAbs = [], dLev = [], dLat = [], dEar = [], dAct = [], dJoin = [], dLeav = [];
 
-            chartLabels.forEach(label => {
-                arrHours.push(groupedStats[label].hours);
-                arrCost.push(groupedStats[label].cost);
-                
-                let avgGrpActStd = groupedStats[label].actStdCount > 0 ? (groupedStats[label].actStdSum / groupedStats[label].actStdCount) : 0;
-                arrActStd.push(avgGrpActStd);
+            labels.forEach(lbl => {
+                let s = groupedStats[lbl];
+                dTP.push(s.tp);
+                dJoin.push(s.jn);
+                dLeav.push(s.lv);
 
-                let avgGrpPct = groupedStats[label].count > 0 ? (groupedStats[label].pctSum / groupedStats[label].count) : 0;
-                arrPct.push(avgGrpPct);
+                dTPPct.push(s.tpC > 0 ? (s.tpP / s.tpC).toFixed(2) : 0);
+                dAbs.push(s.abC > 0 ? (s.abP / s.abC).toFixed(2) : 0);
+                dLev.push(s.leC > 0 ? (s.leP / s.leC).toFixed(2) : 0);
+                dLat.push(s.laC > 0 ? (s.laP / s.laC).toFixed(2) : 0);
+                dEar.push(s.eaC > 0 ? (s.eaP / s.eaC).toFixed(2) : 0);
+                dAct.push(s.acC > 0 ? (s.acP / s.acC).toFixed(2) : 0);
             });
 
-            chartInstanceActVsStd.data.labels = chartLabels;
-            chartInstanceActVsStd.data.datasets[0].data = arrActStd;
-            chartInstanceActVsStd.update();
+            // Update All 9 Chart Instances
+            function updateC(chartInst, lbs, dta) {
+                chartInst.data.labels = lbs;
+                chartInst.data.datasets[0].data = dta;
+                chartInst.update();
+            }
 
-            chartInstanceOTHours.data.labels = chartLabels;
-            chartInstanceOTHours.data.datasets[0].data = arrHours;
-            chartInstanceOTHours.update();
-
-            chartInstanceOTCost.data.labels = chartLabels;
-            chartInstanceOTCost.data.datasets[0].data = arrCost;
-            chartInstanceOTCost.update();
-
-            chartInstanceOTPercent.data.labels = chartLabels;
-            chartInstanceOTPercent.data.datasets[0].data = arrPct;
-            chartInstanceOTPercent.update();
+            updateC(charts.tpotHours, labels, dTP);
+            updateC(charts.tpotPct, labels, dTPPct);
+            updateC(charts.absent, labels, dAbs);
+            updateC(charts.leave, labels, dLev);
+            updateC(charts.late, labels, dLat);
+            updateC(charts.early, labels, dEar);
+            updateC(charts.active, labels, dAct);
+            updateC(charts.joiners, labels, dJoin);
+            updateC(charts.leavers, labels, dLeav);
         }
 
+        // Event Listeners
         document.getElementById('filterDept').addEventListener('change', () => {
             updateSectionDropdown(); 
             updateDashboard();       
