@@ -122,22 +122,22 @@
         /* Minimal & Smaller Stats Cards */
         .stats-container {
             display: flex;
-            gap: 15px; /* Reduced gap */
+            gap: 15px; 
             margin-bottom: 25px;
             flex-wrap: wrap;
         }
 
         .card {
             background: var(--surface);
-            padding: 12px 15px; /* Reduced padding for smaller size */
+            padding: 12px 15px; 
             border-radius: 10px;
             box-shadow: 0 1px 3px rgba(60,64,67,0.1), 0 1px 2px rgba(60,64,67,0.06);
             display: flex;
             flex-direction: column;
             justify-content: center;
-            min-width: 160px; /* Reduced minimum width */
+            min-width: 160px; 
             flex: 1;
-            border-top: 3px solid var(--border-color); /* Thinner top border */
+            border-top: 3px solid var(--border-color); 
         }
 
         /* 4 Google Colors for 4 Cards */
@@ -147,8 +147,8 @@
         .card:nth-child(4) { border-top-color: var(--google-green); }
 
         .card h3 {
-            margin: 0 0 5px 0; /* Reduced bottom margin */
-            font-size: 0.75rem; /* Smaller heading font */
+            margin: 0 0 5px 0; 
+            font-size: 0.75rem; 
             color: var(--text-muted);
             font-weight: 500;
             text-transform: uppercase;
@@ -156,8 +156,8 @@
         }
 
         .card .value {
-            font-size: 1.4rem; /* Smaller numbers */
-            font-weight: 500; /* Adjusted weight to match smaller size */
+            font-size: 1.4rem; 
+            font-weight: 500; 
             color: var(--text-main);
             margin: 0;
         }
@@ -381,22 +381,55 @@
             });
         }
 
+        // New function to handle Dynamic Section Dropdown
+        function updateSectionDropdown() {
+            const selectedDept = document.getElementById('filterDept').value;
+            const deptCol = findColumn(sheetData[0], ['department', 'dept']);
+            const sectionCol = findColumn(sheetData[0], ['section', 'sec']);
+
+            if (!sectionCol) return;
+
+            const sections = new Set();
+            sheetData.forEach(row => {
+                // If Department is "All" or matches the row's department, add its sections
+                if (selectedDept === "All" || row[deptCol] === selectedDept) {
+                    if (row[sectionCol]) sections.add(row[sectionCol]);
+                }
+            });
+
+            const sectionSelect = document.getElementById('filterSection');
+            const currentSelection = sectionSelect.value; // Save current choice
+
+            sectionSelect.innerHTML = `<option value="All">All Sections</option>`;
+            
+            sections.forEach(val => {
+                let opt = document.createElement('option');
+                opt.value = val;
+                opt.innerHTML = val;
+                sectionSelect.appendChild(opt);
+            });
+
+            // Keep the previous selection if it still exists in the new list
+            if (sections.has(currentSelection)) {
+                sectionSelect.value = currentSelection;
+            } else {
+                sectionSelect.value = "All";
+            }
+        }
+
         function populateDropdowns() {
             const yearCol = findColumn(sheetData[0], ['year', 'saal']);
             const monthCol = findColumn(sheetData[0], ['month', 'mahina']);
             const deptCol = findColumn(sheetData[0], ['department', 'dept']);
-            const sectionCol = findColumn(sheetData[0], ['section', 'sec']);
 
             const years = new Set();
             const months = new Set();
             const depts = new Set();
-            const sections = new Set();
 
             sheetData.forEach(row => {
                 if (yearCol && row[yearCol]) years.add(row[yearCol]);
                 if (monthCol && row[monthCol]) months.add(row[monthCol]);
                 if (deptCol && row[deptCol]) depts.add(row[deptCol]);
-                if (sectionCol && row[sectionCol]) sections.add(row[sectionCol]);
             });
 
             const addOptions = (setId, dataSet) => {
@@ -414,7 +447,9 @@
             addOptions('filterYear', years);
             addOptions('filterMonth', months);
             addOptions('filterDept', depts);
-            addOptions('filterSection', sections);
+            
+            // Populate Sections dynamically based on default Department (which is "All")
+            updateSectionDropdown();
         }
 
         async function fetchGoogleSheetData() {
@@ -561,12 +596,21 @@
             chartInstanceOTPercent.update();
         }
 
-        document.querySelectorAll('select').forEach(select => {
-            select.addEventListener('change', updateDashboard);
+        // --- UPDATED EVENT LISTENERS ---
+        document.getElementById('filterDept').addEventListener('change', () => {
+            updateSectionDropdown(); // Update sections first based on new Dept
+            updateDashboard();       // Then update charts
         });
 
+        // Other filters directly update the dashboard
+        document.getElementById('filterYear').addEventListener('change', updateDashboard);
+        document.getElementById('filterMonth').addEventListener('change', updateDashboard);
+        document.getElementById('filterSection').addEventListener('change', updateDashboard);
+
+        // Clear Filters Logic
         document.getElementById('clearFiltersBtn').addEventListener('click', () => {
             document.querySelectorAll('select').forEach(select => select.value = 'All');
+            updateSectionDropdown(); // Reset sections to show all
             updateDashboard(); 
         });
 
