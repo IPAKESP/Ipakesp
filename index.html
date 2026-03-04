@@ -400,4 +400,84 @@
 
             // Target Specific Data Columns
             const otHoursCol = findColumn(sheetData[0], ['overtime hours', 'total ot hours']);
-            const otCostCol = findColumn(
+            const otCostCol = findColumn(sheetData[0], ['ot cost', 'overtime cost']);
+            const otPercentCol = findColumn(sheetData[0], ['ot%', 'ot %', 'overtime %']);
+            
+            // For charting, group by Section first, then Dept, or Month
+            const groupByCol = sectionCol || deptCol || monthCol || headers[0]; 
+
+            // Temporary object to sum/average data by the grouped label
+            let groupedStats = {};
+            let totalOT = 0, totalCost = 0, totalPct = 0, pctCount = 0;
+
+            filteredData.forEach(item => {
+                let label = item[groupByCol] || "Unknown";
+                let otVal = cleanNumber(item[otHoursCol]);
+                let costVal = cleanNumber(item[otCostCol]);
+                let pctVal = cleanNumber(item[otPercentCol]);
+
+                // Totals for top cards
+                totalOT += otVal;
+                totalCost += costVal;
+                if (pctVal > 0) { totalPct += pctVal; pctCount++; }
+
+                // Grouping for charts
+                if (!groupedStats[label]) {
+                    groupedStats[label] = { hours: 0, cost: 0, pctSum: 0, count: 0 };
+                }
+                groupedStats[label].hours += otVal;
+                groupedStats[label].cost += costVal;
+                if(pctVal > 0) {
+                    groupedStats[label].pctSum += pctVal;
+                    groupedStats[label].count += 1;
+                }
+            });
+
+            // Update 3 Minimal Boxes
+            document.getElementById('valOTHours').innerText = formatNum(totalOT) + " Hrs";
+            document.getElementById('valOTCost').innerText = "Rs " + formatNum(totalCost); // Add Rs or $ if needed
+            let avgPct = pctCount > 0 ? (totalPct / pctCount).toFixed(2) : 0;
+            document.getElementById('valOTPercent').innerText = avgPct + "%";
+
+            // Prepare Chart Arrays
+            let chartLabels = Object.keys(groupedStats);
+            let arrHours = [];
+            let arrCost = [];
+            let arrPct = [];
+
+            chartLabels.forEach(label => {
+                arrHours.push(groupedStats[label].hours);
+                arrCost.push(groupedStats[label].cost);
+                let avgGrpPct = groupedStats[label].count > 0 ? (groupedStats[label].pctSum / groupedStats[label].count) : 0;
+                arrPct.push(avgGrpPct);
+            });
+
+            // Update Chart 1: OT Hours
+            chartInstanceOTHours.data.labels = chartLabels;
+            chartInstanceOTHours.data.datasets[0].data = arrHours;
+            chartInstanceOTHours.update();
+
+            // Update Chart 2: OT Cost
+            chartInstanceOTCost.data.labels = chartLabels;
+            chartInstanceOTCost.data.datasets[0].data = arrCost;
+            chartInstanceOTCost.update();
+
+            // Update Chart 3: OT Percent
+            chartInstanceOTPercent.data.labels = chartLabels;
+            chartInstanceOTPercent.data.datasets[0].data = arrPct;
+            chartInstanceOTPercent.update();
+        }
+
+        // Add Event Listeners
+        document.querySelectorAll('select').forEach(select => {
+            select.addEventListener('change', updateDashboard);
+        });
+
+        // Start App
+        window.onload = () => {
+            initCharts();
+            fetchGoogleSheetData();
+        };
+    </script>
+</body>
+</html>
