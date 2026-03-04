@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Overtime Dashboard</title>
+    <title>Overtime Dashboard with Animated Charts</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { margin: 0; display: flex; height: 100vh; background-color: #f4f7f6; }
@@ -18,62 +22,39 @@
         
         /* Main Content Styling */
         .main-content { flex: 1; padding: 30px; overflow-y: auto; }
-        .main-content h1 { color: #333; margin-top: 0; }
+        .main-content h1 { color: #333; margin-top: 0; text-align: center; margin-bottom: 30px;}
         
-        /* KPI Cards */
-        .dashboard-cards { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
-        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); flex: 1; min-width: 250px; text-align: center; border-top: 4px solid #3498db; }
-        .card.percent { border-top-color: #e74c3c; }
-        .card h3 { margin: 0 0 15px 0; color: #7f8c8d; font-size: 16px; text-transform: uppercase; }
-        .card .value { font-size: 2.5em; color: #2c3e50; font-weight: bold; }
+        /* Charts Container */
+        .charts-wrapper { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }
+        .chart-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); flex: 1; min-width: 300px; max-width: 600px; }
+        .chart-card h3 { text-align: center; color: #7f8c8d; margin-top: 0; }
+        
+        /* Chart Canvas Resize constraints */
+        canvas { max-height: 350px; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
         <h2>Filters</h2>
-        
-        <div class="filter-group">
-            <label for="yearDropdown">Select Year</label>
-            <select id="yearDropdown">
-                <option value="All">All Years</option>
-            </select>
-        </div>
-        
-        <div class="filter-group">
-            <label for="monthDropdown">Select Month</label>
-            <select id="monthDropdown">
-                <option value="All">All Months</option>
-            </select>
-        </div>
-
-        <div class="filter-group">
-            <label for="departmentDropdown">Select Department</label>
-            <select id="departmentDropdown">
-                <option value="All">All Departments</option>
-            </select>
-        </div>
-        
-        <div class="filter-group">
-            <label for="sectionDropdown">Select Section</label>
-            <select id="sectionDropdown">
-                <option value="All">All Sections</option>
-            </select>
-        </div>
+        <div class="filter-group"><label>Select Year</label><select id="yearDropdown"><option value="All">All Years</option></select></div>
+        <div class="filter-group"><label>Select Month</label><select id="monthDropdown"><option value="All">All Months</option></select></div>
+        <div class="filter-group"><label>Select Department</label><select id="departmentDropdown"><option value="All">All Departments</option></select></div>
+        <div class="filter-group"><label>Select Section</label><select id="sectionDropdown"><option value="All">All Sections</option></select></div>
     </div>
 
     <div class="main-content">
         <h1>Employee Overtime Dashboard</h1>
         
-        <div class="dashboard-cards">
-            <div class="card">
-                <h3>Total Overtime (Hours)</h3>
-                <div class="value" id="otHoursDisplay">0</div>
+        <div class="charts-wrapper">
+            <div class="chart-card">
+                <h3>Schedule vs Overtime Hours</h3>
+                <canvas id="hoursChart"></canvas>
             </div>
             
-            <div class="card percent">
+            <div class="chart-card">
                 <h3>Overtime Percentage</h3>
-                <div class="value" id="otPercentDisplay">0%</div>
+                <canvas id="percentChart"></canvas>
             </div>
         </div>
     </div>
@@ -81,8 +62,11 @@
     <script>
         const sheetCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?output=csv'; 
         let dashboardData = [];
+        
+        // Chart variables
+        let hoursBarChart = null;
+        let percentBarChart = null;
 
-        // Fetch data from Google Sheets
         Papa.parse(sheetCSVUrl, {
             download: true,
             header: true,
@@ -90,31 +74,23 @@
             complete: function(results) {
                 dashboardData = results.data;
                 initializeDashboard();
-            },
-            error: function(error) {
-                console.error("Error fetching data:", error);
-                alert("Data load nahi ho saka.");
             }
         });
 
         function initializeDashboard() {
             populateDropdowns();
+            initCharts(); // Charts ko pehli dafa draw karne ke liye
             calculateMetrics();
 
-            // Event Listeners for all dropdowns
-            document.getElementById('yearDropdown').addEventListener('change', calculateMetrics);
-            document.getElementById('monthDropdown').addEventListener('change', calculateMetrics);
-            document.getElementById('departmentDropdown').addEventListener('change', calculateMetrics);
-            document.getElementById('sectionDropdown').addEventListener('change', calculateMetrics);
+            // Event Listeners
+            ['yearDropdown', 'monthDropdown', 'departmentDropdown', 'sectionDropdown'].forEach(id => {
+                document.getElementById(id).addEventListener('change', calculateMetrics);
+            });
         }
 
         function populateDropdowns() {
-            let years = new Set();
-            let months = new Set();
-            let departments = new Set();
-            let sections = new Set();
+            let years = new Set(), months = new Set(), departments = new Set(), sections = new Set();
 
-            // Extract unique values from data
             dashboardData.forEach(row => {
                 if(row.Year) years.add(row.Year.trim());
                 if(row.Month) months.add(row.Month.trim());
@@ -122,21 +98,55 @@
                 if(row.Section) sections.add(row.Section.trim());
             });
 
-            // Populate Year
-            const yearDropdown = document.getElementById('yearDropdown');
-            years.forEach(year => yearDropdown.add(new Option(year, year)));
+            const addOptions = (set, elementId) => {
+                const dropdown = document.getElementById(elementId);
+                set.forEach(item => dropdown.add(new Option(item, item)));
+            };
 
-            // Populate Month
-            const monthDropdown = document.getElementById('monthDropdown');
-            months.forEach(month => monthDropdown.add(new Option(month, month)));
+            addOptions(years, 'yearDropdown');
+            addOptions(months, 'monthDropdown');
+            addOptions(departments, 'departmentDropdown');
+            addOptions(sections, 'sectionDropdown');
+        }
 
-            // Populate Department
-            const deptDropdown = document.getElementById('departmentDropdown');
-            departments.forEach(dept => deptDropdown.add(new Option(dept, dept)));
+        // Initialize empty charts
+        function initCharts() {
+            const ctxHours = document.getElementById('hoursChart').getContext('2d');
+            const ctxPercent = document.getElementById('percentChart').getContext('2d');
 
-            // Populate Section
-            const sectionDropdown = document.getElementById('sectionDropdown');
-            sections.forEach(sec => sectionDropdown.add(new Option(sec, sec)));
+            // Setup for Hours Chart
+            hoursBarChart = new Chart(ctxHours, {
+                type: 'bar',
+                data: {
+                    labels: ['Schedule Hours', 'Overtime Hours'],
+                    datasets: [{
+                        label: 'Total Hours',
+                        data: [0, 0],
+                        backgroundColor: ['#3498db', '#e67e22'], // Blue and Orange
+                        borderRadius: 6
+                    }]
+                },
+                options: { responsive: true, animation: { duration: 1000, easing: 'easeOutQuart' } }
+            });
+
+            // Setup for Percentage Chart
+            percentBarChart = new Chart(ctxPercent, {
+                type: 'bar',
+                data: {
+                    labels: ['Overtime %'],
+                    datasets: [{
+                        label: 'Percentage',
+                        data: [0],
+                        backgroundColor: ['#e74c3c'], // Red
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    animation: { duration: 1000, easing: 'easeOutQuart' },
+                    scales: { y: { beginAtZero: true, max: 100 } } // Y-axis 0 se 100 tak fix kar di hai
+                }
+            });
         }
 
         function calculateMetrics() {
@@ -149,34 +159,33 @@
             let totalScheduleHours = 0;
 
             dashboardData.forEach(row => {
-                // Logical Check: Agar "All" select hai, ya phir exact value match ho rahi hai
                 let matchYear = (selectedYear === "All" || row.Year === selectedYear);
                 let matchMonth = (selectedMonth === "All" || row.Month === selectedMonth);
                 let matchDept = (selectedDept === "All" || row.Department === selectedDept);
                 let matchSection = (selectedSection === "All" || row.Section === selectedSection);
 
-                // Agar sab conditions true hain, toh hi calculation mein add karo (Accumulated logic)
                 if (matchYear && matchMonth && matchDept && matchSection) {
-                    
-                    // Column names match karna zaroori hai Google Sheet ke headings ke sath
                     let otHours = parseFloat(row['Overtime Hours']) || 0;
                     let scheduleHours = parseFloat(row['Schedule Hours']) || 0; 
-
                     totalOvertimeHours += otHours;
                     totalScheduleHours += scheduleHours;
                 }
             });
 
-            // Calculate Overtime Percentage based on your formula
-            // (Total Overtime Hours / Total Schedule Hours) * 100
-            let otPercentage = 0;
-            if (totalScheduleHours > 0) {
-                otPercentage = (totalOvertimeHours / totalScheduleHours) * 100;
-            }
+            let otPercentage = totalScheduleHours > 0 ? (totalOvertimeHours / totalScheduleHours) * 100 : 0;
 
-            // Update UI
-            document.getElementById('otHoursDisplay').innerText = totalOvertimeHours.toFixed(2);
-            document.getElementById('otPercentDisplay').innerText = otPercentage.toFixed(2) + "%";
+            // Update Chart Animations dynamically
+            updateChartData(totalScheduleHours, totalOvertimeHours, otPercentage);
+        }
+
+        function updateChartData(schedule, overtime, percentage) {
+            // Update Hours Chart
+            hoursBarChart.data.datasets[0].data = [schedule.toFixed(2), overtime.toFixed(2)];
+            hoursBarChart.update();
+
+            // Update Percentage Chart
+            percentBarChart.data.datasets[0].data = [percentage.toFixed(2)];
+            percentBarChart.update();
         }
     </script>
 </body>
