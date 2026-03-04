@@ -119,12 +119,12 @@
             font-weight: 400;
         }
 
-        /* Minimal & Smaller Stats Cards */
+        /* Minimal Stats Cards Grid */
         .stats-container {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 15px; 
             margin-bottom: 25px;
-            flex-wrap: wrap;
         }
 
         .card {
@@ -135,20 +135,18 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            min-width: 160px; 
-            flex: 1;
             border-top: 3px solid var(--border-color); 
         }
 
-        /* 4 Google Colors for 4 Cards */
-        .card:nth-child(1) { border-top-color: var(--google-blue); }
-        .card:nth-child(2) { border-top-color: var(--google-red); }
-        .card:nth-child(3) { border-top-color: var(--google-yellow); }
-        .card:nth-child(4) { border-top-color: var(--google-green); }
+        /* Cyclic Google Colors for 9 Cards */
+        .card:nth-child(4n+1) { border-top-color: var(--google-blue); }
+        .card:nth-child(4n+2) { border-top-color: var(--google-red); }
+        .card:nth-child(4n+3) { border-top-color: var(--google-yellow); }
+        .card:nth-child(4n+4) { border-top-color: var(--google-green); }
 
         .card h3 {
             margin: 0 0 5px 0; 
-            font-size: 0.75rem; 
+            font-size: 0.70rem; 
             color: var(--text-muted);
             font-weight: 500;
             text-transform: uppercase;
@@ -156,7 +154,7 @@
         }
 
         .card .value {
-            font-size: 1.4rem; 
+            font-size: 1.3rem; 
             font-weight: 500; 
             color: var(--text-main);
             margin: 0;
@@ -238,20 +236,40 @@
 
         <div class="stats-container" id="dashboardContent" style="display: none;">
             <div class="card">
-                <h3>Act vs Std Hrs %</h3>
-                <div class="value" id="valActVsStdPercent">...</div>
+                <h3>TP Total OT Hrs</h3>
+                <div class="value" id="valTPOTHours">...</div>
             </div>
             <div class="card">
-                <h3>Total OT Hours</h3>
-                <div class="value" id="valOTHours">...</div>
+                <h3>TP OT %</h3>
+                <div class="value" id="valTPOTPercent">...</div>
             </div>
             <div class="card">
-                <h3>Total OT Cost</h3>
-                <div class="value" id="valOTCost">...</div>
+                <h3>Absenteeism %</h3>
+                <div class="value" id="valAbsent">...</div>
             </div>
             <div class="card">
-                <h3>Average OT %</h3>
-                <div class="value" id="valOTPercent">...</div>
+                <h3>Leaves %</h3>
+                <div class="value" id="valLeave">...</div>
+            </div>
+            <div class="card">
+                <h3>Late Arrival %</h3>
+                <div class="value" id="valLate">...</div>
+            </div>
+            <div class="card">
+                <h3>Early Out %</h3>
+                <div class="value" id="valEarly">...</div>
+            </div>
+            <div class="card">
+                <h3>Active Emp %</h3>
+                <div class="value" id="valActive">...</div>
+            </div>
+            <div class="card">
+                <h3>Joiners</h3>
+                <div class="value" id="valJoiners">...</div>
+            </div>
+            <div class="card">
+                <h3>Leavers</h3>
+                <div class="value" id="valLeavers">...</div>
             </div>
         </div>
 
@@ -381,7 +399,6 @@
             });
         }
 
-        // New function to handle Dynamic Section Dropdown
         function updateSectionDropdown() {
             const selectedDept = document.getElementById('filterDept').value;
             const deptCol = findColumn(sheetData[0], ['department', 'dept']);
@@ -391,14 +408,13 @@
 
             const sections = new Set();
             sheetData.forEach(row => {
-                // If Department is "All" or matches the row's department, add its sections
                 if (selectedDept === "All" || row[deptCol] === selectedDept) {
                     if (row[sectionCol]) sections.add(row[sectionCol]);
                 }
             });
 
             const sectionSelect = document.getElementById('filterSection');
-            const currentSelection = sectionSelect.value; // Save current choice
+            const currentSelection = sectionSelect.value;
 
             sectionSelect.innerHTML = `<option value="All">All Sections</option>`;
             
@@ -409,7 +425,6 @@
                 sectionSelect.appendChild(opt);
             });
 
-            // Keep the previous selection if it still exists in the new list
             if (sections.has(currentSelection)) {
                 sectionSelect.value = currentSelection;
             } else {
@@ -448,7 +463,6 @@
             addOptions('filterMonth', months);
             addOptions('filterDept', depts);
             
-            // Populate Sections dynamically based on default Department (which is "All")
             updateSectionDropdown();
         }
 
@@ -471,7 +485,7 @@
                 sheetData = sheetData.filter(row => Object.values(row).some(x => x !== ""));
 
                 document.getElementById('loadingMsg').style.display = 'none';
-                document.getElementById('dashboardContent').style.display = 'flex';
+                document.getElementById('dashboardContent').style.display = 'grid'; // Changed to grid for better 9-card layout
                 document.getElementById('chartsContent').style.display = 'grid';
 
                 populateDropdowns();
@@ -490,6 +504,7 @@
             const selectedDept = document.getElementById('filterDept').value;
             const selectedSection = document.getElementById('filterSection').value;
 
+            // Dimensions
             const companyCol = findColumn(sheetData[0], ['company', 'unit', 'plant', 'factory']);
             const yearCol = findColumn(sheetData[0], ['year']);
             const monthCol = findColumn(sheetData[0], ['month']);
@@ -505,6 +520,18 @@
                 return match;
             });
 
+            // --- 9 KPI Columns ---
+            const tpOTHoursCol = findColumn(sheetData[0], ['tp total ot hours', 'tp ot hour', 'tp ot hrs']);
+            const tpOTPctCol = findColumn(sheetData[0], ['tp ot%', 'tp ot %']);
+            const absentCol = findColumn(sheetData[0], ['absenteeism', 'absent']);
+            const leaveCol = findColumn(sheetData[0], ['leaves', 'leave %']);
+            const lateCol = findColumn(sheetData[0], ['late arrival', 'late']);
+            const earlyCol = findColumn(sheetData[0], ['early out', 'early']);
+            const activeEmpCol = findColumn(sheetData[0], ['active employee', 'active %']);
+            const joinersCol = findColumn(sheetData[0], ['joiners', 'join']);
+            const leaversCol = findColumn(sheetData[0], ['leavers', 'leave count']);
+
+            // --- Old Chart Columns (kept intact) ---
             const actVsStdCol = findColumn(sheetData[0], ['actual vs standard', 'actual vs std']);
             const otHoursCol = findColumn(sheetData[0], ['overtime hours', 'total ot hours']);
             const otCostCol = findColumn(sheetData[0], ['ot cost', 'overtime cost']);
@@ -515,28 +542,54 @@
             if (selectedDept !== "All" && sectionCol) {
                 groupByCol = sectionCol;
             }
-            
             if (selectedSection !== "All" && monthCol) {
                 groupByCol = monthCol;
             }
 
+            // --- Aggregation Variables ---
+            // 9 Cards
+            let sumTPOT = 0, sumJoiners = 0, sumLeavers = 0;
+            let sumTPOTPct = 0, countTPOTPct = 0;
+            let sumAbsent = 0, countAbsent = 0;
+            let sumLeave = 0, countLeave = 0;
+            let sumLate = 0, countLate = 0;
+            let sumEarly = 0, countEarly = 0;
+            let sumActive = 0, countActive = 0;
+
+            // Chart Grouping
             let groupedStats = {};
-            let totalOT = 0, totalCost = 0;
-            let totalOTPct = 0, countOTPct = 0;
-            let totalActStdPct = 0, countActStdPct = 0;
 
             filteredData.forEach(item => {
                 let label = item[groupByCol] || "Unknown";
-                
+
+                // Read 9 KPI values
+                let valTPOT = cleanNumber(item[tpOTHoursCol]);
+                let valTPOTPct = cleanNumber(item[tpOTPctCol]);
+                let valAbsent = cleanNumber(item[absentCol]);
+                let valLeave = cleanNumber(item[leaveCol]);
+                let valLate = cleanNumber(item[lateCol]);
+                let valEarly = cleanNumber(item[earlyCol]);
+                let valActive = cleanNumber(item[activeEmpCol]);
+                let valJoiners = cleanNumber(item[joinersCol]);
+                let valLeavers = cleanNumber(item[leaversCol]);
+
+                // Calculate Totals / Counts for 9 Cards
+                sumTPOT += valTPOT;
+                sumJoiners += valJoiners;
+                sumLeavers += valLeavers;
+
+                if (valTPOTPct > 0) { sumTPOTPct += valTPOTPct; countTPOTPct++; }
+                if (valAbsent > 0) { sumAbsent += valAbsent; countAbsent++; }
+                if (valLeave > 0) { sumLeave += valLeave; countLeave++; }
+                if (valLate > 0) { sumLate += valLate; countLate++; }
+                if (valEarly > 0) { sumEarly += valEarly; countEarly++; }
+                if (valActive > 0) { sumActive += valActive; countActive++; }
+
+                // --- Old Chart logic intact ---
                 let actStdVal = cleanNumber(item[actVsStdCol]);
                 let otVal = cleanNumber(item[otHoursCol]);
                 let costVal = cleanNumber(item[otCostCol]);
                 let otPctVal = cleanNumber(item[otPercentCol]);
-
-                totalOT += otVal;
-                totalCost += costVal;
-                if (otPctVal > 0) { totalOTPct += otPctVal; countOTPct++; }
-                if (actStdVal > 0) { totalActStdPct += actStdVal; countActStdPct++; }
 
                 if (!groupedStats[label]) {
                     groupedStats[label] = { hours: 0, cost: 0, pctSum: 0, count: 0, actStdSum: 0, actStdCount: 0 };
@@ -548,25 +601,27 @@
                     groupedStats[label].pctSum += otPctVal;
                     groupedStats[label].count += 1;
                 }
-                
                 if(actStdVal > 0) {
                     groupedStats[label].actStdSum += actStdVal;
                     groupedStats[label].actStdCount += 1;
                 }
             });
 
-            let avgActStdPct = countActStdPct > 0 ? (totalActStdPct / countActStdPct).toFixed(2) : 0;
-            document.getElementById('valActVsStdPercent').innerText = avgActStdPct + "%";
-            document.getElementById('valOTHours').innerText = formatNum(totalOT);
-            document.getElementById('valOTCost').innerText = "Rs " + formatNum(totalCost); 
-            let avgOTPct = countOTPct > 0 ? (totalOTPct / countOTPct).toFixed(2) : 0;
-            document.getElementById('valOTPercent').innerText = avgOTPct + "%";
+            // --- Update 9 Cards in UI ---
+            document.getElementById('valTPOTHours').innerText = formatNum(sumTPOT);
+            document.getElementById('valJoiners').innerText = formatNum(sumJoiners);
+            document.getElementById('valLeavers').innerText = formatNum(sumLeavers);
 
+            document.getElementById('valTPOTPercent').innerText = countTPOTPct > 0 ? (sumTPOTPct / countTPOTPct).toFixed(2) + "%" : "0%";
+            document.getElementById('valAbsent').innerText = countAbsent > 0 ? (sumAbsent / countAbsent).toFixed(2) + "%" : "0%";
+            document.getElementById('valLeave').innerText = countLeave > 0 ? (sumLeave / countLeave).toFixed(2) + "%" : "0%";
+            document.getElementById('valLate').innerText = countLate > 0 ? (sumLate / countLate).toFixed(2) + "%" : "0%";
+            document.getElementById('valEarly').innerText = countEarly > 0 ? (sumEarly / countEarly).toFixed(2) + "%" : "0%";
+            document.getElementById('valActive').innerText = countActive > 0 ? (sumActive / countActive).toFixed(2) + "%" : "0%";
+
+            // --- Update Charts ---
             let chartLabels = Object.keys(groupedStats);
-            let arrActStd = [];
-            let arrHours = [];
-            let arrCost = [];
-            let arrPct = [];
+            let arrActStd = [], arrHours = [], arrCost = [], arrPct = [];
 
             chartLabels.forEach(label => {
                 arrHours.push(groupedStats[label].hours);
@@ -596,21 +651,18 @@
             chartInstanceOTPercent.update();
         }
 
-        // --- UPDATED EVENT LISTENERS ---
         document.getElementById('filterDept').addEventListener('change', () => {
-            updateSectionDropdown(); // Update sections first based on new Dept
-            updateDashboard();       // Then update charts
+            updateSectionDropdown(); 
+            updateDashboard();       
         });
 
-        // Other filters directly update the dashboard
         document.getElementById('filterYear').addEventListener('change', updateDashboard);
         document.getElementById('filterMonth').addEventListener('change', updateDashboard);
         document.getElementById('filterSection').addEventListener('change', updateDashboard);
 
-        // Clear Filters Logic
         document.getElementById('clearFiltersBtn').addEventListener('click', () => {
             document.querySelectorAll('select').forEach(select => select.value = 'All');
-            updateSectionDropdown(); // Reset sections to show all
+            updateSectionDropdown(); 
             updateDashboard(); 
         });
 
