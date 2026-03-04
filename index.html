@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Corporate Dashboard</title>
+    <title>IPAK Corporate Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -112,16 +112,119 @@
         /* Main Content Area */
         .main-content {
             margin-left: 300px;
-            padding: 30px 40px;
+            padding: 25px 40px;
             width: calc(100% - 340px);
         }
 
-        header h1 {
+        /* ---------------------------------
+           NEW TOP HEADER STYLES
+        --------------------------------- */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            height: 45px; /* Adjust as needed */
+            width: auto;
+            object-fit: contain;
+        }
+
+        .header-left h1 {
             color: var(--text-main);
-            margin-top: 0;
-            margin-bottom: 25px;
-            font-size: 1.6rem;
-            font-weight: 400;
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Share Button & Popup */
+        .share-container {
+            position: relative;
+        }
+
+        .share-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--google-blue);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-family: 'Roboto', sans-serif;
+            box-shadow: 0 2px 4px rgba(66, 133, 244, 0.3);
+        }
+
+        .share-btn:hover {
+            background: #3367d6;
+        }
+
+        .share-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .share-popup {
+            position: absolute;
+            top: 110%;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            min-width: 180px;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .share-popup.show {
+            display: flex;
+        }
+
+        .share-popup button {
+            background: none;
+            border: none;
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            cursor: pointer;
+            font-family: 'Roboto', sans-serif;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .share-popup button:hover {
+            background: var(--bg-light);
+        }
+
+        .share-popup button:not(:last-child) {
+            border-bottom: 1px solid var(--border-color);
         }
 
         /* Unified Card & Graph Widget Grid */
@@ -187,6 +290,54 @@
             transform: translate(-50%, -50%);
             z-index: 10;
         }
+
+        /* ---------------------------------
+           A4 PRINT / DOWNLOAD LOGIC
+        --------------------------------- */
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 10mm;
+            }
+            body {
+                background-color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            /* Hide Sidebar & Share Buttons */
+            .sidebar, .share-container, #loadingMsg {
+                display: none !important;
+            }
+            /* Expand Main Content */
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+                padding: 0 !important;
+            }
+            /* Adjust Top Header for Print */
+            .top-header {
+                margin-bottom: 15px !important;
+                padding-bottom: 10px !important;
+                border-bottom: 2px solid #000;
+            }
+            /* Adjust Grid to fit A4 Landscape (4 columns) */
+            .dashboard-grid {
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 10px !important;
+            }
+            .kpi-widget {
+                page-break-inside: avoid;
+                box-shadow: none !important;
+                border: 1px solid var(--border-color);
+                padding: 10px 15px 5px 15px !important;
+            }
+            .kpi-value {
+                font-size: 1.2rem !important;
+            }
+            .chart-wrapper {
+                height: 100px !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -213,8 +364,26 @@
     </div>
 
     <div class="main-content">
-        <header>
-            <h1>HR OPERATIONS</h1>
+        
+        <header class="top-header">
+            <div class="header-left">
+                <img src="Logo.png" alt="IPAK Logo" class="logo" onerror="this.style.display='none'">
+                <h1>IPAK Corporate Dashboard</h1>
+            </div>
+            
+            <div class="header-right">
+                <div class="share-container">
+                    <button class="share-btn" id="shareBtn">
+                        <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8m-4-6l-4-4m0 0L8 6m4-4v16"></path></svg>
+                        Share
+                    </button>
+                    
+                    <div class="share-popup" id="sharePopup">
+                        <button id="downloadBtn">📄 Download PDF</button>
+                        <button id="printBtn">🖨️ Print (A4)</button>
+                    </div>
+                </div>
+            </div>
         </header>
 
         <div id="loadingMsg">Fetching live data...</div>
@@ -224,7 +393,7 @@
             <div class="kpi-widget">
                 <div class="kpi-header">
                     <div class="kpi-title">
-                        <h3>Act vs Std Hours %</h3>
+                        <h3>Actual vs Standard Hours %</h3>
                         <div class="kpi-value" id="valActVsStd">...</div>
                     </div>
                 </div>
@@ -369,8 +538,6 @@
 
         let sheetData = [];
         let headers = [];
-
-        // Store Chart Instances
         const charts = {};
 
         // Colors
@@ -421,7 +588,6 @@
             return num.toLocaleString('en-US', { maximumFractionDigits: 1 });
         }
 
-        // Helper function to create charts
         function createChart(canvasId, type, colorLine, colorBg) {
             const ctx = document.getElementById(canvasId).getContext('2d');
             return new Chart(ctx, {
@@ -465,8 +631,6 @@
         }
 
         function initCharts() {
-            // Colors exactly sync with CSS nth-child logic (Blue, Red, Yellow, Green cycle)
-            
             charts.actStd = createChart('chartActVsStd', 'line', G_BLUE, BG_BLUE);       // 1. Blue
             charts.otHours = createChart('chartOTHours', 'bar', G_RED, BG_RED);          // 2. Red
             charts.otCost = createChart('chartOTCost', 'bar', G_YELLOW, BG_YELLOW);      // 3. Yellow
@@ -589,7 +753,6 @@
             const selectedDept = document.getElementById('filterDept').value;
             const selectedSection = document.getElementById('filterSection').value;
 
-            // Dimensions
             const companyCol = findColumn(sheetData[0], ['company', 'unit', 'plant', 'factory']);
             const yearCol = findColumn(sheetData[0], ['year']);
             const monthCol = findColumn(sheetData[0], ['month']);
@@ -621,7 +784,6 @@
             const leaversCol = findColumn(sheetData[0], ['leavers', 'leave count']);
             const pendingCol = findColumn(sheetData[0], ['pending final settlement', 'pending settlement', 'settlement']);
 
-            // Drilldown Logic
             let groupByCol = companyCol || deptCol || headers[0]; 
             if (selectedDept !== "All" && sectionCol) groupByCol = sectionCol;
             if (selectedSection !== "All" && monthCol) groupByCol = monthCol;
@@ -656,7 +818,6 @@
                 let vLeav = cleanNumber(item[leaversCol]);
                 let vPend = cleanNumber(item[pendingCol]);
 
-                // Update Globals
                 gOtHours += vOtHrs; gOtCost += vOtCost; 
                 gTpOTHours += vTpHrs; gTpOTCost += vTpCost;
                 gJoiners += vJoin; gLeavers += vLeav; gPending += vPend;
@@ -669,7 +830,6 @@
                 if (vEar > 0) { sumEarly += vEar; cntEarly++; }
                 if (vAct > 0) { sumActive += vAct; cntActive++; }
 
-                // Update Groupings for Charts
                 if (!groupedStats[label]) {
                     groupedStats[label] = {
                         otH:0, otC:0, tpH:0, tpC:0, jn:0, lv:0, pnd:0,
@@ -735,7 +895,6 @@
                 dAct.push(s.ac_c > 0 ? (s.ac_p / s.ac_c).toFixed(2) : 0);
             });
 
-            // Update 14 Chart Instances
             function updateC(chartInst, lbs, dta) {
                 chartInst.data.labels = lbs;
                 chartInst.data.datasets[0].data = dta;
@@ -758,12 +917,13 @@
             updateC(charts.pending, labels, dPend);
         }
 
-        // Event Listeners
+        /* --- UI EVENT LISTENERS --- */
+
+        // Filters
         document.getElementById('filterDept').addEventListener('change', () => {
             updateSectionDropdown(); 
             updateDashboard();       
         });
-
         document.getElementById('filterYear').addEventListener('change', updateDashboard);
         document.getElementById('filterMonth').addEventListener('change', updateDashboard);
         document.getElementById('filterSection').addEventListener('change', updateDashboard);
@@ -772,6 +932,35 @@
             document.querySelectorAll('select').forEach(select => select.value = 'All');
             updateSectionDropdown(); 
             updateDashboard(); 
+        });
+
+        // Share & Print Logic
+        const shareBtn = document.getElementById('shareBtn');
+        const sharePopup = document.getElementById('sharePopup');
+        const printBtn = document.getElementById('printBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        shareBtn.addEventListener('click', (e) => {
+            sharePopup.classList.toggle('show');
+            e.stopPropagation();
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!sharePopup.contains(e.target) && !shareBtn.contains(e.target)) {
+                sharePopup.classList.remove('show');
+            }
+        });
+
+        printBtn.addEventListener('click', () => {
+            sharePopup.classList.remove('show');
+            setTimeout(() => window.print(), 200); // slight delay to close popup smoothly
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            sharePopup.classList.remove('show');
+            // A browser's print dialog natively handles "Save as PDF".
+            alert("To Download: Select 'Save as PDF' from the destination dropdown in the next window.");
+            setTimeout(() => window.print(), 200); 
         });
 
         window.onload = () => {
