@@ -30,6 +30,7 @@
             padding: 20px;
             position: fixed;
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            overflow-y: auto;
         }
 
         .sidebar h2 {
@@ -38,6 +39,7 @@
             margin-bottom: 20px;
             border-bottom: 1px solid var(--ipak-gold);
             padding-bottom: 10px;
+            text-transform: uppercase;
         }
 
         .filter-group {
@@ -49,6 +51,8 @@
             margin-bottom: 5px;
             font-size: 0.8rem;
             color: #ddd;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .filter-group select {
@@ -59,6 +63,7 @@
             background: white;
             color: var(--text-dark);
             font-size: 0.9rem;
+            cursor: pointer;
         }
 
         /* Main Content */
@@ -90,7 +95,7 @@
             padding: 10px 15px;
             border-radius: 6px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            border-left: 4px solid var(--ipak-gold); /* Side border for minimal look */
+            border-left: 4px solid var(--ipak-gold); 
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -119,47 +124,39 @@
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            height: 350px; /* Controlled height for chart */
+            height: 400px; 
             position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #loadingMsg {
+            position: absolute;
+            color: var(--ipak-blue);
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h2>FILTERS</h2>
+        <h2>Filters</h2>
         <div class="filter-group">
             <label>Year</label>
-            <select id="filterYear">
-                <option value="2026">2026</option>
-                <option value="2025">2025</option>
-            </select>
+            <select id="filterYear"><option value="All">All Years</option></select>
         </div>
         <div class="filter-group">
             <label>Month</label>
-            <select id="filterMonth">
-                <option value="All">All Months</option>
-                <option value="January">January</option>
-                <option value="February">February</option>
-                <option value="March">March</option>
-            </select>
+            <select id="filterMonth"><option value="All">All Months</option></select>
         </div>
         <div class="filter-group">
             <label>Department</label>
-            <select id="filterDept">
-                <option value="All">All Departments</option>
-                <option value="Production">Production</option>
-                <option value="Quality">Quality</option>
-                <option value="HR">HR</option>
-            </select>
+            <select id="filterDept"><option value="All">All Departments</option></select>
         </div>
         <div class="filter-group">
             <label>Section</label>
-            <select id="filterSection">
-                <option value="All">All Sections</option>
-                <option value="A1">Section A1</option>
-                <option value="B1">Section B1</option>
-            </select>
+            <select id="filterSection"><option value="All">All Sections</option></select>
         </div>
     </div>
 
@@ -171,70 +168,207 @@
         <div class="stats-container">
             <div class="card">
                 <h3>Total Hourtime</h3>
-                <div class="value" id="totalHours">0 Hrs</div>
+                <div class="value" id="totalHours">...</div>
             </div>
             <div class="card">
                 <h3>Efficiency %</h3>
-                <div class="value" id="avgPercentage">0%</div>
+                <div class="value" id="avgPercentage">...</div>
             </div>
-            </div>
+        </div>
 
         <div class="chart-container">
-            <canvas id="ipakBarChart"></canvas>
+            <div id="loadingMsg">Loading Live Data...</div>
+            <canvas id="ipakBarChart" style="display: none;"></canvas>
         </div>
     </div>
 
     <script>
-        const ctx = document.getElementById('ipakBarChart').getContext('2d');
-        let ipakChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                datasets: [{
-                    label: 'Hourtime Percentage (%)',
-                    data: [65, 78, 82, 70], 
-                    backgroundColor: '#003366',
-                    borderColor: '#c5a059',
-                    borderWidth: 2,
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false, /* Chart ko container ki height lene dega */
-                animation: {
-                    duration: 1500,
-                    easing: 'easeOutQuart'
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: true,
-                        labels: { color: '#003366', boxWidth: 12 }
-                    }
-                }
-            }
-        });
+        // Google Sheet CSV Link
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=798992094&single=true&output=csv';
 
-        function updateDashboard() {
-            const randomData = Array.from({length: 4}, () => Math.floor(Math.random() * 40) + 60);
-            ipakChart.data.datasets[0].data = randomData;
-            ipakChart.update();
+        let sheetData = [];
+        let ipakChart;
+        let headers = [];
 
-            document.getElementById('totalHours').innerText = Math.floor(Math.random() * 500) + 1000 + " Hrs";
-            document.getElementById('avgPercentage').innerText = Math.floor(Math.random() * 20) + 75 + "%";
+        // Helper function to find correct column names dynamically
+        function findColumn(row, keywords) {
+            return Object.keys(row).find(key => keywords.some(kw => key.toLowerCase().includes(kw)));
         }
 
+        // Initialize Chart.js
+        function initChart() {
+            const ctx = document.getElementById('ipakBarChart').getContext('2d');
+            ipakChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [], 
+                    datasets: [{
+                        label: 'Hourtime Value',
+                        data: [], 
+                        backgroundColor: '#003366',
+                        borderColor: '#c5a059',
+                        borderWidth: 2,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeOutQuart'
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    },
+                    plugins: {
+                        legend: { display: true, labels: { color: '#003366', boxWidth: 12 } }
+                    }
+                }
+            });
+        }
+
+        // Populate Dropdowns with Unique Values
+        function populateDropdowns() {
+            const yearCol = findColumn(sheetData[0], ['year', 'saal']);
+            const monthCol = findColumn(sheetData[0], ['month', 'mahina']);
+            const deptCol = findColumn(sheetData[0], ['department', 'dept']);
+            const sectionCol = findColumn(sheetData[0], ['section', 'sec']);
+
+            const years = new Set();
+            const months = new Set();
+            const depts = new Set();
+            const sections = new Set();
+
+            sheetData.forEach(row => {
+                if (yearCol && row[yearCol]) years.add(row[yearCol]);
+                if (monthCol && row[monthCol]) months.add(row[monthCol]);
+                if (deptCol && row[deptCol]) depts.add(row[deptCol]);
+                if (sectionCol && row[sectionCol]) sections.add(row[sectionCol]);
+            });
+
+            const addOptions = (setId, dataSet) => {
+                const select = document.getElementById(setId);
+                dataSet.forEach(val => {
+                    let opt = document.createElement('option');
+                    opt.value = val;
+                    opt.innerHTML = val;
+                    select.appendChild(opt);
+                });
+            };
+
+            addOptions('filterYear', years);
+            addOptions('filterMonth', months);
+            addOptions('filterDept', depts);
+            addOptions('filterSection', sections);
+        }
+
+        // Fetch Data from Google Sheets
+        async function fetchGoogleSheetData() {
+            try {
+                const response = await fetch(csvUrl);
+                const csvText = await response.text();
+                
+                // Simple CSV Parser
+                const rows = csvText.split('\n').map(row => row.split(','));
+                headers = rows[0].map(h => h.trim().replace(/\r/g, ''));
+                
+                sheetData = rows.slice(1).map(row => {
+                    let obj = {};
+                    row.forEach((cell, i) => {
+                        obj[headers[i]] = cell ? cell.trim().replace(/\r/g, '') : "";
+                    });
+                    return obj;
+                });
+
+                // Remove empty rows
+                sheetData = sheetData.filter(row => Object.values(row).some(x => x !== ""));
+
+                document.getElementById('loadingMsg').style.display = 'none';
+                document.getElementById('ipakBarChart').style.display = 'block';
+
+                populateDropdowns();
+                updateDashboard(); 
+            } catch (error) {
+                console.error("Data uthane mein masla:", error);
+                document.getElementById('loadingMsg').innerText = "Failed to load data. Check console.";
+                document.getElementById('totalHours').innerText = "Error";
+                document.getElementById('avgPercentage').innerText = "Error";
+            }
+        }
+
+        // Apply Filters & Update Dashboard
+        function updateDashboard() {
+            if(sheetData.length === 0) return;
+
+            const selectedYear = document.getElementById('filterYear').value;
+            const selectedMonth = document.getElementById('filterMonth').value;
+            const selectedDept = document.getElementById('filterDept').value;
+            const selectedSection = document.getElementById('filterSection').value;
+
+            const yearCol = findColumn(sheetData[0], ['year']);
+            const monthCol = findColumn(sheetData[0], ['month']);
+            const deptCol = findColumn(sheetData[0], ['department', 'dept']);
+            const sectionCol = findColumn(sheetData[0], ['section', 'sec']);
+
+            let filteredData = sheetData.filter(item => {
+                let match = true;
+                if(selectedYear !== "All" && yearCol && item[yearCol] !== selectedYear) match = false;
+                if(selectedMonth !== "All" && monthCol && item[monthCol] !== selectedMonth) match = false;
+                if(selectedDept !== "All" && deptCol && item[deptCol] !== selectedDept) match = false;
+                if(selectedSection !== "All" && sectionCol && item[sectionCol] !== selectedSection) match = false;
+                return match;
+            });
+
+            // Find dynamic columns for numbers
+            const hoursCol = findColumn(sheetData[0], ['hour', 'time', 'overtime']);
+            const percentCol = findColumn(sheetData[0], ['percent', 'efficiency']);
+            
+            // For the chart, we will group by Department or Section based on what is available
+            const groupByCol = deptCol || sectionCol || monthCol || headers[0]; 
+
+            let chartLabels = [];
+            let chartValues = [];
+            let totalHrs = 0;
+            let totalPercent = 0;
+            let percentCount = 0;
+
+            filteredData.forEach(item => {
+                let val = parseFloat(item[hoursCol]) || 0;
+                let pct = parseFloat(item[percentCol]) || 0;
+                
+                chartLabels.push(item[groupByCol] || "Unknown"); 
+                chartValues.push(val > 0 ? val : pct); // Priorities hours for chart, fallback to pct
+
+                totalHrs += val;
+                if(pct > 0) {
+                    totalPercent += pct;
+                    percentCount++;
+                }
+            });
+
+            // Update Minimal Boxes
+            document.getElementById('totalHours').innerText = totalHrs.toLocaleString() + " Hrs";
+            let avgPct = percentCount > 0 ? (totalPercent / percentCount).toFixed(1) : 0;
+            document.getElementById('avgPercentage').innerText = avgPct + "%";
+
+            // Update Chart
+            ipakChart.data.labels = chartLabels;
+            ipakChart.data.datasets[0].data = chartValues;
+            ipakChart.data.datasets[0].label = hoursCol ? hoursCol : 'Value';
+            ipakChart.update();
+        }
+
+        // Add Event Listeners
         document.querySelectorAll('select').forEach(select => {
             select.addEventListener('change', updateDashboard);
         });
 
-        window.onload = updateDashboard;
+        // Start
+        window.onload = () => {
+            initChart();
+            fetchGoogleSheetData();
+        };
     </script>
 </body>
 </html>
