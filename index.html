@@ -167,12 +167,16 @@
 
         <div class="stats-container">
             <div class="card">
-                <h3>Total Hourtime</h3>
-                <div class="value" id="totalHours">...</div>
+                <h3>Total OT Hours</h3>
+                <div class="value" id="valOTHours">...</div>
             </div>
             <div class="card">
-                <h3>Efficiency %</h3>
-                <div class="value" id="avgPercentage">...</div>
+                <h3>OT Cost</h3>
+                <div class="value" id="valOTCost">...</div>
+            </div>
+            <div class="card">
+                <h3>OT %</h3>
+                <div class="value" id="valOTPercent">...</div>
             </div>
         </div>
 
@@ -195,6 +199,19 @@
             return Object.keys(row).find(key => keywords.some(kw => key.toLowerCase().includes(kw)));
         }
 
+        // Clean numbers from strings (e.g. "3,962" or "10%")
+        function cleanNumber(val) {
+            if (!val) return 0;
+            if (typeof val === 'number') return val;
+            let cleaned = val.toString().replace(/,/g, '').replace(/%/g, '').replace(/[^\d.-]/g, '');
+            return parseFloat(cleaned) || 0;
+        }
+
+        // Formatter for Currency / Numbers
+        function formatNum(num) {
+            return num.toLocaleString('en-US', { maximumFractionDigits: 1 });
+        }
+
         // Initialize Chart.js
         function initChart() {
             const ctx = document.getElementById('ipakBarChart').getContext('2d');
@@ -203,7 +220,7 @@
                 data: {
                     labels: [], 
                     datasets: [{
-                        label: 'Hourtime Value',
+                        label: 'OT Hours',
                         data: [], 
                         backgroundColor: '#003366',
                         borderColor: '#c5a059',
@@ -214,13 +231,8 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: {
-                        duration: 1500,
-                        easing: 'easeOutQuart'
-                    },
-                    scales: {
-                        y: { beginAtZero: true }
-                    },
+                    animation: { duration: 1500, easing: 'easeOutQuart' },
+                    scales: { y: { beginAtZero: true } },
                     plugins: {
                         legend: { display: true, labels: { color: '#003366', boxWidth: 12 } }
                     }
@@ -269,7 +281,7 @@
                 const response = await fetch(csvUrl);
                 const csvText = await response.text();
                 
-                // Simple CSV Parser
+                // Simple CSV Parser (handles basic commas, but not commas inside quotes)
                 const rows = csvText.split('\n').map(row => row.split(','));
                 headers = rows[0].map(h => h.trim().replace(/\r/g, ''));
                 
@@ -292,8 +304,6 @@
             } catch (error) {
                 console.error("Data uthane mein masla:", error);
                 document.getElementById('loadingMsg').innerText = "Failed to load data. Check console.";
-                document.getElementById('totalHours').innerText = "Error";
-                document.getElementById('avgPercentage').innerText = "Error";
             }
         }
 
@@ -306,6 +316,7 @@
             const selectedDept = document.getElementById('filterDept').value;
             const selectedSection = document.getElementById('filterSection').value;
 
+            // Dimensions
             const yearCol = findColumn(sheetData[0], ['year']);
             const monthCol = findColumn(sheetData[0], ['month']);
             const deptCol = findColumn(sheetData[0], ['department', 'dept']);
@@ -320,42 +331,51 @@
                 return match;
             });
 
-            // Find dynamic columns for numbers
-            const hoursCol = findColumn(sheetData[0], ['hour', 'time', 'overtime']);
-            const percentCol = findColumn(sheetData[0], ['percent', 'efficiency']);
+            // Target Specific Columns based on exact keywords
+            const otHoursCol = findColumn(sheetData[0], ['overtime hours', 'total ot hours']);
+            const otCostCol = findColumn(sheetData[0], ['ot cost', 'overtime cost']);
+            const otPercentCol = findColumn(sheetData[0], ['ot%', 'ot %', 'overtime %', 'overtime percent']);
             
             // For the chart, we will group by Department or Section based on what is available
             const groupByCol = deptCol || sectionCol || monthCol || headers[0]; 
 
             let chartLabels = [];
             let chartValues = [];
-            let totalHrs = 0;
-            let totalPercent = 0;
-            let percentCount = 0;
+            
+            let totalOT = 0;
+            let totalCost = 0;
+            let totalPct = 0;
+            let pctCount = 0;
 
             filteredData.forEach(item => {
-                let val = parseFloat(item[hoursCol]) || 0;
-                let pct = parseFloat(item[percentCol]) || 0;
+                let otVal = cleanNumber(item[otHoursCol]);
+                let costVal = cleanNumber(item[otCostCol]);
+                let pctVal = cleanNumber(item[otPercentCol]);
                 
                 chartLabels.push(item[groupByCol] || "Unknown"); 
-                chartValues.push(val > 0 ? val : pct); // Priorities hours for chart, fallback to pct
+                chartValues.push(otVal); // Chart will map OT Hours
 
-                totalHrs += val;
-                if(pct > 0) {
-                    totalPercent += pct;
-                    percentCount++;
+                totalOT += otVal;
+                totalCost += costVal;
+                
+                if(pctVal > 0) {
+                    totalPct += pctVal;
+                    pctCount++;
                 }
             });
 
             // Update Minimal Boxes
-            document.getElementById('totalHours').innerText = totalHrs.toLocaleString() + " Hrs";
-            let avgPct = percentCount > 0 ? (totalPercent / percentCount).toFixed(1) : 0;
-            document.getElementById('avgPercentage').innerText = avgPct + "%";
+            document.getElementById('valOTHours').innerText = formatNum(totalOT) + " Hrs";
+            document.getElementById('valOTCost').innerText = formatNum(totalCost);
+            
+            // Average of percentages across rows
+            let avgPct = pctCount > 0 ? (totalPct / pctCount).toFixed(2) : 0;
+            document.getElementById('valOTPercent').innerText = avgPct + "%";
 
             // Update Chart
             ipakChart.data.labels = chartLabels;
             ipakChart.data.datasets[0].data = chartValues;
-            ipakChart.data.datasets[0].label = hoursCol ? hoursCol : 'Value';
+            ipakChart.data.datasets[0].label = otHoursCol ? otHoursCol : 'OT Hours';
             ipakChart.update();
         }
 
