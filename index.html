@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPAK Corporate Dashboard</title>
+    <title>Corporate Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -24,14 +24,61 @@
             --text-main: #202124;
             --text-muted: #5F6368;
             --border-color: #DADCE0;
+            --header-height: 80px;
         }
 
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
             display: flex;
+            flex-direction: column; /* Changed to column for full-width header */
             background-color: var(--bg-light);
             color: var(--text-main);
+            height: 100vh;
+        }
+
+        /* ---------------------------------
+           FULL-WIDTH TOP HEADER
+        --------------------------------- */
+        .top-header {
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            z-index: 200;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            height: 50px; /* Adjust as needed */
+            width: auto;
+            object-fit: contain;
+            margin-right: 20px;
+        }
+
+        .top-header h1 {
+            color: var(--google-blue);
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ---------------------------------
+           LAYOUT WRAPPER (Below Header)
+        --------------------------------- */
+        .layout-container {
+            display: flex;
+            margin-top: var(--header-height); /* Push down below header */
+            height: calc(100vh - var(--header-height));
         }
 
         /* Clean Sidebar */
@@ -39,22 +86,20 @@
             width: 260px;
             background-color: var(--surface);
             border-right: 1px solid var(--border-color);
-            height: 100vh;
             padding: 25px 20px;
-            position: fixed;
             overflow-y: auto;
-            z-index: 100;
+            box-sizing: border-box;
+            flex-shrink: 0;
         }
 
         .sidebar h2 {
             color: var(--text-main);
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 500;
             margin-top: 0;
             margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .filter-group {
@@ -111,120 +156,11 @@
 
         /* Main Content Area */
         .main-content {
-            margin-left: 300px;
-            padding: 25px 40px;
-            width: calc(100% - 340px);
-        }
-
-        /* ---------------------------------
-           NEW TOP HEADER STYLES
-        --------------------------------- */
-        .top-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo {
-            height: 45px; /* Adjust as needed */
-            width: auto;
-            object-fit: contain;
-        }
-
-        .header-left h1 {
-            color: var(--text-main);
-            margin: 0;
-            font-size: 1.5rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Share Button & Popup */
-        .share-container {
+            flex-grow: 1;
+            padding: 30px 40px;
+            overflow-y: auto;
+            box-sizing: border-box;
             position: relative;
-        }
-
-        .share-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--google-blue);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.3s;
-            font-family: 'Roboto', sans-serif;
-            box-shadow: 0 2px 4px rgba(66, 133, 244, 0.3);
-        }
-
-        .share-btn:hover {
-            background: #3367d6;
-        }
-
-        .share-btn svg {
-            width: 18px;
-            height: 18px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .share-popup {
-            position: absolute;
-            top: 110%;
-            right: 0;
-            background: white;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            border-radius: 8px;
-            min-width: 180px;
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-            z-index: 1000;
-        }
-
-        .share-popup.show {
-            display: flex;
-        }
-
-        .share-popup button {
-            background: none;
-            border: none;
-            padding: 12px 15px;
-            text-align: left;
-            font-size: 0.95rem;
-            color: var(--text-main);
-            cursor: pointer;
-            font-family: 'Roboto', sans-serif;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .share-popup button:hover {
-            background: var(--bg-light);
-        }
-
-        .share-popup button:not(:last-child) {
-            border-bottom: 1px solid var(--border-color);
         }
 
         /* Unified Card & Graph Widget Grid */
@@ -290,246 +226,184 @@
             transform: translate(-50%, -50%);
             z-index: 10;
         }
-
-        /* ---------------------------------
-           A4 PRINT / DOWNLOAD LOGIC
-        --------------------------------- */
-        @media print {
-            @page {
-                size: A4 landscape;
-                margin: 10mm;
-            }
-            body {
-                background-color: white !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-            /* Hide Sidebar & Share Buttons */
-            .sidebar, .share-container, #loadingMsg {
-                display: none !important;
-            }
-            /* Expand Main Content */
-            .main-content {
-                margin-left: 0 !important;
-                width: 100% !important;
-                padding: 0 !important;
-            }
-            /* Adjust Top Header for Print */
-            .top-header {
-                margin-bottom: 15px !important;
-                padding-bottom: 10px !important;
-                border-bottom: 2px solid #000;
-            }
-            /* Adjust Grid to fit A4 Landscape (4 columns) */
-            .dashboard-grid {
-                grid-template-columns: repeat(4, 1fr) !important;
-                gap: 10px !important;
-            }
-            .kpi-widget {
-                page-break-inside: avoid;
-                box-shadow: none !important;
-                border: 1px solid var(--border-color);
-                padding: 10px 15px 5px 15px !important;
-            }
-            .kpi-value {
-                font-size: 1.2rem !important;
-            }
-            .chart-wrapper {
-                height: 100px !important;
-            }
-        }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <h2>Filters</h2>
-        <div class="filter-group">
-            <label>Year</label>
-            <select id="filterYear"><option value="All">All Years</option></select>
-        </div>
-        <div class="filter-group">
-            <label>Month</label>
-            <select id="filterMonth"><option value="All">All Months</option></select>
-        </div>
-        <div class="filter-group">
-            <label>Department</label>
-            <select id="filterDept"><option value="All">All Departments</option></select>
-        </div>
-        <div class="filter-group">
-            <label>Section</label>
-            <select id="filterSection"><option value="All">All Sections</option></select>
-        </div>
-        <button id="clearFiltersBtn" class="clear-btn">Clear Filters</button>
-    </div>
+    <header class="top-header">
+        <img src="Logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
+        <h1>IPAK Corporate Dashboard</h1>
+    </header>
 
-    <div class="main-content">
+    <div class="layout-container">
         
-        <header class="top-header">
-            <div class="header-left">
-                <img src="Logo.png" alt="IPAK Logo" class="logo" onerror="this.style.display='none'">
-                <h1>IPAK Corporate Dashboard</h1>
+        <div class="sidebar">
+            <h2>Filters</h2>
+            <div class="filter-group">
+                <label>Year</label>
+                <select id="filterYear"><option value="All">All Years</option></select>
             </div>
-            
-            <div class="header-right">
-                <div class="share-container">
-                    <button class="share-btn" id="shareBtn">
-                        <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8m-4-6l-4-4m0 0L8 6m4-4v16"></path></svg>
-                        Share
-                    </button>
-                    
-                    <div class="share-popup" id="sharePopup">
-                        <button id="downloadBtn">📄 Download PDF</button>
-                        <button id="printBtn">🖨️ Print (A4)</button>
+            <div class="filter-group">
+                <label>Month</label>
+                <select id="filterMonth"><option value="All">All Months</option></select>
+            </div>
+            <div class="filter-group">
+                <label>Department</label>
+                <select id="filterDept"><option value="All">All Departments</option></select>
+            </div>
+            <div class="filter-group">
+                <label>Section</label>
+                <select id="filterSection"><option value="All">All Sections</option></select>
+            </div>
+            <button id="clearFiltersBtn" class="clear-btn">Clear Filters</button>
+        </div>
+
+        <div class="main-content">
+            <div id="loadingMsg">Fetching live data...</div>
+
+            <div class="dashboard-grid" id="dashboardContent" style="display: none;">
+                
+                <div class="kpi-widget">
+                    <div class="kpi-header">
+                        <div class="kpi-title">
+                            <h3>Act vs Std Hours %</h3>
+                            <div class="kpi-value" id="valActVsStd">...</div>
+                        </div>
                     </div>
+                    <div class="chart-wrapper"><canvas id="chartActVsStd"></canvas></div>
                 </div>
-            </div>
-        </header>
 
-        <div id="loadingMsg">Fetching live data...</div>
-
-        <div class="dashboard-grid" id="dashboardContent" style="display: none;">
-            
-            <div class="kpi-widget">
-                <div class="kpi-header">
-                    <div class="kpi-title">
-                        <h3>Actual vs Standard Hours %</h3>
-                        <div class="kpi-value" id="valActVsStd">...</div>
+                <div class="kpi-widget">
+                    <div class="kpi-header">
+                        <div class="kpi-title">
+                            <h3>Total OT Hours</h3>
+                            <div class="kpi-value" id="valOTHours">...</div>
+                        </div>
                     </div>
+                    <div class="chart-wrapper"><canvas id="chartOTHours"></canvas></div>
                 </div>
-                <div class="chart-wrapper"><canvas id="chartActVsStd"></canvas></div>
-            </div>
 
-            <div class="kpi-widget">
-                <div class="kpi-header">
-                    <div class="kpi-title">
-                        <h3>Total OT Hours</h3>
-                        <div class="kpi-value" id="valOTHours">...</div>
+                <div class="kpi-widget">
+                    <div class="kpi-header">
+                        <div class="kpi-title">
+                            <h3>OT Cost</h3>
+                            <div class="kpi-value" id="valOTCost">...</div>
+                        </div>
                     </div>
+                    <div class="chart-wrapper"><canvas id="chartOTCost"></canvas></div>
                 </div>
-                <div class="chart-wrapper"><canvas id="chartOTHours"></canvas></div>
-            </div>
 
-            <div class="kpi-widget">
-                <div class="kpi-header">
-                    <div class="kpi-title">
-                        <h3>OT Cost</h3>
-                        <div class="kpi-value" id="valOTCost">...</div>
+                <div class="kpi-widget">
+                    <div class="kpi-header">
+                        <div class="kpi-title">
+                            <h3>OT %</h3>
+                            <div class="kpi-value" id="valOTPercent">...</div>
+                        </div>
                     </div>
+                    <div class="chart-wrapper"><canvas id="chartOTPercent"></canvas></div>
                 </div>
-                <div class="chart-wrapper"><canvas id="chartOTCost"></canvas></div>
-            </div>
 
-            <div class="kpi-widget">
-                <div class="kpi-header">
-                    <div class="kpi-title">
-                        <h3>OT %</h3>
-                        <div class="kpi-value" id="valOTPercent">...</div>
+                <div class="kpi-widget">
+                    <div class="kpi-header">
+                        <div class="kpi-title">
+                            <h3>TP Total OT Hours</h3>
+                            <div class="kpi-value" id="valTPOTHours">...</div>
+                        </div>
                     </div>
+                    <div class="chart-wrapper"><canvas id="chartTPOTHours"></canvas></div>
                 </div>
-                <div class="chart-wrapper"><canvas id="chartOTPercent"></canvas></div>
-            </div>
 
-            <div class="kpi-widget">
-                <div class="kpi-header">
-                    <div class="kpi-title">
-                        <h3>TP Total OT Hours</h3>
-                        <div class="kpi-value" id="valTPOTHours">...</div>
+                <div class="kpi-widget">
+                    <div class="kpi-header">
+                        <div class="kpi-title">
+                            <h3>TP OT Cost</h3>
+                            <div class="kpi-value" id="valTPOTCost">...</div>
+                        </div>
                     </div>
+                    <div class="chart-wrapper"><canvas id="chartTPOTCost"></canvas></div>
                 </div>
-                <div class="chart-wrapper"><canvas id="chartTPOTHours"></canvas></div>
-            </div>
 
-            <div class="kpi-widget">
-                <div class="kpi-header">
-                    <div class="kpi-title">
-                        <h3>TP OT Cost</h3>
-                        <div class="kpi-value" id="valTPOTCost">...</div>
+                <div class="kpi-widget">
+                    <div class="kpi-header">
+                        <div class="kpi-title">
+                            <h3>Absenteeism %</h3>
+                            <div class="kpi-value" id="valAbsent">...</div>
+                        </div>
                     </div>
+                    <div class="chart-wrapper"><canvas id="chartAbsent"></canvas></div>
                 </div>
-                <div class="chart-wrapper"><canvas id="chartTPOTCost"></canvas></div>
-            </div>
 
-            <div class="kpi-widget">
-                <div class="kpi-header">
-                    <div class="kpi-title">
-                        <h3>Absenteeism %</h3>
-                        <div class="kpi-value" id="valAbsent">...</div>
+                <div class="kpi-widget">
+                    <div class="kpi-header">
+                        <div class="kpi-title">
+                            <h3>Leaves %</h3>
+                            <div class="kpi-value" id="valLeave">...</div>
+                        </div>
                     </div>
+                    <div class="chart-wrapper"><canvas id="chartLeave"></canvas></div>
                 </div>
-                <div class="chart-wrapper"><canvas id="chartAbsent"></canvas></div>
-            </div>
 
-            <div class="kpi-widget">
-                <div class="kpi-header">
-                    <div class="kpi-title">
-                        <h3>Leaves %</h3>
-                        <div class="kpi-value" id="valLeave">...</div>
+                <div class="kpi-widget">
+                    <div class="kpi-header">
+                        <div class="kpi-title">
+                            <h3>Late Arrival %</h3>
+                            <div class="kpi-value" id="valLate">...</div>
+                        </div>
                     </div>
+                    <div class="chart-wrapper"><canvas id="chartLate"></canvas></div>
                 </div>
-                <div class="chart-wrapper"><canvas id="chartLeave"></canvas></div>
-            </div>
 
-            <div class="kpi-widget">
-                <div class="kpi-header">
-                    <div class="kpi-title">
-                        <h3>Late Arrival %</h3>
-                        <div class="kpi-value" id="valLate">...</div>
+                <div class="kpi-widget">
+                    <div class="kpi-header">
+                        <div class="kpi-title">
+                            <h3>Early Out %</h3>
+                            <div class="kpi-value" id="valEarly">...</div>
+                        </div>
                     </div>
+                    <div class="chart-wrapper"><canvas id="chartEarly"></canvas></div>
                 </div>
-                <div class="chart-wrapper"><canvas id="chartLate"></canvas></div>
-            </div>
 
-            <div class="kpi-widget">
-                <div class="kpi-header">
-                    <div class="kpi-title">
-                        <h3>Early Out %</h3>
-                        <div class="kpi-value" id="valEarly">...</div>
+                <div class="kpi-widget">
+                    <div class="kpi-header">
+                        <div class="kpi-title">
+                            <h3>Active Employee %</h3>
+                            <div class="kpi-value" id="valActive">...</div>
+                        </div>
                     </div>
+                    <div class="chart-wrapper"><canvas id="chartActive"></canvas></div>
                 </div>
-                <div class="chart-wrapper"><canvas id="chartEarly"></canvas></div>
-            </div>
 
-            <div class="kpi-widget">
-                <div class="kpi-header">
-                    <div class="kpi-title">
-                        <h3>Active Employee %</h3>
-                        <div class="kpi-value" id="valActive">...</div>
+                <div class="kpi-widget">
+                    <div class="kpi-header">
+                        <div class="kpi-title">
+                            <h3>Joiners</h3>
+                            <div class="kpi-value" id="valJoiners">...</div>
+                        </div>
                     </div>
+                    <div class="chart-wrapper"><canvas id="chartJoiners"></canvas></div>
                 </div>
-                <div class="chart-wrapper"><canvas id="chartActive"></canvas></div>
-            </div>
 
-            <div class="kpi-widget">
-                <div class="kpi-header">
-                    <div class="kpi-title">
-                        <h3>Joiners</h3>
-                        <div class="kpi-value" id="valJoiners">...</div>
+                <div class="kpi-widget">
+                    <div class="kpi-header">
+                        <div class="kpi-title">
+                            <h3>Leavers</h3>
+                            <div class="kpi-value" id="valLeavers">...</div>
+                        </div>
                     </div>
+                    <div class="chart-wrapper"><canvas id="chartLeavers"></canvas></div>
                 </div>
-                <div class="chart-wrapper"><canvas id="chartJoiners"></canvas></div>
-            </div>
 
-            <div class="kpi-widget">
-                <div class="kpi-header">
-                    <div class="kpi-title">
-                        <h3>Leavers</h3>
-                        <div class="kpi-value" id="valLeavers">...</div>
+                <div class="kpi-widget">
+                    <div class="kpi-header">
+                        <div class="kpi-title">
+                            <h3>Pending Final Settlement</h3>
+                            <div class="kpi-value" id="valPending">...</div>
+                        </div>
                     </div>
+                    <div class="chart-wrapper"><canvas id="chartPending"></canvas></div>
                 </div>
-                <div class="chart-wrapper"><canvas id="chartLeavers"></canvas></div>
-            </div>
 
-            <div class="kpi-widget">
-                <div class="kpi-header">
-                    <div class="kpi-title">
-                        <h3>Pending Final Settlement</h3>
-                        <div class="kpi-value" id="valPending">...</div>
-                    </div>
-                </div>
-                <div class="chart-wrapper"><canvas id="chartPending"></canvas></div>
             </div>
-
         </div>
     </div>
 
@@ -540,7 +414,6 @@
         let headers = [];
         const charts = {};
 
-        // Colors
         const G_BLUE = '#4285F4';
         const G_RED = '#EA4335';
         const G_YELLOW = '#FBBC05';
@@ -917,8 +790,6 @@
             updateC(charts.pending, labels, dPend);
         }
 
-        /* --- UI EVENT LISTENERS --- */
-
         // Filters
         document.getElementById('filterDept').addEventListener('change', () => {
             updateSectionDropdown(); 
@@ -932,35 +803,6 @@
             document.querySelectorAll('select').forEach(select => select.value = 'All');
             updateSectionDropdown(); 
             updateDashboard(); 
-        });
-
-        // Share & Print Logic
-        const shareBtn = document.getElementById('shareBtn');
-        const sharePopup = document.getElementById('sharePopup');
-        const printBtn = document.getElementById('printBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
-
-        shareBtn.addEventListener('click', (e) => {
-            sharePopup.classList.toggle('show');
-            e.stopPropagation();
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!sharePopup.contains(e.target) && !shareBtn.contains(e.target)) {
-                sharePopup.classList.remove('show');
-            }
-        });
-
-        printBtn.addEventListener('click', () => {
-            sharePopup.classList.remove('show');
-            setTimeout(() => window.print(), 200); // slight delay to close popup smoothly
-        });
-
-        downloadBtn.addEventListener('click', () => {
-            sharePopup.classList.remove('show');
-            // A browser's print dialog natively handles "Save as PDF".
-            alert("To Download: Select 'Save as PDF' from the destination dropdown in the next window.");
-            setTimeout(() => window.print(), 200); 
         });
 
         window.onload = () => {
