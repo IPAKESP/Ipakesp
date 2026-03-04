@@ -161,10 +161,10 @@
             margin: 0;
         }
 
-        /* Compact Charts Grid */
+        /* Compact Charts Grid (2x2 Layout) */
         .charts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 20px;
             margin-bottom: 40px;
         }
@@ -256,6 +256,10 @@
 
         <div class="charts-grid" id="chartsContent" style="display: none;">
             <div class="chart-card">
+                <h3>Act vs Std Hours %</h3>
+                <div class="canvas-wrapper"><canvas id="chartActVsStd"></canvas></div>
+            </div>
+            <div class="chart-card">
                 <h3>Overtime Hours</h3>
                 <div class="canvas-wrapper"><canvas id="chartOTHours"></canvas></div>
             </div>
@@ -274,11 +278,12 @@
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=798992094&single=true&output=csv';
 
         let sheetData = [];
-        let chartInstanceOTHours, chartInstanceOTCost, chartInstanceOTPercent;
+        let chartInstanceOTHours, chartInstanceOTCost, chartInstanceOTPercent, chartInstanceActVsStd;
         let headers = [];
 
         const G_BLUE = '#4285F4';
         const G_RED = '#EA4335';
+        const G_YELLOW = '#FBBC05';
         const G_GREEN = '#34A853';
 
         function parseCSV(str) {
@@ -346,20 +351,31 @@
                 }
             };
 
-            const ctx1 = document.getElementById('chartOTHours').getContext('2d');
-            chartInstanceOTHours = new Chart(ctx1, {
+            // Chart 1: Actual vs Standard %
+            const ctx0 = document.getElementById('chartActVsStd').getContext('2d');
+            chartInstanceActVsStd = new Chart(ctx0, {
                 type: 'bar',
                 data: { labels: [], datasets: [{ backgroundColor: G_BLUE, borderRadius: 4, barPercentage: 0.6, data: [] }] },
                 options: commonOptions
             });
 
-            const ctx2 = document.getElementById('chartOTCost').getContext('2d');
-            chartInstanceOTCost = new Chart(ctx2, {
+            // Chart 2: OT Hours
+            const ctx1 = document.getElementById('chartOTHours').getContext('2d');
+            chartInstanceOTHours = new Chart(ctx1, {
                 type: 'bar',
                 data: { labels: [], datasets: [{ backgroundColor: G_RED, borderRadius: 4, barPercentage: 0.6, data: [] }] },
                 options: commonOptions
             });
 
+            // Chart 3: OT Cost
+            const ctx2 = document.getElementById('chartOTCost').getContext('2d');
+            chartInstanceOTCost = new Chart(ctx2, {
+                type: 'bar',
+                data: { labels: [], datasets: [{ backgroundColor: G_YELLOW, borderRadius: 4, barPercentage: 0.6, data: [] }] },
+                options: commonOptions
+            });
+
+            // Chart 4: OT Percent Line Trend
             const ctx3 = document.getElementById('chartOTPercent').getContext('2d');
             chartInstanceOTPercent = new Chart(ctx3, {
                 type: 'line', 
@@ -388,7 +404,6 @@
 
             const addOptions = (setId, dataSet) => {
                 const select = document.getElementById(setId);
-                // Keep the "All" option, clear existing ones
                 select.innerHTML = `<option value="All">All ${setId.replace('filter', '')}s</option>`;
                 
                 dataSet.forEach(val => {
@@ -443,6 +458,7 @@
             const selectedDept = document.getElementById('filterDept').value;
             const selectedSection = document.getElementById('filterSection').value;
 
+            const companyCol = findColumn(sheetData[0], ['company', 'unit', 'plant', 'factory']);
             const yearCol = findColumn(sheetData[0], ['year']);
             const monthCol = findColumn(sheetData[0], ['month']);
             const deptCol = findColumn(sheetData[0], ['department', 'dept']);
@@ -463,7 +479,19 @@
             const otCostCol = findColumn(sheetData[0], ['ot cost', 'overtime cost']);
             const otPercentCol = findColumn(sheetData[0], ['ot%', 'ot %', 'overtime %']);
             
-            const groupByCol = sectionCol || deptCol || monthCol || headers[0]; 
+            // --- SMART DYNAMIC GROUPING ---
+            // 1. Default preview is Company (if exists), else Department.
+            let groupByCol = companyCol || deptCol || headers[0]; 
+
+            // 2. If Department is selected, drill down preview to Section
+            if (selectedDept !== "All" && sectionCol) {
+                groupByCol = sectionCol;
+            }
+            
+            // 3. If Section is also selected, drill down preview to Month
+            if (selectedSection !== "All" && monthCol) {
+                groupByCol = monthCol;
+            }
 
             let groupedStats = {};
             let totalOT = 0, totalCost = 0;
@@ -478,41 +506,41 @@
                 let costVal = cleanNumber(item[otCostCol]);
                 let otPctVal = cleanNumber(item[otPercentCol]);
 
-                // Totals for top cards
+                // Global Totals for top cards
                 totalOT += otVal;
                 totalCost += costVal;
-                
                 if (otPctVal > 0) { totalOTPct += otPctVal; countOTPct++; }
                 if (actStdVal > 0) { totalActStdPct += actStdVal; countActStdPct++; }
 
                 // Grouping for Charts
                 if (!groupedStats[label]) {
-                    groupedStats[label] = { hours: 0, cost: 0, pctSum: 0, count: 0 };
+                    groupedStats[label] = { hours: 0, cost: 0, pctSum: 0, count: 0, actStdSum: 0, actStdCount: 0 };
                 }
                 groupedStats[label].hours += otVal;
                 groupedStats[label].cost += costVal;
+                
                 if(otPctVal > 0) {
                     groupedStats[label].pctSum += otPctVal;
                     groupedStats[label].count += 1;
                 }
+                
+                if(actStdVal > 0) {
+                    groupedStats[label].actStdSum += actStdVal;
+                    groupedStats[label].actStdCount += 1;
+                }
             });
 
-            // Card 1: Act vs Std Hrs %
+            // Update Cards Data
             let avgActStdPct = countActStdPct > 0 ? (totalActStdPct / countActStdPct).toFixed(2) : 0;
             document.getElementById('valActVsStdPercent').innerText = avgActStdPct + "%";
-
-            // Card 2: Total OT Hours
             document.getElementById('valOTHours').innerText = formatNum(totalOT);
-            
-            // Card 3: Total OT Cost
             document.getElementById('valOTCost').innerText = "Rs " + formatNum(totalCost); 
-            
-            // Card 4: Average OT %
             let avgOTPct = countOTPct > 0 ? (totalOTPct / countOTPct).toFixed(2) : 0;
             document.getElementById('valOTPercent').innerText = avgOTPct + "%";
 
-            // Update Charts
+            // Update Charts Arrays
             let chartLabels = Object.keys(groupedStats);
+            let arrActStd = [];
             let arrHours = [];
             let arrCost = [];
             let arrPct = [];
@@ -520,9 +548,18 @@
             chartLabels.forEach(label => {
                 arrHours.push(groupedStats[label].hours);
                 arrCost.push(groupedStats[label].cost);
+                
+                let avgGrpActStd = groupedStats[label].actStdCount > 0 ? (groupedStats[label].actStdSum / groupedStats[label].actStdCount) : 0;
+                arrActStd.push(avgGrpActStd);
+
                 let avgGrpPct = groupedStats[label].count > 0 ? (groupedStats[label].pctSum / groupedStats[label].count) : 0;
                 arrPct.push(avgGrpPct);
             });
+
+            // Push data to Chart JS
+            chartInstanceActVsStd.data.labels = chartLabels;
+            chartInstanceActVsStd.data.datasets[0].data = arrActStd;
+            chartInstanceActVsStd.update();
 
             chartInstanceOTHours.data.labels = chartLabels;
             chartInstanceOTHours.data.datasets[0].data = arrHours;
