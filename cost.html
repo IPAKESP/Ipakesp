@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cost Dashboard</title>
+    <title>Mess & Cost Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -193,7 +193,7 @@
     <header class="top-header">
         <div class="header-left">
             <img src="Logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
-            <h1>Cost Dashboard</h1>
+            <h1>Mess & Cost Dashboard</h1>
         </div>
         <div class="share-container">
             <button class="share-btn" id="shareBtn">
@@ -231,21 +231,6 @@
 
             <div class="dashboard-grid" id="dashboardContent" style="display: none;">
                 
-                <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Permanent Employees</h3><div class="kpi-value" id="valPermEmp">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartPermEmp"></canvas></div>
-                </div>
-
-                <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Third Party Employees</h3><div class="kpi-value" id="valTPEmp">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartTPEmp"></canvas></div>
-                </div>
-
-                <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Guests</h3><div class="kpi-value" id="valGuests">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartGuests"></canvas></div>
-                </div>
-
                 <div class="kpi-widget">
                     <div class="kpi-header"><div class="kpi-title"><h3>Cost per Meal</h3><div class="kpi-value" id="valCostPerMeal">...</div></div></div>
                     <div class="chart-wrapper"><canvas id="chartCostPerMeal"></canvas></div>
@@ -306,7 +291,6 @@
     </div>
 
     <script>
-        // LIVE CSV LINK
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=1994039092&single=true&output=csv';
 
         let sheetData = [];
@@ -365,23 +349,20 @@
         }
 
         function initCharts() {
-            charts.permEmp = createChart('chartPermEmp', 'bar', G_BLUE, BG_BLUE);
-            charts.tpEmp = createChart('chartTPEmp', 'bar', G_RED, BG_RED);
-            charts.guests = createChart('chartGuests', 'bar', G_YELLOW, BG_YELLOW);
-            charts.costPerMeal = createChart('chartCostPerMeal', 'line', G_GREEN, BG_GREEN);
+            // Colors cycle: Blue(1), Red(2), Yellow(3), Green(4)
+            charts.costPerMeal = createChart('chartCostPerMeal', 'line', G_BLUE, BG_BLUE);   // 1
+            charts.messCost = createChart('chartMessCost', 'bar', G_RED, BG_RED);            // 2
+            charts.ctc = createChart('chartCTC', 'bar', G_YELLOW, BG_YELLOW);                // 3
+            charts.grocery = createChart('chartGrocery', 'bar', G_GREEN, BG_GREEN);          // 4
             
-            charts.messCost = createChart('chartMessCost', 'bar', G_BLUE, BG_BLUE);
-            charts.ctc = createChart('chartCTC', 'bar', G_RED, BG_RED);
-            charts.grocery = createChart('chartGrocery', 'bar', G_YELLOW, BG_YELLOW);
-            charts.veg = createChart('chartVeg', 'bar', G_GREEN, BG_GREEN);
+            charts.veg = createChart('chartVeg', 'bar', G_BLUE, BG_BLUE);                    // 5
+            charts.meat = createChart('chartMeat', 'bar', G_RED, BG_RED);                    // 6
+            charts.water = createChart('chartWater', 'bar', G_YELLOW, BG_YELLOW);            // 7
+            charts.permTotal = createChart('chartPermTotal', 'bar', G_GREEN, BG_GREEN);      // 8
             
-            charts.meat = createChart('chartMeat', 'bar', G_BLUE, BG_BLUE);
-            charts.water = createChart('chartWater', 'bar', G_RED, BG_RED);
-            charts.permTotal = createChart('chartPermTotal', 'bar', G_YELLOW, BG_YELLOW);
-            charts.permHead = createChart('chartPermHead', 'line', G_GREEN, BG_GREEN);
-            
-            charts.tpTotal = createChart('chartTPTotal', 'bar', G_BLUE, BG_BLUE);
-            charts.tpHead = createChart('chartTPHead', 'line', G_RED, BG_RED);
+            charts.permHead = createChart('chartPermHead', 'line', G_BLUE, BG_BLUE);         // 9
+            charts.tpTotal = createChart('chartTPTotal', 'bar', G_RED, BG_RED);              // 10
+            charts.tpHead = createChart('chartTPHead', 'line', G_YELLOW, BG_YELLOW);         // 11
         }
 
         function populateDropdowns() {
@@ -477,9 +458,6 @@
             });
 
             // Column Mapping
-            const permEmpCol = findColumn(sheetData[0], ['permanent employees', 'permanent']);
-            const tpEmpCol = findColumn(sheetData[0], ['third party employees', 'third party']);
-            const guestCol = findColumn(sheetData[0], ['guests']);
             const grocCol = findColumn(sheetData[0], ['mess grocery', 'grocery']);
             const waterCol = findColumn(sheetData[0], ['water']);
             const vegCol = findColumn(sheetData[0], ['vegitables', 'fruits', 'veg']);
@@ -492,12 +470,14 @@
             const tpTotCol = findColumn(sheetData[0], ['third party employee cost', 'third party total']);
             const tpHeadCol = findColumn(sheetData[0], ['third party - per employee cost', 'tp per head']);
 
-            // --- STRICT MONTH-WISE X-AXIS ---
+            // X-Axis locked to Month
             let groupByCol = 'ExtractedMonth'; 
 
             // Globals
-            let gPEmp = 0, gTPEmp = 0, gGuest = 0, gGroc = 0, gWat = 0, gVeg = 0, gMeat = 0;
+            let gGroc = 0, gWat = 0, gVeg = 0, gMeat = 0;
             let gMessCost = 0, gCTC = 0, gPTot = 0, gTPTot = 0;
+            
+            // Averages
             let sumCMeal = 0, cntCMeal = 0;
             let sumPHead = 0, cntPHead = 0;
             let sumTPHead = 0, cntTPHead = 0;
@@ -507,9 +487,6 @@
             filteredData.forEach(item => {
                 let label = item[groupByCol] || "Unknown";
 
-                let vPEmp = cleanNumber(item[permEmpCol]);
-                let vTPEmp = cleanNumber(item[tpEmpCol]);
-                let vGuest = cleanNumber(item[guestCol]);
                 let vGroc = cleanNumber(item[grocCol]);
                 let vWat = cleanNumber(item[waterCol]);
                 let vVeg = cleanNumber(item[vegCol]);
@@ -523,7 +500,6 @@
                 let vPHead = cleanNumber(item[permHeadCol]);
                 let vTPHead = cleanNumber(item[tpHeadCol]);
 
-                gPEmp += vPEmp; gTPEmp += vTPEmp; gGuest += vGuest; 
                 gGroc += vGroc; gWat += vWat; gVeg += vVeg; gMeat += vMeat;
                 gMessCost += vMCost; gCTC += vCTC; gPTot += vPTot; gTPTot += vTPTot;
 
@@ -533,12 +509,11 @@
 
                 if (!groupedStats[label]) {
                     groupedStats[label] = {
-                        pe:0, tpe:0, gu:0, gr:0, wa:0, vg:0, me:0, mc:0, ctc:0, pt:0, tpt:0,
+                        gr:0, wa:0, vg:0, me:0, mc:0, ctc:0, pt:0, tpt:0,
                         cm_s:0, cm_c:0, ph_s:0, ph_c:0, tph_s:0, tph_c:0
                     };
                 }
 
-                groupedStats[label].pe += vPEmp; groupedStats[label].tpe += vTPEmp; groupedStats[label].gu += vGuest;
                 groupedStats[label].gr += vGroc; groupedStats[label].wa += vWat; groupedStats[label].vg += vVeg;
                 groupedStats[label].me += vMeat; groupedStats[label].mc += vMCost; groupedStats[label].ctc += vCTC;
                 groupedStats[label].pt += vPTot; groupedStats[label].tpt += vTPTot;
@@ -548,10 +523,7 @@
                 if(vTPHead > 0) { groupedStats[label].tph_s += vTPHead; groupedStats[label].tph_c++; }
             });
 
-            // Update UI Numbers
-            document.getElementById('valPermEmp').innerText = formatNum(gPEmp);
-            document.getElementById('valTPEmp').innerText = formatNum(gTPEmp);
-            document.getElementById('valGuests').innerText = formatNum(gGuest);
+            // Update UI 
             document.getElementById('valGrocery').innerText = "Rs " + formatNum(gGroc);
             document.getElementById('valWater').innerText = "Rs " + formatNum(gWat);
             document.getElementById('valVeg').innerText = "Rs " + formatNum(gVeg);
@@ -565,7 +537,7 @@
             document.getElementById('valPermHead').innerText = "Rs " + (cntPHead > 0 ? formatNum(sumPHead / cntPHead) : "0");
             document.getElementById('valTPHead').innerText = "Rs " + (cntTPHead > 0 ? formatNum(sumTPHead / cntTPHead) : "0");
 
-            // --- SMART MONTH SORTER FOR X-AXIS ---
+            // Charts Data Setup
             let labels = Object.keys(groupedStats);
             const monthOrder = { "jan":1, "feb":2, "mar":3, "apr":4, "may":5, "jun":6, "jul":7, "aug":8, "sep":9, "oct":10, "nov":11, "dec":12 };
             labels.sort((a, b) => {
@@ -574,11 +546,10 @@
                 return numA - numB;
             });
 
-            let dPE=[], dTPE=[], dGu=[], dCMeal=[], dMC=[], dCTC=[], dGr=[], dVg=[], dMe=[], dWa=[], dPTot=[], dPHead=[], dTPTot=[], dTPHead=[];
+            let dCMeal=[], dMC=[], dCTC=[], dGr=[], dVg=[], dMe=[], dWa=[], dPTot=[], dPHead=[], dTPTot=[], dTPHead=[];
 
             labels.forEach(lbl => {
                 let s = groupedStats[lbl];
-                dPE.push(s.pe); dTPE.push(s.tpe); dGu.push(s.gu);
                 dMC.push(s.mc); dCTC.push(s.ctc); dGr.push(s.gr);
                 dVg.push(s.vg); dMe.push(s.me); dWa.push(s.wa);
                 dPTot.push(s.pt); dTPTot.push(s.tpt);
@@ -594,9 +565,6 @@
                 chartInst.update();
             }
 
-            updateC(charts.permEmp, labels, dPE);
-            updateC(charts.tpEmp, labels, dTPE);
-            updateC(charts.guests, labels, dGu);
             updateC(charts.costPerMeal, labels, dCMeal);
             updateC(charts.messCost, labels, dMC);
             updateC(charts.ctc, labels, dCTC);
