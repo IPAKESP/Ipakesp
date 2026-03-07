@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Corporate Dashboard</title>
+    <title>IPAK Corporate Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -31,7 +31,7 @@
             font-family: 'Roboto', sans-serif;
             margin: 0;
             display: flex;
-            flex-direction: column; /* Changed to column for full-width header */
+            flex-direction: column; 
             background-color: var(--bg-light);
             color: var(--text-main);
             height: 100vh;
@@ -57,7 +57,7 @@
         }
 
         .logo {
-            height: 50px; /* Adjust as needed */
+            height: 50px; 
             width: auto;
             object-fit: contain;
             margin-right: 20px;
@@ -77,7 +77,7 @@
         --------------------------------- */
         .layout-container {
             display: flex;
-            margin-top: var(--header-height); /* Push down below header */
+            margin-top: var(--header-height); 
             height: calc(100vh - var(--header-height));
         }
 
@@ -232,7 +232,7 @@
 
     <header class="top-header">
         <img src="Logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
-        <h1>Corporate Dashboard</h1>
+        <h1>HR OPERATIONS</h1>
     </header>
 
     <div class="layout-container">
@@ -473,7 +473,7 @@
                         borderWidth: 2,
                         fill: type === 'line', 
                         tension: 0.4,
-                        pointRadius: 2,
+                        pointRadius: 3,
                         borderRadius: type === 'bar' ? 4 : 0,
                         data: [] 
                     }] 
@@ -484,19 +484,19 @@
                     animation: { duration: 800, easing: 'easeOutQuart' },
                     plugins: { 
                         legend: { display: false },
-                        tooltip: { titleFont: { size: 10 }, bodyFont: { size: 10 } }
+                        tooltip: { titleFont: { size: 11 }, bodyFont: { size: 11 } }
                     },
                     scales: { 
                         y: { 
                             display: true, 
                             beginAtZero: true, 
                             grid: { drawBorder: false, color: '#f1f3f4' },
-                            ticks: { font: { size: 9 }, color: '#9aa0a6' }
+                            ticks: { font: { size: 10 }, color: '#9aa0a6' }
                         },
                         x: { 
                             display: true, 
                             grid: { display: false },
-                            ticks: { font: { size: 9 }, color: '#9aa0a6', maxRotation: 45, minRotation: 0 }
+                            ticks: { font: { size: 10 }, color: '#9aa0a6', maxRotation: 45, minRotation: 0 }
                         }
                     }
                 }
@@ -504,23 +504,23 @@
         }
 
         function initCharts() {
-            charts.actStd = createChart('chartActVsStd', 'line', G_BLUE, BG_BLUE);       // 1. Blue
-            charts.otHours = createChart('chartOTHours', 'bar', G_RED, BG_RED);          // 2. Red
-            charts.otCost = createChart('chartOTCost', 'bar', G_YELLOW, BG_YELLOW);      // 3. Yellow
-            charts.otPct = createChart('chartOTPercent', 'line', G_GREEN, BG_GREEN);     // 4. Green
+            charts.actStd = createChart('chartActVsStd', 'line', G_BLUE, BG_BLUE);       
+            charts.otHours = createChart('chartOTHours', 'bar', G_RED, BG_RED);          
+            charts.otCost = createChart('chartOTCost', 'bar', G_YELLOW, BG_YELLOW);      
+            charts.otPct = createChart('chartOTPercent', 'line', G_GREEN, BG_GREEN);     
             
-            charts.tpOTHours = createChart('chartTPOTHours', 'bar', G_BLUE, BG_BLUE);    // 5. Blue
-            charts.tpOTCost = createChart('chartTPOTCost', 'bar', G_RED, BG_RED);        // 6. Red
-            charts.absent = createChart('chartAbsent', 'line', G_YELLOW, BG_YELLOW);     // 7. Yellow
-            charts.leave = createChart('chartLeave', 'line', G_GREEN, BG_GREEN);         // 8. Green
+            charts.tpOTHours = createChart('chartTPOTHours', 'bar', G_BLUE, BG_BLUE);    
+            charts.tpOTCost = createChart('chartTPOTCost', 'bar', G_RED, BG_RED);        
+            charts.absent = createChart('chartAbsent', 'line', G_YELLOW, BG_YELLOW);     
+            charts.leave = createChart('chartLeave', 'line', G_GREEN, BG_GREEN);         
             
-            charts.late = createChart('chartLate', 'line', G_BLUE, BG_BLUE);             // 9. Blue
-            charts.early = createChart('chartEarly', 'line', G_RED, BG_RED);             // 10. Red
-            charts.active = createChart('chartActive', 'line', G_YELLOW, BG_YELLOW);     // 11. Yellow
-            charts.joiners = createChart('chartJoiners', 'bar', G_GREEN, BG_GREEN);      // 12. Green
+            charts.late = createChart('chartLate', 'line', G_BLUE, BG_BLUE);             
+            charts.early = createChart('chartEarly', 'line', G_RED, BG_RED);             
+            charts.active = createChart('chartActive', 'line', G_YELLOW, BG_YELLOW);     
+            charts.joiners = createChart('chartJoiners', 'bar', G_GREEN, BG_GREEN);      
             
-            charts.leavers = createChart('chartLeavers', 'bar', G_BLUE, BG_BLUE);        // 13. Blue
-            charts.pending = createChart('chartPending', 'bar', G_RED, BG_RED);          // 14. Red
+            charts.leavers = createChart('chartLeavers', 'bar', G_BLUE, BG_BLUE);        
+            charts.pending = createChart('chartPending', 'bar', G_RED, BG_RED);          
         }
 
         function updateSectionDropdown() {
@@ -626,7 +626,7 @@
             const selectedDept = document.getElementById('filterDept').value;
             const selectedSection = document.getElementById('filterSection').value;
 
-            const companyCol = findColumn(sheetData[0], ['company', 'unit', 'plant', 'factory']);
+            // Dimensions
             const yearCol = findColumn(sheetData[0], ['year']);
             const monthCol = findColumn(sheetData[0], ['month']);
             const deptCol = findColumn(sheetData[0], ['department', 'dept']);
@@ -641,7 +641,7 @@
                 return match;
             });
 
-            // 14 KPI Columns Mapping
+            // KPI Columns Mapping
             const actVsStdCol = findColumn(sheetData[0], ['actual vs standard', 'actual vs std']);
             const otHoursCol = findColumn(sheetData[0], ['overtime hours', 'total ot hours']);
             const otCostCol = findColumn(sheetData[0], ['ot cost', 'overtime cost']);
@@ -657,11 +657,9 @@
             const leaversCol = findColumn(sheetData[0], ['leavers', 'leave count']);
             const pendingCol = findColumn(sheetData[0], ['pending final settlement', 'pending settlement', 'settlement']);
 
-            let groupByCol = companyCol || deptCol || headers[0]; 
-            if (selectedDept !== "All" && sectionCol) groupByCol = sectionCol;
-            if (selectedSection !== "All" && monthCol) groupByCol = monthCol;
+            // FORCE GROUP BY MONTH FOR TREND ANALYSIS
+            let groupByCol = monthCol || headers[0];
 
-            // Global Aggregations
             let gOtHours = 0, gOtCost = 0, gTpOTHours = 0, gTpOTCost = 0, gJoiners = 0, gLeavers = 0, gPending = 0;
             let sumActStd = 0, cntActStd = 0;
             let sumOtPct = 0, cntOtPct = 0;
@@ -733,7 +731,7 @@
                 if (vAct > 0) { groupedStats[label].ac_p += vAct; groupedStats[label].ac_c++; }
             });
 
-            // Set UI Values
+            // Update Header Values
             document.getElementById('valActVsStd').innerText = cntActStd > 0 ? (sumActStd / cntActStd).toFixed(2) + "%" : "0%";
             document.getElementById('valOTHours').innerText = formatNum(gOtHours);
             document.getElementById('valOTCost').innerText = "Rs " + formatNum(gOtCost);
@@ -749,11 +747,19 @@
             document.getElementById('valLeavers').innerText = formatNum(gLeavers);
             document.getElementById('valPending').innerText = formatNum(gPending);
 
-            // Prepare Arrays for Charts
-            let labels = Object.keys(groupedStats);
+            let chartLabels = Object.keys(groupedStats);
+
+            // Tarteeb (Chronological sorting for months)
+            const monthsMap = { "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6, "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12 };
+            chartLabels.sort((a, b) => {
+                let valA = monthsMap[a.toLowerCase().substring(0, 3)] || 99;
+                let valB = monthsMap[b.toLowerCase().substring(0, 3)] || 99;
+                return valA - valB;
+            });
+
             let dActStd=[], dOtHrs=[], dOtCost=[], dOtPct=[], dTpHrs=[], dTpCost=[], dAbs=[], dLev=[], dLat=[], dEar=[], dAct=[], dJoin=[], dLeav=[], dPend=[];
 
-            labels.forEach(lbl => {
+            chartLabels.forEach(lbl => {
                 let s = groupedStats[lbl];
                 dOtHrs.push(s.otH); dOtCost.push(s.otC);
                 dTpHrs.push(s.tpH); dTpCost.push(s.tpC);
@@ -774,20 +780,20 @@
                 chartInst.update();
             }
 
-            updateC(charts.actStd, labels, dActStd);
-            updateC(charts.otHours, labels, dOtHrs);
-            updateC(charts.otCost, labels, dOtCost);
-            updateC(charts.otPct, labels, dOtPct);
-            updateC(charts.tpOTHours, labels, dTpHrs);
-            updateC(charts.tpOTCost, labels, dTpCost);
-            updateC(charts.absent, labels, dAbs);
-            updateC(charts.leave, labels, dLev);
-            updateC(charts.late, labels, dLat);
-            updateC(charts.early, labels, dEar);
-            updateC(charts.active, labels, dAct);
-            updateC(charts.joiners, labels, dJoin);
-            updateC(charts.leavers, labels, dLeav);
-            updateC(charts.pending, labels, dPend);
+            updateC(charts.actStd, chartLabels, dActStd);
+            updateC(charts.otHours, chartLabels, dOtHrs);
+            updateC(charts.otCost, chartLabels, dOtCost);
+            updateC(charts.otPct, chartLabels, dOtPct);
+            updateC(charts.tpOTHours, chartLabels, dTpHrs);
+            updateC(charts.tpOTCost, chartLabels, dTpCost);
+            updateC(charts.absent, chartLabels, dAbs);
+            updateC(charts.leave, chartLabels, dLev);
+            updateC(charts.late, chartLabels, dLat);
+            updateC(charts.early, chartLabels, dEar);
+            updateC(charts.active, chartLabels, dAct);
+            updateC(charts.joiners, chartLabels, dJoin);
+            updateC(charts.leavers, chartLabels, dLeav);
+            updateC(charts.pending, chartLabels, dPend);
         }
 
         // Filters
