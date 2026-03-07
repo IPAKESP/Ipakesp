@@ -306,7 +306,7 @@
     </div>
 
     <script>
-        // LIVE CSV LINK ADDED HERE WITH THE EXACT GID PROVIDED
+        // LIVE CSV LINK
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=1994039092&single=true&output=csv';
 
         let sheetData = [];
@@ -365,7 +365,6 @@
         }
 
         function initCharts() {
-            // Colors cycle: Blue, Red, Yellow, Green
             charts.permEmp = createChart('chartPermEmp', 'bar', G_BLUE, BG_BLUE);
             charts.tpEmp = createChart('chartTPEmp', 'bar', G_RED, BG_RED);
             charts.guests = createChart('chartGuests', 'bar', G_YELLOW, BG_YELLOW);
@@ -397,18 +396,20 @@
                 let mRaw = row[monthColRaw] || "";
                 if(mRaw.includes('-')) {
                     let parts = mRaw.split('-');
-                    months.add(parts[0]);
-                    years.add("20" + parts[1]); 
-                    row['ExtractedYear'] = "20" + parts[1];
-                    row['ExtractedMonth'] = parts[0];
+                    let mth = parts[0].trim();
+                    let yr = "20" + parts[1].trim();
+                    months.add(mth);
+                    years.add(yr); 
+                    row['ExtractedYear'] = yr;
+                    row['ExtractedMonth'] = mth;
                 } else {
-                    months.add(mRaw);
-                    row['ExtractedMonth'] = mRaw;
-                    row['ExtractedYear'] = "All"; // Fallback
+                    months.add(mRaw.trim());
+                    row['ExtractedMonth'] = mRaw.trim();
+                    row['ExtractedYear'] = "All"; 
                 }
 
                 let cRaw = row[compColRaw];
-                if (cRaw && cRaw.toLowerCase() !== 'group') companies.add(cRaw);
+                if (cRaw && cRaw.toLowerCase() !== 'group') companies.add(cRaw.trim());
             });
 
             const addOptions = (setId, dataSet) => {
@@ -443,15 +444,6 @@
 
                 sheetData = sheetData.filter(row => Object.values(row).some(x => x !== ""));
 
-                // BASIC SMART CHECKER: Check if some expected data exists
-                if(sheetData.length === 0) {
-                    document.getElementById('loadingMsg').innerHTML = `
-                        <span style="color:red; font-size:1.1rem;">⚠️ Error!</span><br><br>
-                        Data load nahi ho saka. Sheet empty ho sakti hai.
-                    `;
-                    return; 
-                }
-
                 document.getElementById('loadingMsg').style.display = 'none';
                 document.getElementById('dashboardContent').style.display = 'grid'; 
 
@@ -459,7 +451,7 @@
                 updateDashboard(); 
             } catch (error) {
                 console.error("Data loading error:", error);
-                document.getElementById('loadingMsg').innerText = "Failed to load data.";
+                document.getElementById('loadingMsg').innerText = "Failed to load data. Please check the console.";
             }
         }
 
@@ -475,7 +467,7 @@
             let filteredData = sheetData.filter(item => {
                 let match = true;
                 
-                // Exclude the pre-calculated 'Group' rows to avoid double counting if "All" is selected
+                // Exclude the 'Group' total row to avoid double counting numbers when 'All' is selected
                 if(selectedComp === "All" && item[compCol] && item[compCol].toLowerCase() === 'group') return false;
                 
                 if(selectedComp !== "All" && item[compCol] !== selectedComp) match = false;
@@ -490,7 +482,7 @@
             const guestCol = findColumn(sheetData[0], ['guests']);
             const grocCol = findColumn(sheetData[0], ['mess grocery', 'grocery']);
             const waterCol = findColumn(sheetData[0], ['water']);
-            const vegCol = findColumn(sheetData[0], ['vegitables', 'fruits']);
+            const vegCol = findColumn(sheetData[0], ['vegitables', 'fruits', 'veg']);
             const meatCol = findColumn(sheetData[0], ['meat']);
             const messCostCol = findColumn(sheetData[0], ['mess cost']);
             const ctcCol = findColumn(sheetData[0], ['cost to company', 'ctc']);
@@ -500,14 +492,12 @@
             const tpTotCol = findColumn(sheetData[0], ['third party employee cost', 'third party total']);
             const tpHeadCol = findColumn(sheetData[0], ['third party - per employee cost', 'tp per head']);
 
-            // X-Axis locked to Month
+            // --- STRICT MONTH-WISE X-AXIS ---
             let groupByCol = 'ExtractedMonth'; 
 
             // Globals
             let gPEmp = 0, gTPEmp = 0, gGuest = 0, gGroc = 0, gWat = 0, gVeg = 0, gMeat = 0;
             let gMessCost = 0, gCTC = 0, gPTot = 0, gTPTot = 0;
-            
-            // Averages
             let sumCMeal = 0, cntCMeal = 0;
             let sumPHead = 0, cntPHead = 0;
             let sumTPHead = 0, cntTPHead = 0;
@@ -558,7 +548,7 @@
                 if(vTPHead > 0) { groupedStats[label].tph_s += vTPHead; groupedStats[label].tph_c++; }
             });
 
-            // Update UI 
+            // Update UI Numbers
             document.getElementById('valPermEmp').innerText = formatNum(gPEmp);
             document.getElementById('valTPEmp').innerText = formatNum(gTPEmp);
             document.getElementById('valGuests').innerText = formatNum(gGuest);
@@ -575,10 +565,14 @@
             document.getElementById('valPermHead').innerText = "Rs " + (cntPHead > 0 ? formatNum(sumPHead / cntPHead) : "0");
             document.getElementById('valTPHead').innerText = "Rs " + (cntTPHead > 0 ? formatNum(sumTPHead / cntTPHead) : "0");
 
-            // Charts Data
+            // --- SMART MONTH SORTER FOR X-AXIS ---
             let labels = Object.keys(groupedStats);
             const monthOrder = { "jan":1, "feb":2, "mar":3, "apr":4, "may":5, "jun":6, "jul":7, "aug":8, "sep":9, "oct":10, "nov":11, "dec":12 };
-            labels.sort((a, b) => (monthOrder[a.toLowerCase()] || 99) - (monthOrder[b.toLowerCase()] || 99));
+            labels.sort((a, b) => {
+                let numA = monthOrder[a.toLowerCase().substring(0,3)] || 99;
+                let numB = monthOrder[b.toLowerCase().substring(0,3)] || 99;
+                return numA - numB;
+            });
 
             let dPE=[], dTPE=[], dGu=[], dCMeal=[], dMC=[], dCTC=[], dGr=[], dVg=[], dMe=[], dWa=[], dPTot=[], dPHead=[], dTPTot=[], dTPHead=[];
 
@@ -616,7 +610,7 @@
             updateC(charts.tpHead, labels, dTPHead);
         }
 
-        // Dropdown Events
+        // Filters Event Listeners
         document.querySelectorAll('select').forEach(select => {
             select.addEventListener('change', updateDashboard);
         });
