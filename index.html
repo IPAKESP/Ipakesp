@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Corporate Dashboard</title>
+    <title>IPAK Corporate Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -164,7 +164,7 @@
         }
 
         /* ---------------------------------
-           NAVIGATION TABS (NEW)
+           NAVIGATION TABS
         --------------------------------- */
         .nav-tabs {
             display: flex;
@@ -208,7 +208,7 @@
         }
 
         .nav-tabs a.home-icon {
-            margin-left: auto; /* Pushes the home button to the far right */
+            margin-left: auto;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -292,20 +292,6 @@
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 10;
-        }
-
-        /* A4 PRINT / DOWNLOAD LOGIC */
-        @media print {
-            @page { size: A4 landscape; margin: 10mm; }
-            body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .sidebar, .share-container, .nav-tabs, #loadingMsg { display: none !important; }
-            .layout-container { margin-top: 0 !important; height: auto !important; }
-            .main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; overflow: visible !important; }
-            .top-header { position: relative !important; margin-bottom: 15px !important; padding: 0 0 10px 0 !important; border-bottom: 2px solid #000; box-shadow: none !important; }
-            .dashboard-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 10px !important; }
-            .kpi-widget { page-break-inside: avoid; box-shadow: none !important; border: 1px solid var(--border-color); padding: 10px 15px 5px 15px !important; border-top-width: 4px !important; }
-            .kpi-value { font-size: 1.1rem !important; }
-            .chart-wrapper { height: 90px !important; }
         }
     </style>
 </head>
