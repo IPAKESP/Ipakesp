@@ -168,6 +168,7 @@
         --------------------------------- */
         .nav-tabs {
             display: flex;
+            align-items: center;
             gap: 15px;
             margin-bottom: 30px;
             border-bottom: 2px solid var(--border-color);
@@ -198,12 +199,35 @@
         .nav-tabs a.active::after {
             content: '';
             position: absolute;
-            bottom: -12px; /* Matches the padding-bottom of nav-tabs + border */
+            bottom: -12px;
             left: 0;
             width: 100%;
             height: 3px;
             background-color: var(--google-blue);
             border-radius: 3px 3px 0 0;
+        }
+
+        .nav-tabs a.home-icon {
+            margin-left: auto; /* Pushes the home button to the far right */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .nav-tabs a.home-icon::after {
+            display: none;
+        }
+
+        .nav-tabs a.home-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         /* Unified Card & Graph Widget Grid */
@@ -269,6 +293,20 @@
             transform: translate(-50%, -50%);
             z-index: 10;
         }
+
+        /* A4 PRINT / DOWNLOAD LOGIC */
+        @media print {
+            @page { size: A4 landscape; margin: 10mm; }
+            body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .sidebar, .share-container, .nav-tabs, #loadingMsg { display: none !important; }
+            .layout-container { margin-top: 0 !important; height: auto !important; }
+            .main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; overflow: visible !important; }
+            .top-header { position: relative !important; margin-bottom: 15px !important; padding: 0 0 10px 0 !important; border-bottom: 2px solid #000; box-shadow: none !important; }
+            .dashboard-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 10px !important; }
+            .kpi-widget { page-break-inside: avoid; box-shadow: none !important; border: 1px solid var(--border-color); padding: 10px 15px 5px 15px !important; border-top-width: 4px !important; }
+            .kpi-value { font-size: 1.1rem !important; }
+            .chart-wrapper { height: 90px !important; }
+        }
     </style>
 </head>
 <body>
@@ -304,8 +342,16 @@
         <div class="main-content">
             
             <div class="nav-tabs">
+                <a href="index.html">HR Dashboard</a>
                 <a href="#" class="active">Admin Dashboard</a>
                 <a href="cost.html">Cost Dashboard</a>
+                
+                <a href="index.html" class="home-icon" title="Home">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </a>
             </div>
 
             <div id="loadingMsg">Fetching live data...</div>
