@@ -160,7 +160,7 @@
                 </a>
             </div>
 
-            <div id="loadingMsg">Fetching Admin Data...</div>
+            <div id="loadingMsg">Calculating Service Level Averages...</div>
 
             <div class="dashboard-grid" id="dashboardContent" style="display: none;">
                 
@@ -180,7 +180,8 @@
     </div>
 
     <script>
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=846898316&single=true&output=csv';
+        // ADMIN SHEET LINK (GID: 508898650 based on your latest link structure)
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=508898650&single=true&output=csv';
 
         let sheetData = [];
         let headers = [];
@@ -205,35 +206,21 @@
             return arr;
         }
 
-        // ULTRA SMART COLUMN FINDER (Ignores spaces and exact case)
-        function findColumn(row, keywords) {
-            if(!row) return null;
-            let keys = Object.keys(row);
-            for(let key of keys) {
-                let cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
-                for(let kw of keywords) {
-                    let cleanKw = kw.toLowerCase().replace(/[^a-z0-9]/g, '');
-                    if(cleanKey.includes(cleanKw) && cleanKw.length > 2) return key;
-                }
-            }
-            return null;
-        }
-
-        // ULTRA SMART NUMBER EXTRACTOR (Handles decimals < 1 like 0.90 -> 90%)
-        function cleanNumber(val) {
-            if (val === undefined || val === null || val.toString().trim() === '') return null;
+        // Extremely precise percentage cleaner
+        function cleanPercent(val) {
+            if (!val || val.toString().trim() === '') return null;
             let strVal = val.toString().toLowerCase();
-            if (strVal.includes('#div/0!') || strVal.includes('#n/a') || strVal.includes('#ref!') || strVal.includes('error')) return null;
+            if (strVal.includes('#div/0!') || strVal.includes('#n/a') || strVal.includes('error')) return null;
             
-            let cleaned = strVal.replace(/,/g, '').replace(/%/g, '').replace(/[^\d.-]/g, '');
-            let num = parseFloat(cleaned);
-            
+            let num = parseFloat(strVal.replace(/[^0-9.-]/g, ''));
             if (isNaN(num)) return null;
+
+            // If string already contains '%', just return the number (e.g. "95%" -> 95)
+            if (strVal.includes('%')) return num;
             
-            // If data comes in as decimals (e.g. 0.85 instead of 85%), multiply by 100
-            if (num > 0 && num <= 1.0 && !strVal.includes('%')) {
-                num = num * 100;
-            }
+            // If it's a decimal from Google sheets (e.g. 0.95 -> 95%)
+            if (num > 0 && num <= 1.0) return num * 100;
+            
             return num;
         }
 
@@ -263,24 +250,35 @@
             charts.loc6 = createChart('chartLoc6', G_RED, BG_RED);
             charts.loc7 = createChart('chartLoc7', G_YELLOW, BG_YELLOW);
             charts.loc8 = createChart('chartLoc8', G_GREEN, BG_GREEN);
-            charts.loc9 = createChart('chartLoc9', G_BLUE, BG_BLUE); 
-            charts.loc10 = createChart('chartLoc10', G_RED, BG_RED); 
+            charts.loc9 = createChart('chartLoc9', G_BLUE, BG_BLUE); // Technical Office
+            charts.loc10 = createChart('chartLoc10', G_RED, BG_RED); // Washrooms
+        }
+
+        // EXACT MAPPING VARIABLES
+        let h_month, h_surv, h_area, h_loc, h_svc;
+
+        function identifyHeaders(headerRow) {
+            headerRow.forEach(h => {
+                let cleanH = h.toLowerCase().replace(/[^a-z0-9]/g, '');
+                if (cleanH.includes('month')) h_month = h;
+                if (cleanH.includes('surveyour') || cleanH.includes('surveyor')) h_surv = h;
+                if (cleanH.includes('areaofsurvey') || cleanH.includes('area')) h_area = h;
+                if (cleanH.includes('location')) h_loc = h;
+                if (cleanH.includes('servicelevel') || cleanH.includes('score')) h_svc = h;
+            });
         }
 
         function populateDropdowns() {
-            const monthColRaw = findColumn(sheetData[0], ['month', 'date']);
-            const survColRaw = findColumn(sheetData[0], ['surveyour', 'surveyor', 'name']);
-            const locColRaw = findColumn(sheetData[0], ['location', 'site', 'branch']);
-
             const years = new Set(), months = new Set(), surveyors = new Set(), locations = new Set();
 
             sheetData.forEach(row => {
-                let mRaw = row[monthColRaw] || "";
+                let mRaw = row[h_month] || "";
                 if(mRaw.includes('-')) {
                     let parts = mRaw.split('-');
                     months.add(parts[0].trim());
-                    years.add((parts[1].length === 2 ? "20" : "") + parts[1].trim()); 
-                    row['ExtractedYear'] = (parts[1].length === 2 ? "20" : "") + parts[1].trim();
+                    let yr = (parts[1].length === 2 ? "20" : "") + parts[1].trim();
+                    years.add(yr); 
+                    row['ExtractedYear'] = yr;
                     row['ExtractedMonth'] = parts[0].trim();
                 } else {
                     if(mRaw) months.add(mRaw.trim());
@@ -288,8 +286,8 @@
                     row['ExtractedYear'] = "All"; 
                 }
 
-                if(survColRaw && row[survColRaw]) surveyors.add(row[survColRaw].trim());
-                if(locColRaw && row[locColRaw]) locations.add(row[locColRaw].trim());
+                if(h_surv && row[h_surv]) surveyors.add(row[h_surv].trim());
+                if(h_loc && row[h_loc]) locations.add(row[h_loc].trim());
             });
 
             const addOptions = (setId, dataSet) => {
@@ -310,17 +308,18 @@
                 const csvText = await response.text();
                 const rows = parseCSV(csvText);
                 
-                // SMART HEADER DETECTOR: Dhoondho k Area ya Service Level kis line par likha hai
+                // Find exactly where the data headers start
                 let headerIdx = 0;
                 for(let i=0; i<Math.min(15, rows.length); i++) {
-                    let rowStr = rows[i].join("").toLowerCase().replace(/[^a-z0-9]/g, '');
-                    if(rowStr.includes("area") || rowStr.includes("service") || rowStr.includes("level")) {
+                    let rowStr = rows[i].join("").toLowerCase().replace(/\s/g, '');
+                    if(rowStr.includes("month") && rowStr.includes("servicelevel")) {
                         headerIdx = i;
                         break;
                     }
                 }
 
                 headers = rows[headerIdx].map(h => h ? h.trim() : `Col_${Math.random()}`);
+                identifyHeaders(headers); // Lock the columns based on your provided names
                 
                 sheetData = rows.slice(headerIdx + 1).map(row => {
                     let obj = {};
@@ -339,7 +338,7 @@
                 updateDashboard(); 
             } catch (error) {
                 console.error("Data error:", error);
-                document.getElementById('loadingMsg').innerHTML = `<span style='color:red'>Data Error: Please check the sheet format.</span>`;
+                document.getElementById('loadingMsg').innerHTML = `<span style='color:red'>Error reading sheet headers. Check columns.</span>`;
             }
         }
 
@@ -349,27 +348,26 @@
             const sVal = document.getElementById('filterSurveyor').value;
             const lVal = document.getElementById('filterLocation').value;
 
-            const survCol = findColumn(sheetData[0], ['surveyour', 'surveyor', 'name']);
-            const locCol = findColumn(sheetData[0], ['location', 'site']);
-
+            // FILTER THE DATA GLOBALLY
             let filteredData = sheetData.filter(item => {
                 if(yVal !== "All" && item['ExtractedYear'] !== yVal) return false;
                 if(mVal !== "All" && item['ExtractedMonth'] !== mVal) return false;
-                if(sVal !== "All" && survCol && item[survCol] !== sVal) return false;
-                if(lVal !== "All" && locCol && item[locCol] !== lVal) return false;
+                if(sVal !== "All" && h_surv && item[h_surv] !== sVal) return false;
+                if(lVal !== "All" && h_loc && item[h_loc] !== lVal) return false;
                 return true;
             });
 
-            // ---------------------------------------------------------
-            // SPECIFIC LOGIC FOR "AREA OF SURVEY" AND "SERVICE LEVEL"
-            // ---------------------------------------------------------
-            const areaCol = findColumn(sheetData[0], ['area of survey', 'survey area', 'area']);
-            const scoreCol = findColumn(sheetData[0], ['service level', 'servicelevel', 'score', 'sla']);
-
+            // 10 Specific Area Keywords
             const targetAreas = [
-                ['admin building', 'admin'], ['executive mess'], ['guesthouse', 'guest house'], ['guest room'],
-                ['locker'], ['plant outside', 'plant'], ['social block', 'staff mess'], ['transport'],
-                ['technical office', 'tech office', 'gpak', 'ipak', 'petpak'], // Combined Technical Office
+                ['admin building', 'admin'], 
+                ['executive mess'], 
+                ['guesthouse', 'guest house'], 
+                ['guest room'],
+                ['locker'], 
+                ['plant outside', 'plant'], 
+                ['social block', 'staff mess'], 
+                ['transport'],
+                ['technical', 'gpak', 'ipak', 'petpak'], // All Tech Offices combined
                 ['washroom']
             ];
 
@@ -381,29 +379,34 @@
                 let label = item['ExtractedMonth'] || "Unknown";
                 if (!groupedStats[label]) groupedStats[label] = { sums: Array(10).fill(0), cnts: Array(10).fill(0) };
 
-                // Ensure columns exist
-                if(areaCol && scoreCol) {
-                    let rArea = (item[areaCol] || "").toLowerCase();
-                    let val = cleanNumber(item[scoreCol]);
-                    
-                    if(val !== null) {
-                        for(let i=0; i<10; i++) {
-                            if(targetAreas[i].some(kw => rArea.includes(kw))) {
-                                gSum[i] += val; gCnt[i]++;
-                                groupedStats[label].sums[i] += val; groupedStats[label].cnts[i]++;
-                                break;
-                            }
+                // Get Area Name from the row
+                let rArea = (item[h_area] || "").toLowerCase();
+                
+                // Get Service Level Score from the row and clean it properly
+                let val = cleanPercent(item[h_svc]);
+                
+                if(val !== null && rArea !== "") {
+                    // Check which of the 10 categories this row belongs to
+                    for(let i=0; i<10; i++) {
+                        if(targetAreas[i].some(kw => rArea.includes(kw))) {
+                            // Sum the percentage and increase the count for AVERAGE calculation
+                            gSum[i] += val; 
+                            gCnt[i]++;
+                            
+                            groupedStats[label].sums[i] += val; 
+                            groupedStats[label].cnts[i]++;
+                            break; // Stop checking once area matches
                         }
                     }
                 }
             });
 
-            // Update Top Numbers
+            // Update Top Cumulative Numbers (Total Sum / Total Count)
             for(let i=0; i<10; i++) {
                 document.getElementById('valLoc'+(i+1)).innerText = gCnt[i] > 0 ? formatAvg(gSum[i] / gCnt[i]) : "0%";
             }
 
-            // Update Charts
+            // Month-wise sorting for Graph X-Axis
             let labels = Object.keys(groupedStats);
             const mOrder = {"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12};
             labels.sort((a,b) => (mOrder[a.substring(0,3).toLowerCase()]||99) - (mOrder[b.substring(0,3).toLowerCase()]||99));
@@ -411,14 +414,21 @@
             let datasets = Array.from({length: 10}, () => []);
             labels.forEach(lbl => {
                 let s = groupedStats[lbl];
-                for(let i=0; i<10; i++) datasets[i].push(s.cnts[i] > 0 ? (s.sums[i]/s.cnts[i]).toFixed(1) : 0);
+                for(let i=0; i<10; i++) {
+                    // Push exact Monthly Average to graph
+                    datasets[i].push(s.cnts[i] > 0 ? (s.sums[i]/s.cnts[i]).toFixed(1) : 0);
+                }
             });
 
+            function updateC(chartInst, lbs, dta) {
+                chartInst.data.labels = lbs;
+                chartInst.data.datasets[0].data = dta;
+                chartInst.update();
+            }
+
+            // Render all 10 Charts
             for(let i=0; i<10; i++) {
-                let inst = charts['loc'+(i+1)];
-                inst.data.labels = labels;
-                inst.data.datasets[0].data = datasets[i];
-                inst.update();
+                updateC(charts['loc'+(i+1)], labels, datasets[i]);
             }
         }
 
