@@ -170,7 +170,7 @@
         }
 
         /* ---------------------------------
-           NAVIGATION TABS (UPDATED)
+           NAVIGATION TABS 
         --------------------------------- */
         .nav-tabs {
             display: flex;
@@ -296,8 +296,10 @@
 <body>
 
     <header class="top-header">
-        <img src="Logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
-        <h1>Corporate Dashboard</h1>
+        <div class="header-left">
+            <img src="Logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
+            <h1>Corporate Dashboard</h1>
+        </div>
     </header>
 
     <div class="layout-container">
@@ -343,43 +345,63 @@
             <div class="dashboard-grid" id="dashboardContent" style="display: none;">
                 
                 <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Overall Service Level</h3><div class="kpi-value" id="valArea1">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartArea1"></canvas></div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>Admin Building</h3><div class="kpi-value" id="valLoc1">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartLoc1"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Cleanliness SLA</h3><div class="kpi-value" id="valArea2">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartArea2"></canvas></div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>Executive Mess</h3><div class="kpi-value" id="valLoc2">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartLoc2"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Security SLA</h3><div class="kpi-value" id="valArea3">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartArea3"></canvas></div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>Guesthouse Building</h3><div class="kpi-value" id="valLoc3">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartLoc3"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Maintenance SLA</h3><div class="kpi-value" id="valArea4">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartArea4"></canvas></div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>Guest Rooms</h3><div class="kpi-value" id="valLoc4">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartLoc4"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Food Quality SLA</h3><div class="kpi-value" id="valArea5">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartArea5"></canvas></div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>Lockers</h3><div class="kpi-value" id="valLoc5">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartLoc5"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Transport SLA</h3><div class="kpi-value" id="valArea6">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartArea6"></canvas></div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>Plant Outside</h3><div class="kpi-value" id="valLoc6">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartLoc6"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Staff Behavior SLA</h3><div class="kpi-value" id="valArea7">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartArea7"></canvas></div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>Staff Mess Social Block</h3><div class="kpi-value" id="valLoc7">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartLoc7"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Timeliness SLA</h3><div class="kpi-value" id="valArea8">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartArea8"></canvas></div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>Staff Transport</h3><div class="kpi-value" id="valLoc8">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartLoc8"></canvas></div>
+                </div>
+
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Technical Office GPAK</h3><div class="kpi-value" id="valLoc9">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartLoc9"></canvas></div>
+                </div>
+
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Technical Office IPAK</h3><div class="kpi-value" id="valLoc10">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartLoc10"></canvas></div>
+                </div>
+
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Technical Office PETPAK</h3><div class="kpi-value" id="valLoc11">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartLoc11"></canvas></div>
+                </div>
+
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Washrooms</h3><div class="kpi-value" id="valLoc12">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartLoc12"></canvas></div>
                 </div>
 
             </div>
@@ -426,10 +448,10 @@
         }
 
         function formatAvg(num) {
-            return num.toFixed(1) + "%"; // Percent formatting for SLAs
+            return num.toFixed(1) + "%"; // Format as Percentage
         }
 
-        // Standard Chart Setup Function
+        // Standard Chart Setup Function (Line Charts for Trends)
         function createChart(canvasId, type, colorLine, colorBg) {
             const ctx = document.getElementById(canvasId).getContext('2d');
             return new Chart(ctx, {
@@ -453,7 +475,10 @@
                     animation: { duration: 800, easing: 'easeOutQuart' },
                     plugins: { 
                         legend: { display: false },
-                        tooltip: { titleFont: { size: 11 }, bodyFont: { size: 11 } }
+                        tooltip: { 
+                            titleFont: { size: 11 }, bodyFont: { size: 11 },
+                            callbacks: { label: function(context) { return context.parsed.y + "%"; } }
+                        }
                     },
                     scales: { 
                         y: { 
@@ -473,20 +498,24 @@
         }
 
         function initCharts() {
-            // Setup 8 trend line charts for Admin SLAs
-            charts.area1 = createChart('chartArea1', 'line', G_BLUE, BG_BLUE);
-            charts.area2 = createChart('chartArea2', 'line', G_RED, BG_RED);
-            charts.area3 = createChart('chartArea3', 'line', G_YELLOW, BG_YELLOW);
-            charts.area4 = createChart('chartArea4', 'line', G_GREEN, BG_GREEN);
+            // Setup 12 trend line charts with rotating colors
+            charts.loc1 = createChart('chartLoc1', 'line', G_BLUE, BG_BLUE);
+            charts.loc2 = createChart('chartLoc2', 'line', G_RED, BG_RED);
+            charts.loc3 = createChart('chartLoc3', 'line', G_YELLOW, BG_YELLOW);
+            charts.loc4 = createChart('chartLoc4', 'line', G_GREEN, BG_GREEN);
             
-            charts.area5 = createChart('chartArea5', 'line', G_BLUE, BG_BLUE);
-            charts.area6 = createChart('chartArea6', 'line', G_RED, BG_RED);
-            charts.area7 = createChart('chartArea7', 'line', G_YELLOW, BG_YELLOW);
-            charts.area8 = createChart('chartArea8', 'line', G_GREEN, BG_GREEN);
+            charts.loc5 = createChart('chartLoc5', 'line', G_BLUE, BG_BLUE);
+            charts.loc6 = createChart('chartLoc6', 'line', G_RED, BG_RED);
+            charts.loc7 = createChart('chartLoc7', 'line', G_YELLOW, BG_YELLOW);
+            charts.loc8 = createChart('chartLoc8', 'line', G_GREEN, BG_GREEN);
+            
+            charts.loc9 = createChart('chartLoc9', 'line', G_BLUE, BG_BLUE);
+            charts.loc10 = createChart('chartLoc10', 'line', G_RED, BG_RED);
+            charts.loc11 = createChart('chartLoc11', 'line', G_YELLOW, BG_YELLOW);
+            charts.loc12 = createChart('chartLoc12', 'line', G_GREEN, BG_GREEN);
         }
 
         function populateDropdowns() {
-            // Find Filter Columns based on generic names
             const monthColRaw = findColumn(sheetData[0], ['month', 'mahina', 'date']);
             const survColRaw = findColumn(sheetData[0], ['surveyour', 'surveyor', 'name']);
             const locColRaw = findColumn(sheetData[0], ['location', 'site', 'plant', 'area']);
@@ -581,42 +610,49 @@
             });
 
             // ---------------------------------------------------------
-            // COLUMN MAPPING FOR SURVEY AREAS
+            // COLUMN MAPPING FOR 12 SPECIFIC AREAS
             // ---------------------------------------------------------
-            const cArea1 = findColumn(sheetData[0], ['overall', 'average service', 'total']);
-            const cArea2 = findColumn(sheetData[0], ['cleanliness', 'cleaning']);
-            const cArea3 = findColumn(sheetData[0], ['security', 'guard']);
-            const cArea4 = findColumn(sheetData[0], ['maintenance', 'repair', 'civil']);
-            const cArea5 = findColumn(sheetData[0], ['food', 'quality', 'cafeteria', 'mess']);
-            const cArea6 = findColumn(sheetData[0], ['transport', 'vehicle']);
-            const cArea7 = findColumn(sheetData[0], ['behavior', 'attitude', 'staff']);
-            const cArea8 = findColumn(sheetData[0], ['time', 'timeliness', 'punctuality']);
+            const cLoc1 = findColumn(sheetData[0], ['admin building', 'admin']);
+            const cLoc2 = findColumn(sheetData[0], ['executive mess']);
+            const cLoc3 = findColumn(sheetData[0], ['guesthouse building', 'guest house']);
+            const cLoc4 = findColumn(sheetData[0], ['guest rooms', 'guest room']);
+            const cLoc5 = findColumn(sheetData[0], ['lockers', 'locker']);
+            const cLoc6 = findColumn(sheetData[0], ['plant outside', 'plant']);
+            const cLoc7 = findColumn(sheetData[0], ['staff mess social block', 'staff mess', 'social block']);
+            const cLoc8 = findColumn(sheetData[0], ['staff transport', 'transport']);
+            const cLoc9 = findColumn(sheetData[0], ['technical office gpak', 'gpak office']);
+            const cLoc10 = findColumn(sheetData[0], ['technical office ipak', 'ipak office']);
+            const cLoc11 = findColumn(sheetData[0], ['technical office petpak', 'petpak office']);
+            const cLoc12 = findColumn(sheetData[0], ['washrooms', 'washroom']);
 
             let groupByCol = 'ExtractedMonth'; 
             let groupedStats = {};
 
-            // Global Sums & Counts for top cards
-            let gSum = [0,0,0,0,0,0,0,0], gCnt = [0,0,0,0,0,0,0,0];
+            // Global Sums & Counts arrays of size 12
+            let gSum = Array(12).fill(0);
+            let gCnt = Array(12).fill(0);
 
             filteredData.forEach(item => {
                 let label = item[groupByCol] || "Unknown";
                 
                 let vals = [
-                    cleanNumber(item[cArea1]), cleanNumber(item[cArea2]),
-                    cleanNumber(item[cArea3]), cleanNumber(item[cArea4]),
-                    cleanNumber(item[cArea5]), cleanNumber(item[cArea6]),
-                    cleanNumber(item[cArea7]), cleanNumber(item[cArea8])
+                    cleanNumber(item[cLoc1]), cleanNumber(item[cLoc2]),
+                    cleanNumber(item[cLoc3]), cleanNumber(item[cLoc4]),
+                    cleanNumber(item[cLoc5]), cleanNumber(item[cLoc6]),
+                    cleanNumber(item[cLoc7]), cleanNumber(item[cLoc8]),
+                    cleanNumber(item[cLoc9]), cleanNumber(item[cLoc10]),
+                    cleanNumber(item[cLoc11]), cleanNumber(item[cLoc12])
                 ];
 
-                for(let i=0; i<8; i++) {
+                for(let i=0; i<12; i++) {
                     if(vals[i] > 0) { gSum[i] += vals[i]; gCnt[i]++; }
                 }
 
                 if (!groupedStats[label]) {
-                    groupedStats[label] = { sums: [0,0,0,0,0,0,0,0], cnts: [0,0,0,0,0,0,0,0] };
+                    groupedStats[label] = { sums: Array(12).fill(0), cnts: Array(12).fill(0) };
                 }
 
-                for(let i=0; i<8; i++) {
+                for(let i=0; i<12; i++) {
                     if(vals[i] > 0) {
                         groupedStats[label].sums[i] += vals[i];
                         groupedStats[label].cnts[i]++;
@@ -625,8 +661,8 @@
             });
 
             // Update Top Accumulated Values (Averages)
-            for(let i=0; i<8; i++) {
-                let valId = 'valArea' + (i+1);
+            for(let i=0; i<12; i++) {
+                let valId = 'valLoc' + (i+1);
                 document.getElementById(valId).innerText = gCnt[i] > 0 ? formatAvg(gSum[i]/gCnt[i]) : "0%";
             }
 
@@ -635,11 +671,11 @@
             const monthOrder = { "jan":1, "feb":2, "mar":3, "apr":4, "may":5, "jun":6, "jul":7, "aug":8, "sep":9, "oct":10, "nov":11, "dec":12 };
             labels.sort((a, b) => (monthOrder[a.toLowerCase().substring(0,3)] || 99) - (monthOrder[b.toLowerCase().substring(0,3)] || 99));
 
-            let datasets = [[],[],[],[],[],[],[],[]];
+            let datasets = Array.from({length: 12}, () => []);
 
             labels.forEach(lbl => {
                 let s = groupedStats[lbl];
-                for(let i=0; i<8; i++) {
+                for(let i=0; i<12; i++) {
                     datasets[i].push(s.cnts[i] > 0 ? (s.sums[i] / s.cnts[i]).toFixed(1) : 0);
                 }
             });
@@ -650,14 +686,18 @@
                 chartInst.update();
             }
 
-            updateC(charts.area1, labels, datasets[0]);
-            updateC(charts.area2, labels, datasets[1]);
-            updateC(charts.area3, labels, datasets[2]);
-            updateC(charts.area4, labels, datasets[3]);
-            updateC(charts.area5, labels, datasets[4]);
-            updateC(charts.area6, labels, datasets[5]);
-            updateC(charts.area7, labels, datasets[6]);
-            updateC(charts.area8, labels, datasets[7]);
+            updateC(charts.loc1, labels, datasets[0]);
+            updateC(charts.loc2, labels, datasets[1]);
+            updateC(charts.loc3, labels, datasets[2]);
+            updateC(charts.loc4, labels, datasets[3]);
+            updateC(charts.loc5, labels, datasets[4]);
+            updateC(charts.loc6, labels, datasets[5]);
+            updateC(charts.loc7, labels, datasets[6]);
+            updateC(charts.loc8, labels, datasets[7]);
+            updateC(charts.loc9, labels, datasets[8]);
+            updateC(charts.loc10, labels, datasets[9]);
+            updateC(charts.loc11, labels, datasets[10]);
+            updateC(charts.loc12, labels, datasets[11]);
         }
 
         document.querySelectorAll('select').forEach(select => {
