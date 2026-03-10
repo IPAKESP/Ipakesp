@@ -209,17 +209,17 @@
                 <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Plant Outside</h3><div class="kpi-value" id="valLoc6">...</div></div></div><div class="chart-wrapper"><canvas id="chartLoc6"></canvas></div></div>
                 <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Staff Mess Social Block</h3><div class="kpi-value" id="valLoc7">...</div></div></div><div class="chart-wrapper"><canvas id="chartLoc7"></canvas></div></div>
                 <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Staff Transport</h3><div class="kpi-value" id="valLoc8">...</div></div></div><div class="chart-wrapper"><canvas id="chartLoc8"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Technical Office GPAK</h3><div class="kpi-value" id="valLoc9">...</div></div></div><div class="chart-wrapper"><canvas id="chartLoc9"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Technical Office IPAK</h3><div class="kpi-value" id="valLoc10">...</div></div></div><div class="chart-wrapper"><canvas id="chartLoc10"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Technical Office PETPAK</h3><div class="kpi-value" id="valLoc11">...</div></div></div><div class="chart-wrapper"><canvas id="chartLoc11"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Washrooms</h3><div class="kpi-value" id="valLoc12">...</div></div></div><div class="chart-wrapper"><canvas id="chartLoc12"></canvas></div></div>
+                
+                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Technical Office</h3><div class="kpi-value" id="valLoc9">...</div></div></div><div class="chart-wrapper"><canvas id="chartLoc9"></canvas></div></div>
+                
+                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Washrooms</h3><div class="kpi-value" id="valLoc10">...</div></div></div><div class="chart-wrapper"><canvas id="chartLoc10"></canvas></div></div>
 
             </div>
         </div>
     </div>
 
     <script>
-        // NEW UPDATED ADMIN SHEET LINK (GID: 846898316)
+        // ADMIN SHEET LINK
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=846898316&single=true&output=csv';
 
         let sheetData = [];
@@ -245,7 +245,6 @@
             return arr;
         }
 
-        // ADVANCED ERROR-FREE COLUMN FINDER
         function findColumn(row, keywords) {
             if(!row) return null;
             let keys = Object.keys(row);
@@ -259,7 +258,7 @@
             return null;
         }
 
-        // SMART NUMBER EXTRACTOR
+        // Cleans percentage signs and text safely
         function cleanNumber(val) {
             if (val === undefined || val === null || val.toString().trim() === '') return null;
             let strVal = val.toString().toLowerCase();
@@ -274,6 +273,7 @@
             return num.toFixed(1) + "%"; 
         }
 
+        // Line Charts for Trends
         function createChart(canvasId, colorLine, colorBg) {
             const ctx = document.getElementById(canvasId).getContext('2d');
             return new Chart(ctx, {
@@ -288,6 +288,7 @@
         }
 
         function initCharts() {
+            // Setup 10 trend line charts 
             charts.loc1 = createChart('chartLoc1', G_BLUE, BG_BLUE);
             charts.loc2 = createChart('chartLoc2', G_RED, BG_RED);
             charts.loc3 = createChart('chartLoc3', G_YELLOW, BG_YELLOW);
@@ -296,10 +297,45 @@
             charts.loc6 = createChart('chartLoc6', G_RED, BG_RED);
             charts.loc7 = createChart('chartLoc7', G_YELLOW, BG_YELLOW);
             charts.loc8 = createChart('chartLoc8', G_GREEN, BG_GREEN);
-            charts.loc9 = createChart('chartLoc9', G_BLUE, BG_BLUE);
-            charts.loc10 = createChart('chartLoc10', G_RED, BG_RED);
-            charts.loc11 = createChart('chartLoc11', G_YELLOW, BG_YELLOW);
-            charts.loc12 = createChart('chartLoc12', G_GREEN, BG_GREEN);
+            charts.loc9 = createChart('chartLoc9', G_BLUE, BG_BLUE); // Combined Technical Office
+            charts.loc10 = createChart('chartLoc10', G_RED, BG_RED); // Washrooms
+        }
+
+        function populateDropdowns() {
+            const monthColRaw = findColumn(sheetData[0], ['month', 'date']);
+            const survColRaw = findColumn(sheetData[0], ['surveyour', 'surveyor', 'name']);
+            const locColRaw = findColumn(sheetData[0], ['location', 'site', 'branch']);
+
+            const years = new Set(), months = new Set(), surveyors = new Set(), locations = new Set();
+
+            sheetData.forEach(row => {
+                let mRaw = row[monthColRaw] || "";
+                if(mRaw.includes('-')) {
+                    let parts = mRaw.split('-');
+                    months.add(parts[0].trim());
+                    years.add((parts[1].length === 2 ? "20" : "") + parts[1].trim()); 
+                    row['ExtractedYear'] = (parts[1].length === 2 ? "20" : "") + parts[1].trim();
+                    row['ExtractedMonth'] = parts[0].trim();
+                } else {
+                    if(mRaw) months.add(mRaw.trim());
+                    row['ExtractedMonth'] = mRaw.trim();
+                    row['ExtractedYear'] = "All"; 
+                }
+
+                if(survColRaw && row[survColRaw]) surveyors.add(row[survColRaw].trim());
+                if(locColRaw && row[locColRaw]) locations.add(row[locColRaw].trim());
+            });
+
+            const addOptions = (setId, dataSet) => {
+                const select = document.getElementById(setId);
+                select.innerHTML = `<option value="All">All</option>`;
+                dataSet.forEach(val => {
+                    if(val) select.innerHTML += `<option value="${val}">${val}</option>`;
+                });
+            };
+
+            addOptions('filterYear', years); addOptions('filterMonth', months);
+            addOptions('filterSurveyor', surveyors); addOptions('filterLocation', locations);
         }
 
         async function fetchGoogleSheetData() {
@@ -339,43 +375,6 @@
             }
         }
 
-        function populateDropdowns() {
-            const monthColRaw = findColumn(sheetData[0], ['month', 'date']);
-            const survColRaw = findColumn(sheetData[0], ['surveyour', 'surveyor', 'name']);
-            const locColRaw = findColumn(sheetData[0], ['location', 'site', 'plant', 'branch']);
-
-            const years = new Set(), months = new Set(), surveyors = new Set(), locations = new Set();
-
-            sheetData.forEach(row => {
-                let mRaw = row[monthColRaw] || "";
-                if(mRaw.includes('-')) {
-                    let parts = mRaw.split('-');
-                    months.add(parts[0].trim());
-                    years.add((parts[1].length === 2 ? "20" : "") + parts[1].trim()); 
-                    row['ExtractedYear'] = (parts[1].length === 2 ? "20" : "") + parts[1].trim();
-                    row['ExtractedMonth'] = parts[0].trim();
-                } else {
-                    if(mRaw) months.add(mRaw.trim());
-                    row['ExtractedMonth'] = mRaw.trim();
-                    row['ExtractedYear'] = "All"; 
-                }
-
-                if(survColRaw && row[survColRaw]) surveyors.add(row[survColRaw].trim());
-                if(locColRaw && row[locColRaw]) locations.add(row[locColRaw].trim());
-            });
-
-            const addOptions = (setId, dataSet) => {
-                const select = document.getElementById(setId);
-                select.innerHTML = `<option value="All">All</option>`;
-                dataSet.forEach(val => {
-                    if(val) select.innerHTML += `<option value="${val}">${val}</option>`;
-                });
-            };
-
-            addOptions('filterYear', years); addOptions('filterMonth', months);
-            addOptions('filterSurveyor', surveyors); addOptions('filterLocation', locations);
-        }
-
         function updateDashboard() {
             const yVal = document.getElementById('filterYear').value;
             const mVal = document.getElementById('filterMonth').value;
@@ -393,35 +392,36 @@
                 return true;
             });
 
-            // HYBRID DATA DETECTOR: WIDE OR LONG FORMAT
-            // Check if areas are Columns (Wide) or Data Values (Long)
-            const areaCol = findColumn(sheetData[0], ['area', 'survey area', 'category']);
-            const scoreCol = findColumn(sheetData[0], ['score', 'service level', 'sla', 'percentage', 'result']);
-            
+            // ---------------------------------------------------------
+            // SPECIFIC LOGIC FOR "AREA OF SURVEY" AND "SERVICE LEVEL"
+            // ---------------------------------------------------------
+            const areaCol = findColumn(sheetData[0], ['area of survey', 'survey area', 'area']);
+            const scoreCol = findColumn(sheetData[0], ['service level', 'score', 'sla']);
+
             let isLongFormat = (areaCol !== null && scoreCol !== null);
 
-            // Names of the 12 areas to match
+            // UPDATED: 10 specific keywords. "technical office" will automatically catch GPAK, IPAK, and PETPAK
             const targetAreas = [
                 ['admin building', 'admin'], ['executive mess'], ['guesthouse', 'guest house'], ['guest room'],
                 ['locker'], ['plant outside', 'plant'], ['social block', 'staff mess'], ['transport'],
-                ['technical office gpak', 'gpak office'], ['technical office ipak', 'ipak office'], 
-                ['technical office petpak', 'petpak office'], ['washroom']
+                ['technical office', 'tech office'], // This single keyword will merge all 3 tech offices!
+                ['washroom']
             ];
 
-            let gSum = Array(12).fill(0);
-            let gCnt = Array(12).fill(0);
+            let gSum = Array(10).fill(0);
+            let gCnt = Array(10).fill(0);
             let groupedStats = {};
 
             filteredData.forEach(item => {
                 let label = item['ExtractedMonth'] || "Unknown";
-                if (!groupedStats[label]) groupedStats[label] = { sums: Array(12).fill(0), cnts: Array(12).fill(0) };
+                if (!groupedStats[label]) groupedStats[label] = { sums: Array(10).fill(0), cnts: Array(10).fill(0) };
 
                 if(isLongFormat) {
                     // Scenario 1: Data is vertical (Area names are inside rows)
                     let rArea = (item[areaCol] || "").toLowerCase();
                     let val = cleanNumber(item[scoreCol]);
                     if(val !== null) {
-                        for(let i=0; i<12; i++) {
+                        for(let i=0; i<10; i++) {
                             if(targetAreas[i].some(kw => rArea.includes(kw))) {
                                 gSum[i] += val; gCnt[i]++;
                                 groupedStats[label].sums[i] += val; groupedStats[label].cnts[i]++;
@@ -431,21 +431,26 @@
                     }
                 } else {
                     // Scenario 2: Data is horizontal (Area names are columns)
-                    for(let i=0; i<12; i++) {
-                        let cName = findColumn(item, targetAreas[i]);
-                        if(cName) {
+                    let keys = Object.keys(item);
+                    for(let i=0; i<10; i++) {
+                        let matchingKeys = keys.filter(k => {
+                            let cleanKey = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+                            return targetAreas[i].some(kw => cleanKey.includes(kw.replace(/[^a-z0-9]/g, '')));
+                        });
+                        
+                        matchingKeys.forEach(cName => {
                             let val = cleanNumber(item[cName]);
                             if(val !== null) {
                                 gSum[i] += val; gCnt[i]++;
                                 groupedStats[label].sums[i] += val; groupedStats[label].cnts[i]++;
                             }
-                        }
+                        });
                     }
                 }
             });
 
             // Update Top Numbers
-            for(let i=0; i<12; i++) {
+            for(let i=0; i<10; i++) {
                 document.getElementById('valLoc'+(i+1)).innerText = gCnt[i] > 0 ? formatAvg(gSum[i] / gCnt[i]) : "0%";
             }
 
@@ -454,13 +459,13 @@
             const mOrder = {"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12};
             labels.sort((a,b) => (mOrder[a.substring(0,3).toLowerCase()]||99) - (mOrder[b.substring(0,3).toLowerCase()]||99));
 
-            let datasets = Array.from({length: 12}, () => []);
+            let datasets = Array.from({length: 10}, () => []);
             labels.forEach(lbl => {
                 let s = groupedStats[lbl];
-                for(let i=0; i<12; i++) datasets[i].push(s.cnts[i] > 0 ? (s.sums[i]/s.cnts[i]).toFixed(1) : 0);
+                for(let i=0; i<10; i++) datasets[i].push(s.cnts[i] > 0 ? (s.sums[i]/s.cnts[i]).toFixed(1) : 0);
             });
 
-            for(let i=0; i<12; i++) {
+            for(let i=0; i<10; i++) {
                 let inst = charts['loc'+(i+1)];
                 inst.data.labels = labels;
                 inst.data.datasets[0].data = datasets[i];
