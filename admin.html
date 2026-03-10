@@ -79,7 +79,7 @@
         }
 
         /* ---------------------------------
-           LAYOUT WRAPPER (Below Header)
+           LAYOUT WRAPPER
         --------------------------------- */
         .layout-container {
             display: flex;
@@ -108,189 +108,46 @@
             letter-spacing: 0.5px;
         }
 
-        .filter-group {
-            margin-bottom: 20px;
-        }
+        .filter-group { margin-bottom: 20px; }
+        .filter-group label { display: block; margin-bottom: 8px; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 500; letter-spacing: 0.5px; }
+        .filter-group select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: #F1F3F4; color: var(--text-main); font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; outline: none; }
+        .filter-group select:focus { background: var(--surface); border-color: var(--google-blue); box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2); }
 
-        .filter-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-
-        .filter-group select {
-            width: 100%;
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: #F1F3F4;
-            color: var(--text-main);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            outline: none;
-        }
-
-        .filter-group select:focus {
-            background: var(--surface);
-            border-color: var(--google-blue);
-            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
-        }
-
-        .clear-btn {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            background-color: transparent;
-            color: var(--google-blue);
-            border: 1px solid var(--google-blue);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .clear-btn:hover {
-            background-color: rgba(66, 133, 244, 0.08);
-        }
+        .clear-btn { width: 100%; padding: 10px; margin-top: 10px; background-color: transparent; color: var(--google-blue); border: 1px solid var(--google-blue); border-radius: 8px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; font-family: 'Roboto', sans-serif; }
+        .clear-btn:hover { background-color: rgba(66, 133, 244, 0.08); }
 
         /* Main Content Area */
         .main-content {
-            flex-grow: 1;
-            padding: 30px 40px;
-            overflow-y: auto;
-            box-sizing: border-box;
-            position: relative;
+            flex-grow: 1; padding: 30px 40px; overflow-y: auto; box-sizing: border-box; position: relative;
         }
 
         /* ---------------------------------
-           NAVIGATION TABS (UPDATED)
+           NAVIGATION TABS
         --------------------------------- */
-        .nav-tabs {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .nav-tabs a {
-            text-decoration: none;
-            padding: 10px 24px;
-            font-size: 1rem;
-            font-weight: 500;
-            color: var(--text-muted);
-            background-color: white;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .nav-tabs a:hover {
-            color: var(--text-main);
-            background-color: var(--bg-light);
-            border-color: #c0c4c9;
-        }
-
-        .nav-tabs a.active {
-            background-color: var(--google-green);
-            color: white;
-            border-color: var(--google-green);
-            box-shadow: 0 2px 6px rgba(52, 168, 83, 0.3);
-        }
-
-        .nav-tabs a.home-icon {
-            margin-left: auto; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
-            border-radius: 8px;
-            background-color: white;
-        }
-
-        .nav-tabs a.home-icon:hover {
-            background-color: var(--bg-light);
-        }
-
-        .nav-tabs a.home-icon svg {
-            width: 20px;
-            height: 20px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
+        .nav-tabs { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
+        .nav-tabs a { text-decoration: none; padding: 10px 24px; font-size: 1rem; font-weight: 500; color: var(--text-muted); background-color: white; border: 1px solid var(--border-color); border-radius: 8px; transition: all 0.3s ease; }
+        .nav-tabs a:hover { color: var(--text-main); background-color: var(--bg-light); border-color: #c0c4c9; }
+        .nav-tabs a.active { background-color: var(--google-green); color: white; border-color: var(--google-green); box-shadow: 0 2px 6px rgba(52, 168, 83, 0.3); }
+        .nav-tabs a.home-icon { margin-left: auto; display: flex; align-items: center; justify-content: center; padding: 10px; border-radius: 8px; background-color: white; }
+        .nav-tabs a.home-icon:hover { background-color: var(--bg-light); }
+        .nav-tabs a.home-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
         /* Unified Card & Graph Widget Grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 40px; }
 
-        .kpi-widget {
-            background: var(--surface);
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(60,64,67,0.1), 0 1px 2px rgba(60,64,67,0.06);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            border-top: 4px solid var(--border-color);
-            padding: 18px 20px 10px 20px;
-        }
+        .kpi-widget { background: var(--surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(60,64,67,0.1), 0 1px 2px rgba(60,64,67,0.06); display: flex; flex-direction: column; overflow: hidden; border-top: 4px solid var(--border-color); padding: 18px 20px 10px 20px; }
 
-        /* Cyclic Google Colors matching the Charts exactly */
         .kpi-widget:nth-child(4n+1) { border-top-color: var(--google-blue); }
         .kpi-widget:nth-child(4n+2) { border-top-color: var(--google-red); }
         .kpi-widget:nth-child(4n+3) { border-top-color: var(--google-yellow); }
         .kpi-widget:nth-child(4n+4) { border-top-color: var(--google-green); }
 
-        .kpi-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-        }
+        .kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .kpi-title h3 { margin: 0 0 5px 0; font-size: 0.8rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        .kpi-value { font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0; }
+        .chart-wrapper { position: relative; height: 140px; width: 100%; }
 
-        .kpi-title h3 {
-            margin: 0 0 5px 0;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .kpi-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin: 0;
-        }
-
-        .chart-wrapper {
-            position: relative;
-            height: 140px; 
-            width: 100%;
-        }
-
-        #loadingMsg {
-            position: absolute;
-            color: var(--google-blue);
-            font-weight: 500;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-        }
+        #loadingMsg { position: absolute; color: var(--google-blue); font-weight: 500; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; }
     </style>
 </head>
 <body>
@@ -340,7 +197,7 @@
                 </a>
             </div>
 
-            <div id="loadingMsg">Fetching Data & Calculating Averages...</div>
+            <div id="loadingMsg">Fetching Admin Data...</div>
 
             <div class="dashboard-grid" id="dashboardContent" style="display: none;">
                 
@@ -362,8 +219,8 @@
     </div>
 
     <script>
-        // NEW ADMIN SHEET LINK
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=508898650&single=true&output=csv';
+        // NEW UPDATED ADMIN SHEET LINK (GID: 846898316)
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=846898316&single=true&output=csv';
 
         let sheetData = [];
         let headers = [];
@@ -388,6 +245,7 @@
             return arr;
         }
 
+        // ADVANCED ERROR-FREE COLUMN FINDER
         function findColumn(row, keywords) {
             if(!row) return null;
             let keys = Object.keys(row);
@@ -401,7 +259,7 @@
             return null;
         }
 
-        // Cleans percentage signs and text
+        // SMART NUMBER EXTRACTOR
         function cleanNumber(val) {
             if (val === undefined || val === null || val.toString().trim() === '') return null;
             let strVal = val.toString().toLowerCase();
@@ -416,7 +274,6 @@
             return num.toFixed(1) + "%"; 
         }
 
-        // Line Charts for Trends
         function createChart(canvasId, colorLine, colorBg) {
             const ctx = document.getElementById(canvasId).getContext('2d');
             return new Chart(ctx, {
@@ -445,10 +302,47 @@
             charts.loc12 = createChart('chartLoc12', G_GREEN, BG_GREEN);
         }
 
+        async function fetchGoogleSheetData() {
+            try {
+                const response = await fetch(csvUrl);
+                const csvText = await response.text();
+                const rows = parseCSV(csvText);
+                
+                // Find actual Header Row automatically
+                let maxCols = 0;
+                let headerIdx = 0;
+                for(let i=0; i<Math.min(10, rows.length); i++) {
+                    let colsCount = rows[i].filter(c => c && c.trim() !== "").length;
+                    if(colsCount > maxCols) { maxCols = colsCount; headerIdx = i; }
+                }
+
+                headers = rows[headerIdx].map(h => h ? h.trim() : `Col_${Math.random()}`);
+                
+                sheetData = rows.slice(headerIdx + 1).map(row => {
+                    let obj = {};
+                    row.forEach((cell, i) => { if(headers[i]) obj[headers[i]] = cell ? cell.trim() : ""; });
+                    return obj;
+                });
+
+                sheetData = sheetData.filter(row => Object.values(row).some(x => x !== ""));
+
+                if(sheetData.length === 0) throw new Error("No data found");
+
+                document.getElementById('loadingMsg').style.display = 'none';
+                document.getElementById('dashboardContent').style.display = 'grid'; 
+
+                populateDropdowns();
+                updateDashboard(); 
+            } catch (error) {
+                console.error("Data error:", error);
+                document.getElementById('loadingMsg').innerHTML = `<span style='color:red'>Data Error: Failed to sync sheet.</span>`;
+            }
+        }
+
         function populateDropdowns() {
             const monthColRaw = findColumn(sheetData[0], ['month', 'date']);
             const survColRaw = findColumn(sheetData[0], ['surveyour', 'surveyor', 'name']);
-            const locColRaw = findColumn(sheetData[0], ['location', 'site', 'branch']);
+            const locColRaw = findColumn(sheetData[0], ['location', 'site', 'plant', 'branch']);
 
             const years = new Set(), months = new Set(), surveyors = new Set(), locations = new Set();
 
@@ -482,43 +376,6 @@
             addOptions('filterSurveyor', surveyors); addOptions('filterLocation', locations);
         }
 
-        async function fetchGoogleSheetData() {
-            try {
-                const response = await fetch(csvUrl);
-                const csvText = await response.text();
-                const rows = parseCSV(csvText);
-                
-                // Find actual Header Row automatically
-                let maxCols = 0;
-                let headerIdx = 0;
-                for(let i=0; i<Math.min(10, rows.length); i++) {
-                    let colsCount = rows[i].filter(c => c && c.trim() !== "").length;
-                    if(colsCount > maxCols) { maxCols = colsCount; headerIdx = i; }
-                }
-
-                headers = rows[headerIdx].map(h => h ? h.trim() : `Col_${Math.random()}`);
-                
-                sheetData = rows.slice(headerIdx + 1).map(row => {
-                    let obj = {};
-                    row.forEach((cell, i) => { if(headers[i]) obj[headers[i]] = cell ? cell.trim() : ""; });
-                    return obj;
-                });
-
-                sheetData = sheetData.filter(row => Object.values(row).some(x => x !== ""));
-
-                if(sheetData.length === 0) throw new Error("No data");
-
-                document.getElementById('loadingMsg').style.display = 'none';
-                document.getElementById('dashboardContent').style.display = 'grid'; 
-
-                populateDropdowns();
-                updateDashboard(); 
-            } catch (error) {
-                console.error("Data error:", error);
-                document.getElementById('loadingMsg').innerHTML = `<span style='color:red'>Data Error: Please check the sheet format.</span>`;
-            }
-        }
-
         function updateDashboard() {
             const yVal = document.getElementById('filterYear').value;
             const mVal = document.getElementById('filterMonth').value;
@@ -536,15 +393,16 @@
                 return true;
             });
 
-            // ---------------------------------------------------------
-            // SPECIFIC LOGIC FOR "AREA OF SURVEY" AND "SERVICE LEVEL"
-            // ---------------------------------------------------------
-            const areaCol = findColumn(sheetData[0], ['area of survey', 'survey area', 'area']);
-            const scoreCol = findColumn(sheetData[0], ['service level', 'score', 'sla']);
+            // HYBRID DATA DETECTOR: WIDE OR LONG FORMAT
+            // Check if areas are Columns (Wide) or Data Values (Long)
+            const areaCol = findColumn(sheetData[0], ['area', 'survey area', 'category']);
+            const scoreCol = findColumn(sheetData[0], ['score', 'service level', 'sla', 'percentage', 'result']);
+            
+            let isLongFormat = (areaCol !== null && scoreCol !== null);
 
-            // 12 specific keywords to match from "Area of Survey" column
+            // Names of the 12 areas to match
             const targetAreas = [
-                ['admin building'], ['executive mess'], ['guesthouse', 'guest house'], ['guest room'],
+                ['admin building', 'admin'], ['executive mess'], ['guesthouse', 'guest house'], ['guest room'],
                 ['locker'], ['plant outside', 'plant'], ['social block', 'staff mess'], ['transport'],
                 ['technical office gpak', 'gpak office'], ['technical office ipak', 'ipak office'], 
                 ['technical office petpak', 'petpak office'], ['washroom']
@@ -556,59 +414,57 @@
 
             filteredData.forEach(item => {
                 let label = item['ExtractedMonth'] || "Unknown";
-                
-                // Get the string text from Area column
-                let rArea = (item[areaCol] || "").toLowerCase();
-                
-                // Get the numeric score from Service Level column
-                let val = cleanNumber(item[scoreCol]);
+                if (!groupedStats[label]) groupedStats[label] = { sums: Array(12).fill(0), cnts: Array(12).fill(0) };
 
-                if (!groupedStats[label]) {
-                    groupedStats[label] = { sums: Array(12).fill(0), cnts: Array(12).fill(0) };
-                }
-
-                // Match row Area text with our 12 predefined keywords
-                if(val !== null && rArea) {
+                if(isLongFormat) {
+                    // Scenario 1: Data is vertical (Area names are inside rows)
+                    let rArea = (item[areaCol] || "").toLowerCase();
+                    let val = cleanNumber(item[scoreCol]);
+                    if(val !== null) {
+                        for(let i=0; i<12; i++) {
+                            if(targetAreas[i].some(kw => rArea.includes(kw))) {
+                                gSum[i] += val; gCnt[i]++;
+                                groupedStats[label].sums[i] += val; groupedStats[label].cnts[i]++;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    // Scenario 2: Data is horizontal (Area names are columns)
                     for(let i=0; i<12; i++) {
-                        if(targetAreas[i].some(kw => rArea.includes(kw))) {
-                            gSum[i] += val; 
-                            gCnt[i]++;
-                            groupedStats[label].sums[i] += val; 
-                            groupedStats[label].cnts[i]++;
-                            break; // Match found, stop checking this row
+                        let cName = findColumn(item, targetAreas[i]);
+                        if(cName) {
+                            let val = cleanNumber(item[cName]);
+                            if(val !== null) {
+                                gSum[i] += val; gCnt[i]++;
+                                groupedStats[label].sums[i] += val; groupedStats[label].cnts[i]++;
+                            }
                         }
                     }
                 }
             });
 
-            // Update Top Numbers on Cards (Overall Average)
+            // Update Top Numbers
             for(let i=0; i<12; i++) {
                 document.getElementById('valLoc'+(i+1)).innerText = gCnt[i] > 0 ? formatAvg(gSum[i] / gCnt[i]) : "0%";
             }
 
-            // Month-wise sorting for Graph X-Axis
+            // Update Charts
             let labels = Object.keys(groupedStats);
             const mOrder = {"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12};
             labels.sort((a,b) => (mOrder[a.substring(0,3).toLowerCase()]||99) - (mOrder[b.substring(0,3).toLowerCase()]||99));
 
             let datasets = Array.from({length: 12}, () => []);
-
             labels.forEach(lbl => {
                 let s = groupedStats[lbl];
-                for(let i=0; i<12; i++) {
-                    datasets[i].push(s.cnts[i] > 0 ? (s.sums[i]/s.cnts[i]).toFixed(1) : 0);
-                }
+                for(let i=0; i<12; i++) datasets[i].push(s.cnts[i] > 0 ? (s.sums[i]/s.cnts[i]).toFixed(1) : 0);
             });
 
-            function updateC(chartInst, lbs, dta) {
-                chartInst.data.labels = lbs;
-                chartInst.data.datasets[0].data = dta;
-                chartInst.update();
-            }
-
-            // Update all 12 Charts
             for(let i=0; i<12; i++) {
-                updateC(charts['loc'+(i+1)], labels, datasets[i]);
+                let inst = charts['loc'+(i+1)];
+                inst.data.labels = labels;
+                inst.data.datasets[0].data = datasets[i];
+                inst.update();
             }
         }
 
