@@ -58,7 +58,9 @@
 
         .header-left { display: flex; align-items: center; gap: 15px; }
         .logo { height: 50px; width: auto; object-fit: contain; margin-right: 20px; }
-        .top-header h1 { color: var(--google-blue); margin: 0; font-size: 1.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        /* Changed from Blue to Green */
+        .top-header h1 { color: var(--google-green); margin: 0; font-size: 1.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
         /* ---------------------------------
            LAYOUT WRAPPER
@@ -76,10 +78,13 @@
         .filter-group { margin-bottom: 20px; }
         .filter-group label { display: block; margin-bottom: 8px; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 500; letter-spacing: 0.5px; }
         .filter-group select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: #F1F3F4; color: var(--text-main); font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; outline: none; }
-        .filter-group select:focus { background: var(--surface); border-color: var(--google-blue); box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2); }
+        
+        /* Changed Focus ring to Green */
+        .filter-group select:focus { background: var(--surface); border-color: var(--google-green); box-shadow: 0 0 0 2px rgba(52, 168, 83, 0.2); }
 
-        .clear-btn { width: 100%; padding: 10px; margin-top: 10px; background-color: transparent; color: var(--google-blue); border: 1px solid var(--google-blue); border-radius: 8px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; font-family: 'Roboto', sans-serif; }
-        .clear-btn:hover { background-color: rgba(66, 133, 244, 0.08); }
+        /* Changed Button to Green */
+        .clear-btn { width: 100%; padding: 10px; margin-top: 10px; background-color: transparent; color: var(--google-green); border: 1px solid var(--google-green); border-radius: 8px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; font-family: 'Roboto', sans-serif; }
+        .clear-btn:hover { background-color: rgba(52, 168, 83, 0.08); }
 
         /* Main Content Area */
         .main-content { flex-grow: 1; padding: 30px 40px; overflow-y: auto; box-sizing: border-box; position: relative; }
@@ -117,11 +122,12 @@
             min-width: 180px;
         }
 
+        /* Changed Icon colors to Green */
         .surveyor-icon {
             width: 40px;
             height: 40px;
-            background-color: var(--bg-blue-light);
-            color: var(--google-blue);
+            background-color: var(--bg-green-light);
+            color: var(--google-green);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -167,7 +173,8 @@
         .kpi-value { font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0; }
         .chart-wrapper { position: relative; height: 140px; width: 100%; }
 
-        #loadingMsg { position: absolute; color: var(--google-blue); font-weight: 500; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; background: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        /* Changed loading text color to Green */
+        #loadingMsg { position: absolute; color: var(--google-green); font-weight: 500; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; background: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
@@ -217,10 +224,10 @@
                 </a>
             </div>
 
-            <div id="loadingMsg">Fetching Admin Data...</div>
+            <div id="loadingMsg">Calculating Service Level Averages...</div>
 
             <div class="surveyor-rounds-container" id="surveyorRoundsContainer">
-                </div>
+            </div>
 
             <div class="dashboard-grid" id="dashboardContent" style="display: none;">
                 
@@ -368,7 +375,8 @@
                 for(let i=0; i<Math.min(15, rows.length); i++) {
                     let rowStr = rows[i].join("").toLowerCase().replace(/\s/g, '');
                     if(rowStr.includes("month") && rowStr.includes("servicelevel")) {
-                        headerIdx = i; break;
+                        headerIdx = i;
+                        break;
                     }
                 }
 
@@ -383,126 +391,4 @@
 
                 sheetData = sheetData.filter(row => Object.values(row).some(x => x !== ""));
 
-                if(sheetData.length === 0) throw new Error("No data found");
-
-                document.getElementById('loadingMsg').style.display = 'none';
-                document.getElementById('dashboardContent').style.display = 'grid'; 
-
-                populateDropdowns();
-                updateDashboard(); 
-            } catch (error) {
-                console.error("Data error:", error);
-                document.getElementById('loadingMsg').innerHTML = `<span style='color:red'>Error reading sheet.</span>`;
-            }
-        }
-
-        function updateDashboard() {
-            const yVal = document.getElementById('filterYear').value;
-            const mVal = document.getElementById('filterMonth').value;
-            const sVal = document.getElementById('filterSurveyor').value;
-            const lVal = document.getElementById('filterLocation').value;
-
-            // FILTER THE DATA GLOBALLY
-            let filteredData = sheetData.filter(item => {
-                if(yVal !== "All" && item['ExtractedYear'] !== yVal) return false;
-                if(mVal !== "All" && item['ExtractedMonth'] !== mVal) return false;
-                if(sVal !== "All" && h_surv && item[h_surv] !== sVal) return false;
-                if(lVal !== "All" && h_loc && item[h_loc] !== lVal) return false;
-                return true;
-            });
-
-            // ---------------------------------------------------------
-            // CALCULATE & RENDER SURVEYOR ROUNDS (MINI SECTION)
-            // ---------------------------------------------------------
-            let surveyorCounts = {};
-            
-            // Loop over filtered data to count rows per surveyor
-            filteredData.forEach(item => {
-                let sName = item[h_surv];
-                if (sName) {
-                    sName = sName.trim();
-                    if (!surveyorCounts[sName]) surveyorCounts[sName] = 0;
-                    surveyorCounts[sName]++; // Each row is 1 round
-                }
-            });
-
-            const roundsContainer = document.getElementById('surveyorRoundsContainer');
-            roundsContainer.innerHTML = ''; // Clear old cards
-
-            // Build dynamic cards based on the counts
-            for (const [name, count] of Object.entries(surveyorCounts)) {
-                const cardHtml = `
-                    <div class="surveyor-card">
-                        <div class="surveyor-icon">${userSvgIcon}</div>
-                        <div class="surveyor-info">
-                            <span class="surveyor-name">${name}</span>
-                            <span class="surveyor-count">${count} <span style="font-size:0.8rem; font-weight:500; color:var(--text-muted)">Rounds</span></span>
-                        </div>
-                    </div>
-                `;
-                roundsContainer.innerHTML += cardHtml;
-            }
-
-            // ---------------------------------------------------------
-            // GRAPHS LOGIC (AVERAGE SERVICE LEVEL)
-            // ---------------------------------------------------------
-            const targetAreas = [
-                ['admin building', 'admin'], ['executive mess'], ['guesthouse', 'guest house'], ['guest room'],
-                ['locker'], ['plant outside', 'plant'], ['social block', 'staff mess'], ['transport'],
-                ['technical', 'gpak', 'ipak', 'petpak'], ['washroom']
-            ];
-
-            let gSum = Array(10).fill(0);
-            let gCnt = Array(10).fill(0);
-            let groupedStats = {};
-
-            filteredData.forEach(item => {
-                let label = item['ExtractedMonth'] || "Unknown";
-                if (!groupedStats[label]) groupedStats[label] = { sums: Array(10).fill(0), cnts: Array(10).fill(0) };
-
-                let rArea = (item[h_area] || "").toLowerCase();
-                let val = cleanPercent(item[h_svc]);
-                
-                if(val !== null && rArea !== "") {
-                    for(let i=0; i<10; i++) {
-                        if(targetAreas[i].some(kw => rArea.includes(kw))) {
-                            gSum[i] += val; gCnt[i]++;
-                            groupedStats[label].sums[i] += val; groupedStats[label].cnts[i]++;
-                            break; 
-                        }
-                    }
-                }
-            });
-
-            for(let i=0; i<10; i++) {
-                document.getElementById('valLoc'+(i+1)).innerText = gCnt[i] > 0 ? formatAvg(gSum[i] / gCnt[i]) : "0%";
-            }
-
-            let labels = Object.keys(groupedStats);
-            const mOrder = {"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12};
-            labels.sort((a,b) => (mOrder[a.substring(0,3).toLowerCase()]||99) - (mOrder[b.substring(0,3).toLowerCase()]||99));
-
-            let datasets = Array.from({length: 10}, () => []);
-            labels.forEach(lbl => {
-                let s = groupedStats[lbl];
-                for(let i=0; i<10; i++) datasets[i].push(s.cnts[i] > 0 ? (s.sums[i]/s.cnts[i]).toFixed(1) : 0);
-            });
-
-            for(let i=0; i<10; i++) {
-                let inst = charts['loc'+(i+1)];
-                inst.data.labels = labels;
-                inst.data.datasets[0].data = datasets[i];
-                inst.update();
-            }
-        }
-
-        document.querySelectorAll('select').forEach(sel => sel.addEventListener('change', updateDashboard));
-        document.getElementById('clearFiltersBtn').addEventListener('click', () => {
-            document.querySelectorAll('select').forEach(sel => sel.value = 'All');
-            updateDashboard(); 
-        });
-
-        window.onload = () => { initCharts(); fetchGoogleSheetData(); };
-    </script>
-</body>
-</html>
+                if(sheetData.length === 0) throw new Error("No data found
