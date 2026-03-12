@@ -58,7 +58,7 @@
 
         .header-left { display: flex; align-items: center; gap: 15px; }
         .logo { height: 50px; width: auto; object-fit: contain; margin-right: 20px; }
-        .top-header h1 { color: var(--google-blue); margin: 0; font-size: 1.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .top-header h1 { color: var(--google-green); margin: 0; font-size: 1.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
         /* ---------------------------------
            LAYOUT WRAPPER
@@ -76,10 +76,10 @@
         .filter-group { margin-bottom: 20px; }
         .filter-group label { display: block; margin-bottom: 8px; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 500; letter-spacing: 0.5px; }
         .filter-group select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: #F1F3F4; color: var(--text-main); font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; outline: none; }
-        .filter-group select:focus { background: var(--surface); border-color: var(--google-blue); box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2); }
+        .filter-group select:focus { background: var(--surface); border-color: var(--google-green); box-shadow: 0 0 0 2px rgba(52, 168, 83, 0.2); }
 
-        .clear-btn { width: 100%; padding: 10px; margin-top: 10px; background-color: transparent; color: var(--google-blue); border: 1px solid var(--google-blue); border-radius: 8px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; font-family: 'Roboto', sans-serif; }
-        .clear-btn:hover { background-color: rgba(66, 133, 244, 0.08); }
+        .clear-btn { width: 100%; padding: 10px; margin-top: 10px; background-color: transparent; color: var(--google-green); border: 1px solid var(--google-green); border-radius: 8px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; font-family: 'Roboto', sans-serif; }
+        .clear-btn:hover { background-color: rgba(52, 168, 83, 0.08); }
 
         /* Main Content Area */
         .main-content { flex-grow: 1; padding: 30px 40px; overflow-y: auto; box-sizing: border-box; position: relative; }
@@ -101,7 +101,7 @@
         .surveyor-rounds-container {
             display: flex;
             gap: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 40px; /* added bottom margin since it's below graphs now */
             flex-wrap: wrap;
         }
 
@@ -120,8 +120,8 @@
         .surveyor-icon {
             width: 40px;
             height: 40px;
-            background-color: var(--bg-blue-light);
-            color: var(--google-blue);
+            background-color: var(--bg-green-light);
+            color: var(--google-green);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -167,7 +167,7 @@
         .kpi-value { font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0; }
         .chart-wrapper { position: relative; height: 140px; width: 100%; }
 
-        #loadingMsg { position: absolute; color: var(--google-blue); font-weight: 500; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; background: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        #loadingMsg { position: absolute; color: var(--google-green); font-weight: 500; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; background: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
@@ -217,10 +217,7 @@
                 </a>
             </div>
 
-            <div id="loadingMsg">Fetching Admin Data...</div>
-
-            <div class="surveyor-rounds-container" id="surveyorRoundsContainer">
-                </div>
+            <div id="loadingMsg">Calculating Service Level Averages...</div>
 
             <div class="dashboard-grid" id="dashboardContent" style="display: none;">
                 
@@ -236,6 +233,10 @@
                 <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Washrooms</h3><div class="kpi-value" id="valLoc10">...</div></div></div><div class="chart-wrapper"><canvas id="chartLoc10"></canvas></div></div>
 
             </div>
+
+            <div class="surveyor-rounds-container" id="surveyorRoundsContainer">
+            </div>
+
         </div>
     </div>
 
@@ -416,20 +417,18 @@
             // ---------------------------------------------------------
             let surveyorCounts = {};
             
-            // Loop over filtered data to count rows per surveyor
             filteredData.forEach(item => {
                 let sName = item[h_surv];
                 if (sName) {
                     sName = sName.trim();
                     if (!surveyorCounts[sName]) surveyorCounts[sName] = 0;
-                    surveyorCounts[sName]++; // Each row is 1 round
+                    surveyorCounts[sName]++; 
                 }
             });
 
             const roundsContainer = document.getElementById('surveyorRoundsContainer');
-            roundsContainer.innerHTML = ''; // Clear old cards
+            roundsContainer.innerHTML = ''; 
 
-            // Build dynamic cards based on the counts
             for (const [name, count] of Object.entries(surveyorCounts)) {
                 const cardHtml = `
                     <div class="surveyor-card">
@@ -485,14 +484,19 @@
             let datasets = Array.from({length: 10}, () => []);
             labels.forEach(lbl => {
                 let s = groupedStats[lbl];
-                for(let i=0; i<10; i++) datasets[i].push(s.cnts[i] > 0 ? (s.sums[i]/s.cnts[i]).toFixed(1) : 0);
+                for(let i=0; i<10; i++) {
+                    datasets[i].push(s.cnts[i] > 0 ? (s.sums[i]/s.cnts[i]).toFixed(1) : 0);
+                }
             });
 
+            function updateC(chartInst, lbs, dta) {
+                chartInst.data.labels = lbs;
+                chartInst.data.datasets[0].data = dta;
+                chartInst.update();
+            }
+
             for(let i=0; i<10; i++) {
-                let inst = charts['loc'+(i+1)];
-                inst.data.labels = labels;
-                inst.data.datasets[0].data = datasets[i];
-                inst.update();
+                updateC(charts['loc'+(i+1)], labels, datasets[i]);
             }
         }
 
