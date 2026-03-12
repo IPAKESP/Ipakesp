@@ -69,8 +69,9 @@
             object-fit: contain;
         }
 
+        /* Changed to Green */
         .top-header h1 {
-            color: var(--google-blue);
+            color: var(--google-green);
             margin: 0;
             font-size: 1.6rem;
             font-weight: 700;
@@ -80,15 +81,17 @@
 
         /* Share Button & Popup */
         .share-container { position: relative; }
+        
+        /* Changed Share Button to Green */
         .share-btn {
             display: flex; align-items: center; gap: 8px;
-            background: var(--google-blue); color: white;
+            background: var(--google-green); color: white;
             border: none; padding: 10px 20px; border-radius: 8px;
             font-size: 0.95rem; font-weight: 500; cursor: pointer;
             transition: background 0.3s; font-family: 'Roboto', sans-serif;
-            box-shadow: 0 2px 4px rgba(66, 133, 244, 0.3);
+            box-shadow: 0 2px 4px rgba(52, 168, 83, 0.3);
         }
-        .share-btn:hover { background: #3367d6; }
+        .share-btn:hover { background: #2b8b45; }
         .share-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         
         .share-popup {
@@ -104,7 +107,7 @@
             font-family: 'Roboto', sans-serif; transition: background 0.2s;
             display: flex; align-items: center; gap: 10px;
         }
-        .share-popup button:hover { background: var(--bg-light); }
+        .share-popup button:hover { background: var(--bg-light); color: var(--google-green); }
         .share-popup button:not(:last-child) { border-bottom: 1px solid var(--border-color); }
 
         /* LAYOUT WRAPPER */
@@ -133,14 +136,18 @@
         .filter-group { margin-bottom: 20px; }
         .filter-group label { display: block; margin-bottom: 8px; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 500; }
         .filter-group select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: #F1F3F4; color: var(--text-main); font-size: 0.9rem; cursor: pointer; outline: none; }
-        .filter-group select:focus { background: var(--surface); border-color: var(--google-blue); box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2); }
+        
+        /* Changed Focus Ring to Green */
+        .filter-group select:focus { background: var(--surface); border-color: var(--google-green); box-shadow: 0 0 0 2px rgba(52, 168, 83, 0.2); }
 
+        /* Changed Clear Filters Button to Green */
         .clear-btn {
             width: 100%; padding: 10px; margin-top: 10px; background-color: transparent;
-            color: var(--google-blue); border: 1px solid var(--google-blue); border-radius: 8px;
+            color: var(--google-green); border: 1px solid var(--google-green); border-radius: 8px;
             font-size: 0.9rem; font-weight: 500; cursor: pointer; font-family: 'Roboto', sans-serif;
+            transition: all 0.2s ease;
         }
-        .clear-btn:hover { background-color: rgba(66, 133, 244, 0.08); }
+        .clear-btn:hover { background-color: rgba(52, 168, 83, 0.08); }
 
         /* Main Content Area */
         .main-content {
@@ -228,8 +235,9 @@
         .kpi-value { font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin: 0; }
         .chart-wrapper { position: relative; height: 140px; width: 100%; }
         
+        /* Changed loading text color to Green */
         #loadingMsg { 
-            position: absolute; color: var(--google-blue); font-weight: 500; 
+            position: absolute; color: var(--google-green); font-weight: 500; 
             top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; 
             background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
