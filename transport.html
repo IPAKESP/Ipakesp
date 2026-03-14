@@ -471,10 +471,6 @@
                 }
             });
 
-            for(let i=0; i<carCount; i++) {
-                document.getElementById(`valCar${i}`).innerText = gCnt[i] > 0 ? formatAvg(gSum[i] / gCnt[i]) : "0%";
-            }
-
             let labels = Object.keys(groupedStats);
             const mOrder = {"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12};
             labels.sort((a,b) => (mOrder[a.substring(0,3).toLowerCase()]||99) - (mOrder[b.substring(0,3).toLowerCase()]||99));
@@ -493,7 +489,7 @@
                 let colorIdx = i % locColorsLine.length;
                 
                 let topValueEl = document.getElementById(`valCar${i}`);
-                let titleEl = topValueEl.previousElementSibling.querySelector('h3'); // Safely get the H3 tag
+                let titleEl = topValueEl.previousElementSibling; // BUG FIXED HERE: Getting the <h3> properly
                 
                 if(charts[`car${i}`]) {
                     charts[`car${i}`].destroy();
@@ -506,8 +502,8 @@
                     let avgVal = gCnt[i] > 0 ? parseFloat((gSum[i] / gCnt[i]).toFixed(1)) : 0;
                     let targetColor = avgVal >= 95 ? G_GREEN : G_RED; 
                     
-                    topValueEl.style.display = 'none'; // Hide top right value
-                    titleEl.innerText = carName; // Ensure Car Name stays in Heading
+                    topValueEl.style.display = 'none'; // Hide right-side text
+                    titleEl.innerText = carName; // Ensure car name is retained
 
                     charts[`car${i}`] = new Chart(ctx, {
                         type: 'doughnut',
@@ -533,13 +529,13 @@
                                 context.restore();
                                 
                                 // Draw Percentage Exactly in Center
-                                let fontSizePct = (height / 120).toFixed(2); // Bigger and bolder
+                                let fontSizePct = (height / 120).toFixed(2); 
                                 context.font = "bold " + fontSizePct + "em Roboto";
                                 context.textBaseline = "middle";
                                 context.fillStyle = targetColor;
                                 let textPct = avgVal + "%";
                                 let textXPct = Math.round((width - context.measureText(textPct).width) / 2);
-                                let textYPct = height / 2; // Center perfectly
+                                let textYPct = height / 2;
                                 context.fillText(textPct, textXPct, textYPct);
                                 
                                 context.save();
@@ -551,7 +547,7 @@
                     // LINE CHART MODE (TREND)
                     topValueEl.style.display = 'block'; 
                     topValueEl.innerText = formatAvg(gCnt[i] > 0 ? (gSum[i] / gCnt[i]) : 0);
-                    titleEl.innerText = carName; // Keep Car Name in heading
+                    titleEl.innerText = carName; 
 
                     charts[`car${i}`] = new Chart(ctx, {
                         type: 'line',
