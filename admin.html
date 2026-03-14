@@ -96,6 +96,20 @@
         .nav-tabs a.home-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
         /* ---------------------------------
+           SMOOTH TRANSITION CLASSES (NEW)
+        --------------------------------- */
+        .chart-wrapper, .kpi-value, .surveyor-rounds-container {
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .fade-out {
+            opacity: 0 !important;
+            transform: scale(0.95) !important;
+        }
+
+        /* ---------------------------------
            MINI SECTION: SURVEYOR ROUNDS 
         --------------------------------- */
         .surveyor-rounds-container {
@@ -220,7 +234,6 @@
     </div>
 
     <script>
-        // ADMIN SHEET LINK 
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=508898650&single=true&output=csv';
 
         let sheetData = [];
@@ -230,11 +243,9 @@
         const G_BLUE = '#4285F4'; const G_RED = '#EA4335'; const G_YELLOW = '#FBBC05'; const G_GREEN = '#34A853';
         const BG_BLUE = 'rgba(66, 133, 244, 0.15)'; const BG_RED = 'rgba(234, 67, 53, 0.15)'; const BG_YELLOW = 'rgba(251, 188, 5, 0.15)'; const BG_GREEN = 'rgba(52, 168, 83, 0.15)';
 
-        // Line Chart Colors Mapping
         const locColorsLine = [G_BLUE, G_RED, G_YELLOW, G_GREEN, G_BLUE, G_RED, G_YELLOW, G_GREEN, G_BLUE, G_RED];
         const locColorsBg = [BG_BLUE, BG_RED, BG_YELLOW, BG_GREEN, BG_BLUE, BG_RED, BG_YELLOW, BG_GREEN, BG_BLUE, BG_RED];
 
-        // SVG Icon for Surveyor
         const userSvgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
 
         function parseCSV(str) {
@@ -269,14 +280,15 @@
             return num.toFixed(1) + "%"; 
         }
 
-        // Initialize empty Line charts temporarily
+        // Initialize Empty Line Charts initially
         function createEmptyLineChart(canvasId, colorLine, colorBg) {
             const ctx = document.getElementById(canvasId).getContext('2d');
             return new Chart(ctx, {
                 type: 'line',
                 data: { labels: [], datasets: [{ backgroundColor: colorBg, borderColor: colorLine, borderWidth: 2, fill: true, tension: 0.4, pointRadius: 3, pointHoverRadius: 6, data: [] }] },
                 options: {
-                    responsive: true, maintainAspectRatio: false, animation: { duration: 800 },
+                    responsive: true, maintainAspectRatio: false, 
+                    animation: { duration: 1000, easing: 'easeOutQuart' }, // Smooth charting intro
                     plugins: { legend: { display: false } },
                     scales: { y: { display: true, beginAtZero: true, grid: { drawBorder: false, color: '#f1f3f4' } }, x: { display: true, grid: { display: false } } }
                 }
@@ -374,16 +386,32 @@
             }
         }
 
+        // TRIGGER UPDATE WITH FADE TRANSITION
+        function triggerUpdate() {
+            // Select elements to fade
+            const elementsToFade = document.querySelectorAll('.chart-wrapper, .kpi-value, .surveyor-rounds-container');
+            
+            // Step 1: Add fade-out class
+            elementsToFade.forEach(el => el.classList.add('fade-out'));
+            
+            // Step 2: Wait for fade out to complete (300ms), then update logic
+            setTimeout(() => {
+                updateDashboard();
+                
+                // Step 3: Remove fade-out class to trigger fade-in animation
+                elementsToFade.forEach(el => el.classList.remove('fade-out'));
+            }, 300);
+        }
+
         function updateDashboard() {
             const yVal = document.getElementById('filterYear').value;
             const mVal = document.getElementById('filterMonth').value;
             const sVal = document.getElementById('filterSurveyor').value;
             const lVal = document.getElementById('filterLocation').value;
 
-            // Check if a specific Month is selected to switch chart types
+            // Logic trigger: Are we viewing a specific month? (Pie Chart Mode)
             const isMonthSelected = (mVal !== "All");
 
-            // FILTER THE DATA GLOBALLY
             let filteredData = sheetData.filter(item => {
                 if(yVal !== "All" && item['ExtractedYear'] !== yVal) return false;
                 if(mVal !== "All" && item['ExtractedMonth'] !== mVal) return false;
@@ -392,11 +420,8 @@
                 return true;
             });
 
-            // ---------------------------------------------------------
-            // CALCULATE & RENDER SURVEYOR ROUNDS (MINI SECTION)
-            // ---------------------------------------------------------
+            // SURVEYOR ROUNDS 
             let surveyorCounts = {};
-            
             filteredData.forEach(item => {
                 let sName = item[h_surv];
                 if (sName) {
@@ -408,7 +433,6 @@
 
             const roundsContainer = document.getElementById('surveyorRoundsContainer');
             roundsContainer.innerHTML = ''; 
-
             for (const [name, count] of Object.entries(surveyorCounts)) {
                 const cardHtml = `
                     <div class="surveyor-card">
@@ -422,9 +446,7 @@
                 roundsContainer.innerHTML += cardHtml;
             }
 
-            // ---------------------------------------------------------
-            // GRAPHS LOGIC (AVERAGE SERVICE LEVEL)
-            // ---------------------------------------------------------
+            // GRAPHS LOGIC 
             const targetAreas = [
                 ['admin building', 'admin'], ['executive mess'], ['guesthouse', 'guest house'], ['guest room'],
                 ['locker'], ['plant outside', 'plant'], ['social block', 'staff mess'], ['transport'],
@@ -470,11 +492,11 @@
                 }
             });
 
-            // Dynamically Render Charts (Donut or Line based on Month Selection)
+            // Dynamically Update Charts (Line or Doughnut)
             for(let i=0; i<10; i++) {
                 let canvasId = 'chartLoc' + (i+1);
                 
-                // Destroy old chart instance safely
+                // Destroy old instance to swap types cleanly
                 if(charts['loc'+(i+1)]) {
                     charts['loc'+(i+1)].destroy();
                 }
@@ -482,9 +504,9 @@
                 const ctx = document.getElementById(canvasId).getContext('2d');
 
                 if(isMonthSelected) {
-                    // --------- PIE / DONUT CHART MODE ---------
+                    // DOUGHNUT CHART MODE (When a specific month is selected)
                     let avgVal = gCnt[i] > 0 ? parseFloat((gSum[i] / gCnt[i]).toFixed(1)) : 0;
-                    let targetColor = avgVal >= 95 ? G_GREEN : G_RED; // >= 95% Green, else Red
+                    let targetColor = avgVal >= 95 ? G_GREEN : G_RED; // >= 95 is Green, < 95 is Red
                     
                     charts['loc'+(i+1)] = new Chart(ctx, {
                         type: 'doughnut',
@@ -498,7 +520,13 @@
                             }]
                         },
                         options: {
-                            responsive: true, maintainAspectRatio: false, animation: { duration: 800 },
+                            responsive: true, maintainAspectRatio: false, 
+                            animation: { 
+                                duration: 1000, 
+                                easing: 'easeOutBounce', // Gives a nice bounce effect
+                                animateScale: true,      // Grows from center
+                                animateRotate: true      // Rotates in
+                            },
                             plugins: { legend: { display: false }, tooltip: { enabled: false } },
                             scales: { x: { display: false }, y: { display: false } }
                         },
@@ -521,7 +549,7 @@
                     });
 
                 } else {
-                    // --------- LINE CHART (TREND) MODE ---------
+                    // LINE CHART MODE (When 'All Months' is selected)
                     charts['loc'+(i+1)] = new Chart(ctx, {
                         type: 'line',
                         data: { 
@@ -534,7 +562,8 @@
                             }] 
                         },
                         options: {
-                            responsive: true, maintainAspectRatio: false, animation: { duration: 800 },
+                            responsive: true, maintainAspectRatio: false, 
+                            animation: { duration: 1000, easing: 'easeOutQuart' },
                             plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { return context.parsed.y + "%"; } } } },
                             scales: { 
                                 y: { display: true, beginAtZero: true, grid: { drawBorder: false, color: '#f1f3f4' } }, 
@@ -546,10 +575,12 @@
             }
         }
 
-        document.querySelectorAll('select').forEach(sel => sel.addEventListener('change', updateDashboard));
+        // Attach transition function to dropdowns instead of direct update
+        document.querySelectorAll('select').forEach(sel => sel.addEventListener('change', triggerUpdate));
+        
         document.getElementById('clearFiltersBtn').addEventListener('click', () => {
             document.querySelectorAll('select').forEach(sel => sel.value = 'All');
-            updateDashboard(); 
+            triggerUpdate(); 
         });
 
         window.onload = () => { initCharts(); fetchGoogleSheetData(); };
