@@ -101,7 +101,7 @@
         .surveyor-rounds-container {
             display: flex;
             gap: 15px;
-            margin-bottom: 40px; /* added bottom margin since it's below graphs now */
+            margin-bottom: 40px;
             flex-wrap: wrap;
         }
 
@@ -128,29 +128,10 @@
             justify-content: center;
         }
 
-        .surveyor-icon svg {
-            width: 22px;
-            height: 22px;
-            fill: currentColor;
-        }
-
-        .surveyor-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .surveyor-name {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-weight: 500;
-            text-transform: uppercase;
-        }
-
-        .surveyor-count {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
+        .surveyor-icon svg { width: 22px; height: 22px; fill: currentColor; }
+        .surveyor-info { display: flex; flex-direction: column; }
+        .surveyor-name { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; }
+        .surveyor-count { font-size: 1.3rem; font-weight: 700; color: var(--text-main); }
 
         /* Unified Card & Graph Widget Grid */
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 40px; }
@@ -217,10 +198,9 @@
                 </a>
             </div>
 
-            <div id="loadingMsg">Fetching Live Data...</div>
+            <div id="loadingMsg">Calculating Service Level Averages...</div>
 
             <div class="dashboard-grid" id="dashboardContent" style="display: none;">
-                
                 <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Admin Building</h3><div class="kpi-value" id="valLoc1">...</div></div></div><div class="chart-wrapper"><canvas id="chartLoc1"></canvas></div></div>
                 <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Executive Mess</h3><div class="kpi-value" id="valLoc2">...</div></div></div><div class="chart-wrapper"><canvas id="chartLoc2"></canvas></div></div>
                 <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Guesthouse Building</h3><div class="kpi-value" id="valLoc3">...</div></div></div><div class="chart-wrapper"><canvas id="chartLoc3"></canvas></div></div>
@@ -231,7 +211,6 @@
                 <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Staff Transport</h3><div class="kpi-value" id="valLoc8">...</div></div></div><div class="chart-wrapper"><canvas id="chartLoc8"></canvas></div></div>
                 <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Technical Office</h3><div class="kpi-value" id="valLoc9">...</div></div></div><div class="chart-wrapper"><canvas id="chartLoc9"></canvas></div></div>
                 <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Washrooms</h3><div class="kpi-value" id="valLoc10">...</div></div></div><div class="chart-wrapper"><canvas id="chartLoc10"></canvas></div></div>
-
             </div>
 
             <div class="surveyor-rounds-container" id="surveyorRoundsContainer">
@@ -250,6 +229,10 @@
 
         const G_BLUE = '#4285F4'; const G_RED = '#EA4335'; const G_YELLOW = '#FBBC05'; const G_GREEN = '#34A853';
         const BG_BLUE = 'rgba(66, 133, 244, 0.15)'; const BG_RED = 'rgba(234, 67, 53, 0.15)'; const BG_YELLOW = 'rgba(251, 188, 5, 0.15)'; const BG_GREEN = 'rgba(52, 168, 83, 0.15)';
+
+        // Line Chart Colors Mapping
+        const locColorsLine = [G_BLUE, G_RED, G_YELLOW, G_GREEN, G_BLUE, G_RED, G_YELLOW, G_GREEN, G_BLUE, G_RED];
+        const locColorsBg = [BG_BLUE, BG_RED, BG_YELLOW, BG_GREEN, BG_BLUE, BG_RED, BG_YELLOW, BG_GREEN, BG_BLUE, BG_RED];
 
         // SVG Icon for Surveyor
         const userSvgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
@@ -286,30 +269,24 @@
             return num.toFixed(1) + "%"; 
         }
 
-        function createChart(canvasId, colorLine, colorBg) {
+        // Initialize empty Line charts temporarily
+        function createEmptyLineChart(canvasId, colorLine, colorBg) {
             const ctx = document.getElementById(canvasId).getContext('2d');
             return new Chart(ctx, {
                 type: 'line',
                 data: { labels: [], datasets: [{ backgroundColor: colorBg, borderColor: colorLine, borderWidth: 2, fill: true, tension: 0.4, pointRadius: 3, pointHoverRadius: 6, data: [] }] },
                 options: {
                     responsive: true, maintainAspectRatio: false, animation: { duration: 800 },
-                    plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { return context.parsed.y + "%"; } } } },
+                    plugins: { legend: { display: false } },
                     scales: { y: { display: true, beginAtZero: true, grid: { drawBorder: false, color: '#f1f3f4' } }, x: { display: true, grid: { display: false } } }
                 }
             });
         }
 
         function initCharts() {
-            charts.loc1 = createChart('chartLoc1', G_BLUE, BG_BLUE);
-            charts.loc2 = createChart('chartLoc2', G_RED, BG_RED);
-            charts.loc3 = createChart('chartLoc3', G_YELLOW, BG_YELLOW);
-            charts.loc4 = createChart('chartLoc4', G_GREEN, BG_GREEN);
-            charts.loc5 = createChart('chartLoc5', G_BLUE, BG_BLUE);
-            charts.loc6 = createChart('chartLoc6', G_RED, BG_RED);
-            charts.loc7 = createChart('chartLoc7', G_YELLOW, BG_YELLOW);
-            charts.loc8 = createChart('chartLoc8', G_GREEN, BG_GREEN);
-            charts.loc9 = createChart('chartLoc9', G_BLUE, BG_BLUE); 
-            charts.loc10 = createChart('chartLoc10', G_RED, BG_RED); 
+            for(let i=0; i<10; i++) {
+                charts['loc'+(i+1)] = createEmptyLineChart('chartLoc'+(i+1), locColorsLine[i], locColorsBg[i]);
+            }
         }
 
         let h_month, h_surv, h_area, h_loc, h_svc;
@@ -393,7 +370,7 @@
                 updateDashboard(); 
             } catch (error) {
                 console.error("Data error:", error);
-                document.getElementById('loadingMsg').innerHTML = `<span style='color:red'>Error reading sheet.</span>`;
+                document.getElementById('loadingMsg').innerHTML = `<span style='color:red'>Error reading sheet headers. Check columns.</span>`;
             }
         }
 
@@ -402,6 +379,9 @@
             const mVal = document.getElementById('filterMonth').value;
             const sVal = document.getElementById('filterSurveyor').value;
             const lVal = document.getElementById('filterLocation').value;
+
+            // Check if a specific Month is selected to switch chart types
+            const isMonthSelected = (mVal !== "All");
 
             // FILTER THE DATA GLOBALLY
             let filteredData = sheetData.filter(item => {
@@ -473,6 +453,7 @@
                 }
             });
 
+            // Update Top Cumulative Numbers
             for(let i=0; i<10; i++) {
                 document.getElementById('valLoc'+(i+1)).innerText = gCnt[i] > 0 ? formatAvg(gSum[i] / gCnt[i]) : "0%";
             }
@@ -485,18 +466,83 @@
             labels.forEach(lbl => {
                 let s = groupedStats[lbl];
                 for(let i=0; i<10; i++) {
-                    datasets[i].push(s.cnts[i] > 0 ? (s.sums[i]/s.cnts[i]).toFixed(1) : 0);
+                    datasets[i].push(s.cnts[i] > 0 ? parseFloat((s.sums[i]/s.cnts[i]).toFixed(1)) : 0);
                 }
             });
 
-            function updateC(chartInst, lbs, dta) {
-                chartInst.data.labels = lbs;
-                chartInst.data.datasets[0].data = dta;
-                chartInst.update();
-            }
-
+            // Dynamically Render Charts (Donut or Line based on Month Selection)
             for(let i=0; i<10; i++) {
-                updateC(charts['loc'+(i+1)], labels, datasets[i]);
+                let canvasId = 'chartLoc' + (i+1);
+                
+                // Destroy old chart instance safely
+                if(charts['loc'+(i+1)]) {
+                    charts['loc'+(i+1)].destroy();
+                }
+
+                const ctx = document.getElementById(canvasId).getContext('2d');
+
+                if(isMonthSelected) {
+                    // --------- PIE / DONUT CHART MODE ---------
+                    let avgVal = gCnt[i] > 0 ? parseFloat((gSum[i] / gCnt[i]).toFixed(1)) : 0;
+                    let targetColor = avgVal >= 95 ? G_GREEN : G_RED; // >= 95% Green, else Red
+                    
+                    charts['loc'+(i+1)] = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Achieved', 'Remaining'],
+                            datasets: [{
+                                data: [avgVal, Math.max(0, 100 - avgVal)],
+                                backgroundColor: [targetColor, '#E8EAED'],
+                                borderWidth: 0,
+                                cutout: '75%'
+                            }]
+                        },
+                        options: {
+                            responsive: true, maintainAspectRatio: false, animation: { duration: 800 },
+                            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                            scales: { x: { display: false }, y: { display: false } }
+                        },
+                        plugins: [{
+                            id: 'centerTextPlugin',
+                            beforeDraw: function(chart) {
+                                var width = chart.width, height = chart.height, context = chart.ctx;
+                                context.restore();
+                                var fontSize = (height / 100).toFixed(2);
+                                context.font = "bold " + fontSize + "em Roboto";
+                                context.textBaseline = "middle";
+                                var text = avgVal + "%",
+                                    textX = Math.round((width - context.measureText(text).width) / 2),
+                                    textY = height / 2;
+                                context.fillStyle = targetColor;
+                                context.fillText(text, textX, textY);
+                                context.save();
+                            }
+                        }]
+                    });
+
+                } else {
+                    // --------- LINE CHART (TREND) MODE ---------
+                    charts['loc'+(i+1)] = new Chart(ctx, {
+                        type: 'line',
+                        data: { 
+                            labels: labels, 
+                            datasets: [{ 
+                                backgroundColor: locColorsBg[i], 
+                                borderColor: locColorsLine[i], 
+                                borderWidth: 2, fill: true, tension: 0.4, 
+                                pointRadius: 3, pointHoverRadius: 6, data: datasets[i] 
+                            }] 
+                        },
+                        options: {
+                            responsive: true, maintainAspectRatio: false, animation: { duration: 800 },
+                            plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { return context.parsed.y + "%"; } } } },
+                            scales: { 
+                                y: { display: true, beginAtZero: true, grid: { drawBorder: false, color: '#f1f3f4' } }, 
+                                x: { display: true, grid: { display: false } } 
+                            }
+                        }
+                    });
+                }
             }
         }
 
