@@ -112,24 +112,18 @@
         /* Unified Card & Graph Widget Grid */
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px; }
 
-        .kpi-widget { 
-            background: var(--surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(60,64,67,0.1), 0 1px 2px rgba(60,64,67,0.06); 
-            display: flex; flex-direction: column; overflow: hidden; border-top: 4px solid var(--border-color); padding: 15px 20px 15px 20px; 
-        }
+        .kpi-widget { background: var(--surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(60,64,67,0.1), 0 1px 2px rgba(60,64,67,0.06); display: flex; flex-direction: column; overflow: hidden; border-top: 4px solid var(--border-color); padding: 18px 20px 10px 20px; }
 
         .kpi-widget:nth-child(4n+1) { border-top-color: var(--google-blue); }
         .kpi-widget:nth-child(4n+2) { border-top-color: var(--google-red); }
         .kpi-widget:nth-child(4n+3) { border-top-color: var(--google-yellow); }
         .kpi-widget:nth-child(4n+4) { border-top-color: var(--google-green); }
 
-        .kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
-        /* Made KPI title smaller and subtler */
-        .kpi-title h3 { margin: 0 0 2px 0; font-size: 0.7rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; }
-        
-        /* The top right value is only for Trends (All Months). Hidden dynamically in Pie mode */
-        .kpi-value { font-size: 1.2rem; font-weight: 700; color: var(--text-main); margin: 0; }
-        
-        .chart-wrapper { position: relative; height: 160px; width: 100%; display: flex; justify-content: center; align-items: center;}
+        .kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .kpi-title { width: 100%; }
+        .kpi-title h3 { margin: 0 0 2px 0; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .kpi-value { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin: 0; }
+        .chart-wrapper { position: relative; height: 140px; width: 100%; }
 
         /* ---------------------------------
            MINI SECTION: SURVEYOR ROUNDS 
@@ -187,7 +181,7 @@
                 <a href="index.html">HR Dashboard</a>
                 <a href="admin.html">Admin Dashboard</a>
                 <a href="cost.html">Cost Dashboard</a>
-                <a href="#" class="active">Pool & Vehicle</a>
+                <a href="#" class="active">Pool Vehicle</a>
                 
                 <a href="index.html" class="home-icon" title="Home">
                     <svg viewBox="0 0 24 24">
@@ -200,7 +194,7 @@
             <div id="loadingMsg">Analyzing Data & Generating Vehicles...</div>
 
             <div class="dashboard-grid" id="dashboardContent" style="display: none;">
-                </div>
+            </div>
 
             <div class="surveyor-rounds-container" id="surveyorRoundsContainer">
             </div>
@@ -209,6 +203,7 @@
     </div>
 
     <script>
+        // POOL VEHICLE SHEET LINK
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=651598198&single=true&output=csv';
 
         let sheetData = [];
@@ -266,7 +261,6 @@
                 if (cleanH.includes('surveyour') || cleanH.includes('surveyor')) h_surv = h;
                 if (cleanH.includes('driver')) h_driver = h;
                 if (cleanH.includes('location') || cleanH.includes('site')) h_loc = h;
-                
                 if (cleanH.includes('area') || cleanH.includes('vehicle') || cleanH.includes('car')) h_area = h;
                 if (cleanH.includes('servicelevel') || cleanH.includes('score')) h_svc = h;
             });
@@ -282,6 +276,7 @@
                         uniqueCars.push(car.trim());
                     }
                 });
+                uniqueCars.sort();
             } else {
                 isLongFormat = false;
                 const ignore = [h_month, h_surv, h_driver, h_loc, 'ExtractedYear', 'ExtractedMonth'].map(x => x ? x.toLowerCase() : "");
@@ -302,9 +297,9 @@
                     <div class="kpi-widget">
                         <div class="kpi-header">
                             <div class="kpi-title">
-                                <h3>Service Level Trend</h3>
+                                <h3 title="${car}">${car}</h3>
+                                <div class="kpi-value" id="valCar${index}">...</div>
                             </div>
-                            <div class="kpi-value" id="valCar${index}">...</div>
                         </div>
                         <div class="chart-wrapper"><canvas id="chartCar${index}"></canvas></div>
                     </div>
@@ -390,13 +385,13 @@
         }
 
         function triggerUpdate() {
-            const elementsToFade = document.querySelectorAll('.chart-wrapper, .kpi-value, .surveyor-rounds-container, .kpi-title h3');
+            const elementsToFade = document.querySelectorAll('.chart-wrapper, .kpi-value, .surveyor-rounds-container');
             elementsToFade.forEach(el => el.classList.add('fade-out'));
             
             setTimeout(() => {
                 updateDashboard();
                 elementsToFade.forEach(el => el.classList.remove('fade-out'));
-            }, 400);
+            }, 350);
         }
 
         function updateDashboard() {
@@ -430,6 +425,7 @@
 
             const roundsContainer = document.getElementById('surveyorRoundsContainer');
             roundsContainer.innerHTML = ''; 
+
             for (const [name, count] of Object.entries(surveyorCounts)) {
                 const cardHtml = `
                     <div class="surveyor-card">
@@ -443,7 +439,7 @@
                 roundsContainer.innerHTML += cardHtml;
             }
 
-            // GRAPHS LOGIC 
+            // DYNAMIC GRAPHS LOGIC 
             let carCount = uniqueCars.length;
             let gSum = Array(carCount).fill(0);
             let gCnt = Array(carCount).fill(0);
@@ -475,6 +471,10 @@
                 }
             });
 
+            for(let i=0; i<carCount; i++) {
+                document.getElementById(`valCar${i}`).innerText = gCnt[i] > 0 ? formatAvg(gSum[i] / gCnt[i]) : "0%";
+            }
+
             let labels = Object.keys(groupedStats);
             const mOrder = {"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12};
             labels.sort((a,b) => (mOrder[a.substring(0,3).toLowerCase()]||99) - (mOrder[b.substring(0,3).toLowerCase()]||99));
@@ -487,23 +487,27 @@
                 }
             });
 
-            // Dynamically Render Charts (Donut or Line)
             for(let i=0; i<carCount; i++) {
                 let canvasId = `chartCar${i}`;
+                let carName = uniqueCars[i]; 
                 let colorIdx = i % locColorsLine.length;
-                let topValueEl = document.getElementById(`valCar${i}`);
-                let titleEl = topValueEl.previousElementSibling;
                 
-                if(charts[`car${i}`]) { charts[`car${i}`].destroy(); }
+                let topValueEl = document.getElementById(`valCar${i}`);
+                let titleEl = topValueEl.previousElementSibling.querySelector('h3'); // Safely get the H3 tag
+                
+                if(charts[`car${i}`]) {
+                    charts[`car${i}`].destroy();
+                }
+
                 const ctx = document.getElementById(canvasId).getContext('2d');
 
-                let avgVal = gCnt[i] > 0 ? parseFloat((gSum[i] / gCnt[i]).toFixed(1)) : 0;
-                let targetColor = avgVal >= 95 ? G_GREEN : G_RED; 
-
                 if(isMonthSelected) {
-                    // PIE CHART MODE
+                    // DOUGHNUT CHART MODE
+                    let avgVal = gCnt[i] > 0 ? parseFloat((gSum[i] / gCnt[i]).toFixed(1)) : 0;
+                    let targetColor = avgVal >= 95 ? G_GREEN : G_RED; 
+                    
                     topValueEl.style.display = 'none'; // Hide top right value
-                    titleEl.innerText = "Service Level"; // Subtitle
+                    titleEl.innerText = carName; // Ensure Car Name stays in Heading
 
                     charts[`car${i}`] = new Chart(ctx, {
                         type: 'doughnut',
@@ -513,14 +517,14 @@
                                 data: [avgVal, Math.max(0, 100 - avgVal)],
                                 backgroundColor: [targetColor, '#E8EAED'],
                                 borderWidth: 0,
-                                cutout: '80%'
+                                cutout: '75%'
                             }]
                         },
                         options: {
                             responsive: true, maintainAspectRatio: false, 
                             animation: { duration: 1000, easing: 'easeOutBounce', animateScale: true, animateRotate: true },
                             plugins: { legend: { display: false }, tooltip: { enabled: false } },
-                            layout: { padding: 10 }
+                            scales: { x: { display: false }, y: { display: false } }
                         },
                         plugins: [{
                             id: 'centerTextPlugin',
@@ -528,23 +532,14 @@
                                 var width = chart.width, height = chart.height, context = chart.ctx;
                                 context.restore();
                                 
-                                // Draw Car Name (Centered, Top)
-                                let fontSizeName = (height / 150).toFixed(2);
-                                context.font = "bold " + fontSizeName + "em Roboto";
-                                context.textBaseline = "middle";
-                                context.fillStyle = "#1C1E21";
-                                let textName = uniqueCars[i];
-                                let textXName = Math.round((width - context.measureText(textName).width) / 2);
-                                let textYName = height / 2 - 10;
-                                context.fillText(textName, textXName, textYName);
-
-                                // Draw Percentage (Centered, Bottom, Smaller)
-                                let fontSizePct = (height / 200).toFixed(2);
+                                // Draw Percentage Exactly in Center
+                                let fontSizePct = (height / 120).toFixed(2); // Bigger and bolder
                                 context.font = "bold " + fontSizePct + "em Roboto";
+                                context.textBaseline = "middle";
                                 context.fillStyle = targetColor;
                                 let textPct = avgVal + "%";
                                 let textXPct = Math.round((width - context.measureText(textPct).width) / 2);
-                                let textYPct = height / 2 + 15;
+                                let textYPct = height / 2; // Center perfectly
                                 context.fillText(textPct, textXPct, textYPct);
                                 
                                 context.save();
@@ -555,8 +550,8 @@
                 } else {
                     // LINE CHART MODE (TREND)
                     topValueEl.style.display = 'block'; 
-                    topValueEl.innerText = formatAvg(avgVal);
-                    titleEl.innerText = uniqueCars[i]; // Put Car Name back in top left
+                    topValueEl.innerText = formatAvg(gCnt[i] > 0 ? (gSum[i] / gCnt[i]) : 0);
+                    titleEl.innerText = carName; // Keep Car Name in heading
 
                     charts[`car${i}`] = new Chart(ctx, {
                         type: 'line',
