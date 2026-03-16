@@ -87,7 +87,7 @@
         /* ---------------------------------
            NAVIGATION TABS
         --------------------------------- */
-        .nav-tabs { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
+        .nav-tabs { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
         .nav-tabs a { text-decoration: none; padding: 10px 24px; font-size: 1rem; font-weight: 500; color: var(--text-muted); background-color: white; border: 1px solid var(--border-color); border-radius: 8px; transition: all 0.3s ease; }
         .nav-tabs a:hover { color: var(--text-main); background-color: var(--bg-light); border-color: #c0c4c9; }
         .nav-tabs a.active { background-color: var(--google-green); color: white; border-color: var(--google-green); box-shadow: 0 2px 6px rgba(52, 168, 83, 0.3); }
@@ -96,59 +96,21 @@
         .nav-tabs a.home-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
         /* ---------------------------------
-           SMOOTH TRANSITION CLASSES (NEW)
+           SMOOTH TRANSITION CLASSES 
         --------------------------------- */
         .chart-wrapper, .kpi-value, .surveyor-rounds-container {
-            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 1;
             transform: scale(1);
         }
         
         .fade-out {
             opacity: 0 !important;
-            transform: scale(0.95) !important;
+            transform: scale(0.92) !important;
         }
-
-        /* ---------------------------------
-           MINI SECTION: SURVEYOR ROUNDS 
-        --------------------------------- */
-        .surveyor-rounds-container {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-        }
-
-        .surveyor-card {
-            background: var(--surface);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            box-shadow: 0 1px 3px rgba(60,64,67,0.1);
-            min-width: 180px;
-        }
-
-        .surveyor-icon {
-            width: 40px;
-            height: 40px;
-            background-color: var(--bg-green-light);
-            color: var(--google-green);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .surveyor-icon svg { width: 22px; height: 22px; fill: currentColor; }
-        .surveyor-info { display: flex; flex-direction: column; }
-        .surveyor-name { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; }
-        .surveyor-count { font-size: 1.3rem; font-weight: 700; color: var(--text-main); }
 
         /* Unified Card & Graph Widget Grid */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px; }
 
         .kpi-widget { background: var(--surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(60,64,67,0.1), 0 1px 2px rgba(60,64,67,0.06); display: flex; flex-direction: column; overflow: hidden; border-top: 4px solid var(--border-color); padding: 18px 20px 10px 20px; }
 
@@ -158,9 +120,21 @@
         .kpi-widget:nth-child(4n+4) { border-top-color: var(--google-green); }
 
         .kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-        .kpi-title h3 { margin: 0 0 5px 0; font-size: 0.8rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
-        .kpi-value { font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0; }
+        .kpi-title { width: 100%; }
+        .kpi-title h3 { margin: 0 0 2px 0; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .kpi-value { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin: 0; }
         .chart-wrapper { position: relative; height: 140px; width: 100%; }
+
+        /* ---------------------------------
+           MINI SECTION: SURVEYOR ROUNDS 
+        --------------------------------- */
+        .surveyor-rounds-container { display: flex; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; }
+        .surveyor-card { background: var(--surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 1px 3px rgba(60,64,67,0.1); min-width: 180px; }
+        .surveyor-icon { width: 40px; height: 40px; background-color: var(--bg-green-light); color: var(--google-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .surveyor-icon svg { width: 22px; height: 22px; fill: currentColor; }
+        .surveyor-info { display: flex; flex-direction: column; }
+        .surveyor-name { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; }
+        .surveyor-count { font-size: 1.3rem; font-weight: 700; color: var(--text-main); }
 
         #loadingMsg { position: absolute; color: var(--google-green); font-weight: 500; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; background: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     </style>
@@ -187,12 +161,16 @@
                 <select id="filterMonth"><option value="All">All Months</option></select>
             </div>
             <div class="filter-group">
+                <label>Location</label>
+                <select id="filterLocation"><option value="All">All Locations</option></select>
+            </div>
+            <div class="filter-group">
                 <label>Surveyor Name</label>
                 <select id="filterSurveyor"><option value="All">All Surveyors</option></select>
             </div>
             <div class="filter-group">
-                <label>Location</label>
-                <select id="filterLocation"><option value="All">All Locations</option></select>
+                <label>Driver Name</label>
+                <select id="filterDriver"><option value="All">All Drivers</option></select>
             </div>
             <button id="clearFiltersBtn" class="clear-btn">Clear Filters</button>
         </div>
@@ -203,8 +181,7 @@
                 <a href="index.html">HR Dashboard</a>
                 <a href="#" class="active">Admin Dashboard</a>
                 <a href="cost.html">Cost Dashboard</a>
-                
-                <a href="index.html" class="home-icon" title="Home">
+                <a href="transport.html">Pool & Transport</a> <a href="index.html" class="home-icon" title="Home">
                     <svg viewBox="0 0 24 24">
                         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                         <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -234,6 +211,7 @@
     </div>
 
     <script>
+        // ADMIN SHEET LINK 
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=508898650&single=true&output=csv';
 
         let sheetData = [];
@@ -271,6 +249,7 @@
             
             let num = parseFloat(strVal.replace(/[^0-9.-]/g, ''));
             if (isNaN(num)) return null;
+
             if (strVal.includes('%')) return num;
             if (num > 0 && num <= 1.0) return num * 100;
             return num;
@@ -280,15 +259,13 @@
             return num.toFixed(1) + "%"; 
         }
 
-        // Initialize Empty Line Charts initially
         function createEmptyLineChart(canvasId, colorLine, colorBg) {
             const ctx = document.getElementById(canvasId).getContext('2d');
             return new Chart(ctx, {
                 type: 'line',
                 data: { labels: [], datasets: [{ backgroundColor: colorBg, borderColor: colorLine, borderWidth: 2, fill: true, tension: 0.4, pointRadius: 3, pointHoverRadius: 6, data: [] }] },
                 options: {
-                    responsive: true, maintainAspectRatio: false, 
-                    animation: { duration: 1000, easing: 'easeOutQuart' }, // Smooth charting intro
+                    responsive: true, maintainAspectRatio: false, animation: { duration: 800 },
                     plugins: { legend: { display: false } },
                     scales: { y: { display: true, beginAtZero: true, grid: { drawBorder: false, color: '#f1f3f4' } }, x: { display: true, grid: { display: false } } }
                 }
@@ -306,10 +283,10 @@
         function identifyHeaders(headerRow) {
             headerRow.forEach(h => {
                 let cleanH = h.toLowerCase().replace(/[^a-z0-9]/g, '');
-                if (cleanH.includes('month')) h_month = h;
+                if (cleanH.includes('month') || cleanH.includes('date')) h_month = h;
                 if (cleanH.includes('surveyour') || cleanH.includes('surveyor')) h_surv = h;
                 if (cleanH.includes('areaofsurvey') || cleanH.includes('area')) h_area = h;
-                if (cleanH.includes('location')) h_loc = h;
+                if (cleanH.includes('location') || cleanH.includes('site')) h_loc = h;
                 if (cleanH.includes('servicelevel') || cleanH.includes('score')) h_svc = h;
             });
         }
@@ -386,21 +363,14 @@
             }
         }
 
-        // TRIGGER UPDATE WITH FADE TRANSITION
         function triggerUpdate() {
-            // Select elements to fade
             const elementsToFade = document.querySelectorAll('.chart-wrapper, .kpi-value, .surveyor-rounds-container');
-            
-            // Step 1: Add fade-out class
             elementsToFade.forEach(el => el.classList.add('fade-out'));
             
-            // Step 2: Wait for fade out to complete (300ms), then update logic
             setTimeout(() => {
                 updateDashboard();
-                
-                // Step 3: Remove fade-out class to trigger fade-in animation
                 elementsToFade.forEach(el => el.classList.remove('fade-out'));
-            }, 300);
+            }, 350);
         }
 
         function updateDashboard() {
@@ -409,7 +379,6 @@
             const sVal = document.getElementById('filterSurveyor').value;
             const lVal = document.getElementById('filterLocation').value;
 
-            // Logic trigger: Are we viewing a specific month? (Pie Chart Mode)
             const isMonthSelected = (mVal !== "All");
 
             let filteredData = sheetData.filter(item => {
@@ -420,8 +389,11 @@
                 return true;
             });
 
-            // SURVEYOR ROUNDS 
+            // ---------------------------------------------------------
+            // CALCULATE & RENDER SURVEYOR ROUNDS 
+            // ---------------------------------------------------------
             let surveyorCounts = {};
+            
             filteredData.forEach(item => {
                 let sName = item[h_surv];
                 if (sName) {
@@ -433,6 +405,7 @@
 
             const roundsContainer = document.getElementById('surveyorRoundsContainer');
             roundsContainer.innerHTML = ''; 
+
             for (const [name, count] of Object.entries(surveyorCounts)) {
                 const cardHtml = `
                     <div class="surveyor-card">
@@ -446,7 +419,9 @@
                 roundsContainer.innerHTML += cardHtml;
             }
 
-            // GRAPHS LOGIC 
+            // ---------------------------------------------------------
+            // GRAPHS LOGIC (AVERAGE SERVICE LEVEL)
+            // ---------------------------------------------------------
             const targetAreas = [
                 ['admin building', 'admin'], ['executive mess'], ['guesthouse', 'guest house'], ['guest room'],
                 ['locker'], ['plant outside', 'plant'], ['social block', 'staff mess'], ['transport'],
@@ -475,11 +450,6 @@
                 }
             });
 
-            // Update Top Cumulative Numbers
-            for(let i=0; i<10; i++) {
-                document.getElementById('valLoc'+(i+1)).innerText = gCnt[i] > 0 ? formatAvg(gSum[i] / gCnt[i]) : "0%";
-            }
-
             let labels = Object.keys(groupedStats);
             const mOrder = {"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12};
             labels.sort((a,b) => (mOrder[a.substring(0,3).toLowerCase()]||99) - (mOrder[b.substring(0,3).toLowerCase()]||99));
@@ -492,11 +462,11 @@
                 }
             });
 
-            // Dynamically Update Charts (Line or Doughnut)
             for(let i=0; i<10; i++) {
                 let canvasId = 'chartLoc' + (i+1);
+                let colorIdx = i % locColorsLine.length;
+                let topValueEl = document.getElementById('valLoc' + (i+1));
                 
-                // Destroy old instance to swap types cleanly
                 if(charts['loc'+(i+1)]) {
                     charts['loc'+(i+1)].destroy();
                 }
@@ -504,9 +474,11 @@
                 const ctx = document.getElementById(canvasId).getContext('2d');
 
                 if(isMonthSelected) {
-                    // DOUGHNUT CHART MODE (When a specific month is selected)
+                    // DOUGHNUT CHART MODE
+                    if (topValueEl) topValueEl.style.display = 'none';
+
                     let avgVal = gCnt[i] > 0 ? parseFloat((gSum[i] / gCnt[i]).toFixed(1)) : 0;
-                    let targetColor = avgVal >= 95 ? G_GREEN : G_RED; // >= 95 is Green, < 95 is Red
+                    let targetColor = avgVal >= 95 ? G_GREEN : G_RED; 
                     
                     charts['loc'+(i+1)] = new Chart(ctx, {
                         type: 'doughnut',
@@ -521,12 +493,7 @@
                         },
                         options: {
                             responsive: true, maintainAspectRatio: false, 
-                            animation: { 
-                                duration: 1000, 
-                                easing: 'easeOutBounce', // Gives a nice bounce effect
-                                animateScale: true,      // Grows from center
-                                animateRotate: true      // Rotates in
-                            },
+                            animation: { duration: 1000, easing: 'easeOutBounce', animateScale: true, animateRotate: true },
                             plugins: { legend: { display: false }, tooltip: { enabled: false } },
                             scales: { x: { display: false }, y: { display: false } }
                         },
@@ -535,49 +502,50 @@
                             beforeDraw: function(chart) {
                                 var width = chart.width, height = chart.height, context = chart.ctx;
                                 context.restore();
-                                var fontSize = (height / 100).toFixed(2);
-                                context.font = "bold " + fontSize + "em Roboto";
+                                
+                                let fontSizePct = (height / 120).toFixed(2); 
+                                context.font = "bold " + fontSizePct + "em Roboto";
                                 context.textBaseline = "middle";
-                                var text = avgVal + "%",
-                                    textX = Math.round((width - context.measureText(text).width) / 2),
-                                    textY = height / 2;
                                 context.fillStyle = targetColor;
-                                context.fillText(text, textX, textY);
+                                let textPct = avgVal + "%";
+                                let textXPct = Math.round((width - context.measureText(textPct).width) / 2);
+                                let textYPct = height / 2; 
+                                context.fillText(textPct, textXPct, textYPct);
+                                
                                 context.save();
                             }
                         }]
                     });
 
                 } else {
-                    // LINE CHART MODE (When 'All Months' is selected)
+                    // LINE CHART MODE (TREND)
+                    if (topValueEl) {
+                        topValueEl.style.display = 'block';
+                        topValueEl.innerText = formatAvg(gCnt[i] > 0 ? (gSum[i] / gCnt[i]) : 0);
+                    }
+
                     charts['loc'+(i+1)] = new Chart(ctx, {
                         type: 'line',
                         data: { 
                             labels: labels, 
                             datasets: [{ 
-                                backgroundColor: locColorsBg[i], 
-                                borderColor: locColorsLine[i], 
+                                backgroundColor: locColorsBg[colorIdx], 
+                                borderColor: locColorsLine[colorIdx], 
                                 borderWidth: 2, fill: true, tension: 0.4, 
                                 pointRadius: 3, pointHoverRadius: 6, data: datasets[i] 
                             }] 
                         },
                         options: {
-                            responsive: true, maintainAspectRatio: false, 
-                            animation: { duration: 1000, easing: 'easeOutQuart' },
+                            responsive: true, maintainAspectRatio: false, animation: { duration: 800, easing: 'easeOutQuart' },
                             plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { return context.parsed.y + "%"; } } } },
-                            scales: { 
-                                y: { display: true, beginAtZero: true, grid: { drawBorder: false, color: '#f1f3f4' } }, 
-                                x: { display: true, grid: { display: false } } 
-                            }
+                            scales: { y: { display: true, beginAtZero: true, grid: { drawBorder: false, color: '#f1f3f4' } }, x: { display: true, grid: { display: false } } }
                         }
                     });
                 }
             }
         }
 
-        // Attach transition function to dropdowns instead of direct update
         document.querySelectorAll('select').forEach(sel => sel.addEventListener('change', triggerUpdate));
-        
         document.getElementById('clearFiltersBtn').addEventListener('click', () => {
             document.querySelectorAll('select').forEach(sel => sel.value = 'All');
             triggerUpdate(); 
