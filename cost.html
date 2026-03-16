@@ -1,707 +1,676 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cost Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        /* =========================================
-           CLAYMORPHISM DESIGN VARIABLES
-           ========================================= */
-        :root {
-            /* Google Colors */
-            --google-blue: #4285F4;
-            --google-red: #EA4335;
-            --google-yellow: #FBBC05;
-            --google-green: #34A853;
-            
-            /* Claymorphism Base Colors */
-            --bg-light: #e0e5ec; /* Soft, matte clay background */
-            --surface: #e0e5ec;  /* Surface matches background for 3D illusion */
-            --text-main: #2d3748;
-            --text-muted: #718096;
-            --header-height: 80px;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cost Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Google Material Design Variables */
+        :root {
+            --google-blue: #4285F4;
+            --google-red: #EA4335;
+            --google-yellow: #FBBC05;
+            --google-green: #34A853;
+            
+            --bg-blue-light: rgba(66, 133, 244, 0.1);
+            --bg-red-light: rgba(234, 67, 53, 0.1);
+            --bg-yellow-light: rgba(251, 188, 5, 0.1);
+            --bg-green-light: rgba(52, 168, 83, 0.1);
 
-            /* Claymorphism Shadows (Outer drop + Double Inner) */
-            --clay-shadow-out: 8px 8px 16px rgba(163, 177, 198, 0.6), -8px -8px 16px rgba(255, 255, 255, 0.8);
-            --clay-shadow-in-light: inset 3px 3px 6px rgba(255, 255, 255, 0.8);
-            --clay-shadow-in-dark: inset -3px -3px 6px rgba(163, 177, 198, 0.3);
-            
-            /* Combined Clay Box Effect */
-            --clay-box: var(--clay-shadow-out), var(--clay-shadow-in-light), var(--clay-shadow-in-dark);
-            
-            /* Clay Hole Effect (For Inputs/Dropdowns) */
-            --clay-inset: inset 5px 5px 10px rgba(163, 177, 198, 0.6), inset -5px -5px 10px rgba(255, 255, 255, 0.9);
-            
-            /* Active Button Effect */
-            --clay-btn-active: inset 4px 4px 8px rgba(163, 177, 198, 0.6), inset -4px -4px 8px rgba(255, 255, 255, 0.8);
-        }
+            --bg-light: #F8F9FA;
+            --surface: #FFFFFF;
+            --text-main: #202124;
+            --text-muted: #5F6368;
+            --border-color: #DADCE0;
+            --header-height: 80px;
+        }
 
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column; 
-            background-color: var(--bg-light);
-            color: var(--text-main);
-            height: 100vh;
-        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column; 
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            height: 100vh;
+        }
 
-        /* ---------------------------------
-           FULL-WIDTH TOP HEADER
-        --------------------------------- */
-        .top-header {
-            width: 100%;
-            height: var(--header-height);
-            background-color: var(--surface);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 30px;
-            box-shadow: 0 5px 15px rgba(163, 177, 198, 0.4), var(--clay-shadow-in-light);
-            z-index: 200;
-            position: fixed;
-            top: 0;
-            left: 0;
-            box-sizing: border-box;
-            border-bottom: none;
-        }
+        /* ---------------------------------
+           FULL-WIDTH TOP HEADER
+        --------------------------------- */
+        .top-header {
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            z-index: 200;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-sizing: border-box;
+        }
 
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
 
-        .logo {
-            height: 50px; 
-            width: auto;
-            object-fit: contain;
-        }
+        .logo {
+            height: 50px; 
+            width: auto;
+            object-fit: contain;
+        }
 
-        .top-header h1 {
-            color: var(--google-green);
-            margin: 0;
-            font-size: 1.6rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
-        }
+        /* Changed to Green */
+        .top-header h1 {
+            color: var(--google-green);
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-        /* Share Button & Popup */
-        .share-container { position: relative; }
-        
-        .share-btn {
-            display: flex; align-items: center; gap: 8px;
-            background: var(--google-green); color: white;
-            border: none; padding: 12px 24px; border-radius: 16px;
-            font-size: 0.95rem; font-weight: 600; cursor: pointer;
-            transition: all 0.3s ease; font-family: 'Roboto', sans-serif;
-            /* Claymorphism specific shadow for colored button */
-            box-shadow: 6px 6px 12px rgba(52, 168, 83, 0.3), -6px -6px 12px rgba(255, 255, 255, 0.6), inset 2px 2px 5px rgba(255,255,255,0.4), inset -2px -2px 5px rgba(0,0,0,0.1);
-        }
-        .share-btn:active {
-            box-shadow: inset 4px 4px 8px rgba(0,0,0,0.15), inset -4px -4px 8px rgba(255,255,255,0.3);
-            transform: scale(0.98);
-        }
-        .share-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        
-        .share-popup {
-            position: absolute; top: 120%; right: 0; background: var(--surface);
-            border: none; box-shadow: var(--clay-box);
-            border-radius: 16px; min-width: 180px; display: none; flex-direction: column;
-            overflow: hidden; z-index: 1000; padding: 5px;
-        }
-        .share-popup.show { display: flex; }
-        .share-popup button {
-            background: none; border: none; padding: 12px 15px; text-align: left;
-            font-size: 0.95rem; color: var(--text-main); cursor: pointer;
-            font-family: 'Roboto', sans-serif; transition: all 0.2s;
-            display: flex; align-items: center; gap: 10px; border-radius: 12px;
-        }
-        .share-popup button:hover { background: var(--bg-light); box-shadow: var(--clay-inset); color: var(--google-green); }
+        /* Share Button & Popup */
+        .share-container { position: relative; }
+        
+        /* Changed Share Button to Green */
+        .share-btn {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--google-green); color: white;
+            border: none; padding: 10px 20px; border-radius: 8px;
+            font-size: 0.95rem; font-weight: 500; cursor: pointer;
+            transition: background 0.3s; font-family: 'Roboto', sans-serif;
+            box-shadow: 0 2px 4px rgba(52, 168, 83, 0.3);
+        }
+        .share-btn:hover { background: #2b8b45; }
+        .share-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        
+        .share-popup {
+            position: absolute; top: 110%; right: 0; background: white;
+            border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 8px; min-width: 180px; display: none; flex-direction: column;
+            overflow: hidden; z-index: 1000;
+        }
+        .share-popup.show { display: flex; }
+        .share-popup button {
+            background: none; border: none; padding: 12px 15px; text-align: left;
+            font-size: 0.95rem; color: var(--text-main); cursor: pointer;
+            font-family: 'Roboto', sans-serif; transition: background 0.2s;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .share-popup button:hover { background: var(--bg-light); color: var(--google-green); }
+        .share-popup button:not(:last-child) { border-bottom: 1px solid var(--border-color); }
 
-        /* LAYOUT WRAPPER */
-        .layout-container {
-            display: flex;
-            margin-top: var(--header-height); 
-            height: calc(100vh - var(--header-height));
-        }
+        /* LAYOUT WRAPPER */
+        .layout-container {
+            display: flex;
+            margin-top: var(--header-height); 
+            height: calc(100vh - var(--header-height));
+        }
 
-        /* Sidebar */
-        .sidebar {
-            width: 260px;
-            background-color: var(--surface);
-            border-right: none;
-            padding: 25px 20px;
-            overflow-y: auto;
-            box-sizing: border-box;
-            flex-shrink: 0;
-            box-shadow: 4px 0 15px rgba(163, 177, 198, 0.3), var(--clay-shadow-in-light);
-            border-radius: 0 0 24px 0;
-            margin-right: 15px;
-        }
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: var(--surface);
+            border-right: 1px solid var(--border-color);
+            padding: 25px 20px;
+            overflow-y: auto;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
 
-        .sidebar h2 {
-            color: var(--text-main); font-size: 1.1rem; font-weight: 600;
-            margin-top: 0; margin-bottom: 25px; text-transform: uppercase;
-        }
+        .sidebar h2 {
+            color: var(--text-main); font-size: 1.1rem; font-weight: 500;
+            margin-top: 0; margin-bottom: 25px; text-transform: uppercase;
+        }
 
-        .filter-group { margin-bottom: 24px; }
-        .filter-group label { display: block; margin-bottom: 10px; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
-        
-        .filter-group select { 
-            width: 100%; padding: 12px 15px; border-radius: 12px; 
-            border: none; background: var(--surface); color: var(--text-main); 
-            font-size: 0.9rem; cursor: pointer; outline: none;
-            box-shadow: var(--clay-inset);
-            transition: all 0.3s ease;
-        }
-        
-        .filter-group select:focus { 
-            box-shadow: var(--clay-inset), 0 0 0 2px rgba(52, 168, 83, 0.2); 
-        }
+        .filter-group { margin-bottom: 20px; }
+        .filter-group label { display: block; margin-bottom: 8px; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 500; }
+        .filter-group select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: #F1F3F4; color: var(--text-main); font-size: 0.9rem; cursor: pointer; outline: none; }
+        
+        /* Changed Focus Ring to Green */
+        .filter-group select:focus { background: var(--surface); border-color: var(--google-green); box-shadow: 0 0 0 2px rgba(52, 168, 83, 0.2); }
 
-        .clear-btn {
-            width: 100%; padding: 12px; margin-top: 15px; background-color: var(--surface);
-            color: var(--google-green); border: none; border-radius: 12px;
-            font-size: 0.95rem; font-weight: 600; cursor: pointer; font-family: 'Roboto', sans-serif;
-            transition: all 0.3s ease;
-            box-shadow: var(--clay-box);
-        }
-        .clear-btn:active { box-shadow: var(--clay-btn-active); transform: scale(0.98); }
+        /* Changed Clear Filters Button to Green */
+        .clear-btn {
+            width: 100%; padding: 10px; margin-top: 10px; background-color: transparent;
+            color: var(--google-green); border: 1px solid var(--google-green); border-radius: 8px;
+            font-size: 0.9rem; font-weight: 500; cursor: pointer; font-family: 'Roboto', sans-serif;
+            transition: all 0.2s ease;
+        }
+        .clear-btn:hover { background-color: rgba(52, 168, 83, 0.08); }
 
-        /* Main Content Area */
-        .main-content {
-            flex-grow: 1; padding: 30px 40px; overflow-y: auto; box-sizing: border-box; position: relative;
-        }
+        /* Main Content Area */
+        .main-content {
+            flex-grow: 1; padding: 30px 40px; overflow-y: auto; box-sizing: border-box; position: relative;
+        }
 
-        /* ---------------------------------
-           NAVIGATION TABS
-        --------------------------------- */
-        .nav-tabs {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 40px;
-        }
+        /* ---------------------------------
+           NAVIGATION TABS
+        --------------------------------- */
+        .nav-tabs {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
 
-        .nav-tabs a {
-            text-decoration: none;
-            padding: 12px 28px;
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            background-color: var(--surface);
-            border: none;
-            border-radius: 16px; 
-            box-shadow: var(--clay-box);
-            transition: all 0.3s ease;
-        }
+        .nav-tabs a {
+            text-decoration: none;
+            padding: 10px 24px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px; 
+            transition: all 0.3s ease;
+        }
 
-        .nav-tabs a:hover {
-            color: var(--google-green);
-        }
+        .nav-tabs a:hover {
+            color: var(--text-main);
+            background-color: var(--bg-light);
+            border-color: #c0c4c9;
+        }
 
-        .nav-tabs a.active {
-            background-color: var(--google-green); 
-            color: white;
-            box-shadow: 6px 6px 12px rgba(52, 168, 83, 0.3), -6px -6px 12px rgba(255, 255, 255, 0.6), inset 2px 2px 5px rgba(255,255,255,0.4), inset -2px -2px 5px rgba(0,0,0,0.1);
-        }
+        .nav-tabs a.active {
+            background-color: var(--google-green); 
+            color: white;
+            border-color: var(--google-green);
+            box-shadow: 0 2px 6px rgba(52, 168, 83, 0.3);
+        }
 
-        .nav-tabs a.home-icon {
-            margin-left: auto; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px;
-            border-radius: 16px;
-            background-color: var(--surface);
-            box-shadow: var(--clay-box);
-        }
+        .nav-tabs a.home-icon {
+            margin-left: auto; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: white;
+        }
 
-        .nav-tabs a.home-icon:active {
-            box-shadow: var(--clay-btn-active);
-        }
+        .nav-tabs a.home-icon:hover {
+            background-color: var(--bg-light);
+        }
 
-        .nav-tabs a.home-icon svg {
-            width: 22px;
-            height: 22px;
-            fill: none;
-            stroke: var(--text-muted);
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
+        .nav-tabs a.home-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
 
-        /* Unified Card & Graph Widget Grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px; margin-bottom: 40px;
-        }
+        /* Unified Card & Graph Widget Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px; margin-bottom: 40px;
+        }
 
-        .kpi-widget {
-            background: var(--surface); 
-            border-radius: 24px; 
-            box-shadow: var(--clay-box);
-            display: flex; flex-direction: column; overflow: hidden; 
-            border: none; 
-            padding: 20px 24px 15px 24px;
-            /* Using top-border but keeping it rounded */
-            border-top: 6px solid transparent; 
-        }
+        .kpi-widget {
+            background: var(--surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(60,64,67,0.1), 0 1px 2px rgba(60,64,67,0.06);
+            display: flex; flex-direction: column; overflow: hidden; border-top: 4px solid var(--border-color); padding: 18px 20px 10px 20px;
+        }
 
-        .kpi-widget:nth-child(4n+1) { border-top-color: var(--google-blue); }
-        .kpi-widget:nth-child(4n+2) { border-top-color: var(--google-red); }
-        .kpi-widget:nth-child(4n+3) { border-top-color: var(--google-yellow); }
-        .kpi-widget:nth-child(4n+4) { border-top-color: var(--google-green); }
+        .kpi-widget:nth-child(4n+1) { border-top-color: var(--google-blue); }
+        .kpi-widget:nth-child(4n+2) { border-top-color: var(--google-red); }
+        .kpi-widget:nth-child(4n+3) { border-top-color: var(--google-yellow); }
+        .kpi-widget:nth-child(4n+4) { border-top-color: var(--google-green); }
 
-        .kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
-        .kpi-title h3 { margin: 0 0 5px 0; font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;}
-        .kpi-value { font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin: 0; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); }
-        .chart-wrapper { position: relative; height: 140px; width: 100%; }
-        
-        #loadingMsg { 
-            position: absolute; color: var(--google-green); font-weight: 600; 
-            top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; 
-            background: var(--surface); padding: 20px 30px; border-radius: 16px; 
-            box-shadow: var(--clay-box);
-            border: none;
-        }
+        .kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .kpi-title h3 { margin: 0 0 5px 0; font-size: 0.75rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; }
+        .kpi-value { font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin: 0; }
+        .chart-wrapper { position: relative; height: 140px; width: 100%; }
+        
+        /* Changed loading text color to Green */
+        #loadingMsg { 
+            position: absolute; color: var(--google-green); font-weight: 500; 
+            top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; 
+            background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
 
-        /* A4 PRINT / DOWNLOAD LOGIC */
-        @media print {
-            @page { size: A4 landscape; margin: 10mm; }
-            body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .sidebar, .share-container, .nav-tabs, #loadingMsg { display: none !important; }
-            .layout-container { margin-top: 0 !important; height: auto !important; }
-            .main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; overflow: visible !important; }
-            .top-header { position: relative !important; margin-bottom: 15px !important; padding: 0 0 10px 0 !important; border-bottom: 2px solid #000; box-shadow: none !important; }
-            .dashboard-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 15px !important; }
-            .kpi-widget { page-break-inside: avoid; box-shadow: none !important; border: 1px solid var(--border-color); padding: 10px 15px 5px 15px !important; border-top-width: 4px !important; border-radius: 12px !important; }
-            .kpi-value { font-size: 1.1rem !important; }
-            .chart-wrapper { height: 90px !important; }
-        }
-    </style>
+        /* A4 PRINT / DOWNLOAD LOGIC */
+        @media print {
+            @page { size: A4 landscape; margin: 10mm; }
+            body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .sidebar, .share-container, .nav-tabs, #loadingMsg { display: none !important; }
+            .layout-container { margin-top: 0 !important; height: auto !important; }
+            .main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; overflow: visible !important; }
+            .top-header { position: relative !important; margin-bottom: 15px !important; padding: 0 0 10px 0 !important; border-bottom: 2px solid #000; box-shadow: none !important; }
+            .dashboard-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 10px !important; }
+            .kpi-widget { page-break-inside: avoid; box-shadow: none !important; border: 1px solid var(--border-color); padding: 10px 15px 5px 15px !important; border-top-width: 4px !important; }
+            .kpi-value { font-size: 1.1rem !important; }
+            .chart-wrapper { height: 90px !important; }
+        }
+    </style>
 </head>
 <body>
 
-    <header class="top-header">
-        <div class="header-left">
-            <img src="Logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
-            <h1>Cost Dashboard</h1>
-        </div>
-        <div class="share-container">
-            <button class="share-btn" id="shareBtn">
-                <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8m-4-6l-4-4m0 0L8 6m4-4v16"></path></svg>
-                Share
-            </button>
-            <div class="share-popup" id="sharePopup">
-                <button id="downloadBtn">📄 Download PDF</button>
-                <button id="printBtn">🖨️ Print (A4)</button>
-            </div>
-        </div>
-    </header>
+    <header class="top-header">
+        <div class="header-left">
+            <img src="Logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
+            <h1>Cost Dashboard</h1>
+        </div>
+        <div class="share-container">
+            <button class="share-btn" id="shareBtn">
+                <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8m-4-6l-4-4m0 0L8 6m4-4v16"></path></svg>
+                Share
+            </button>
+            <div class="share-popup" id="sharePopup">
+                <button id="downloadBtn">📄 Download PDF</button>
+                <button id="printBtn">🖨️ Print (A4)</button>
+            </div>
+        </div>
+    </header>
 
-    <div class="layout-container">
-        
-        <div class="sidebar">
-            <h2>Filters</h2>
-            <div class="filter-group">
-                <label>Year</label>
-                <select id="filterYear"><option value="All">All Years</option></select>
-            </div>
-            <div class="filter-group">
-                <label>Month</label>
-                <select id="filterMonth"><option value="All">All Months</option></select>
-            </div>
-            <div class="filter-group">
-                <label>Company</label>
-                <select id="filterCompany"><option value="All">All Companies</option></select>
-            </div>
-            <button id="clearFiltersBtn" class="clear-btn">Clear Filters</button>
-        </div>
+    <div class="layout-container">
+        
+        <div class="sidebar">
+            <h2>Filters</h2>
+            <div class="filter-group">
+                <label>Year</label>
+                <select id="filterYear"><option value="All">All Years</option></select>
+            </div>
+            <div class="filter-group">
+                <label>Month</label>
+                <select id="filterMonth"><option value="All">All Months</option></select>
+            </div>
+            <div class="filter-group">
+                <label>Company</label>
+                <select id="filterCompany"><option value="All">All Companies</option></select>
+            </div>
+            <button id="clearFiltersBtn" class="clear-btn">Clear Filters</button>
+        </div>
 
-        <div class="main-content">
-            
-            <div class="nav-tabs">
-                <a href="index.html">HR Dashboard</a>
-                <a href="admin.html">Admin Dashboard</a>
-                <a href="#" class="active">Cost Dashboard</a>
-                
-                <a href="index.html" class="home-icon" title="Home">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                    </svg>
-                </a>
-            </div>
+        <div class="main-content">
+            
+            <div class="nav-tabs">
+                <a href="index.html">HR Dashboard</a>
+                <a href="admin.html">Admin Dashboard</a>
+                <a href="#" class="active">Cost Dashboard</a>
+                
+                <a href="index.html" class="home-icon" title="Home">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </a>
+            </div>
 
-            <div id="loadingMsg">Fetching live data...</div>
+            <div id="loadingMsg">Fetching live data...</div>
 
-            <div class="dashboard-grid" id="dashboardContent" style="display: none;">
+            <div class="dashboard-grid" id="dashboardContent" style="display: none;">
 
-                <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Mess Cost</h3><div class="kpi-value" id="valMessCost">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartMessCost"></canvas></div>
-                </div>
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Mess Cost</h3><div class="kpi-value" id="valMessCost">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartMessCost"></canvas></div>
+                </div>
 
-                <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Cost to Company</h3><div class="kpi-value" id="valCTC">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartCTC"></canvas></div>
-                </div>
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Cost to Company</h3><div class="kpi-value" id="valCTC">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartCTC"></canvas></div>
+                </div>
 
-                <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Mess Grocery</h3><div class="kpi-value" id="valGrocery">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartGrocery"></canvas></div>
-                </div>
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Mess Grocery</h3><div class="kpi-value" id="valGrocery">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartGrocery"></canvas></div>
+                </div>
 
-                <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Vegitables & Fruits</h3><div class="kpi-value" id="valVeg">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartVeg"></canvas></div>
-                </div>
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Vegitables & Fruits</h3><div class="kpi-value" id="valVeg">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartVeg"></canvas></div>
+                </div>
 
-                <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Meat Cost</h3><div class="kpi-value" id="valMeat">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartMeat"></canvas></div>
-                </div>
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Meat Cost</h3><div class="kpi-value" id="valMeat">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartMeat"></canvas></div>
+                </div>
 
-                <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Water Cost</h3><div class="kpi-value" id="valWater">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartWater"></canvas></div>
-                </div>
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Water Cost</h3><div class="kpi-value" id="valWater">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartWater"></canvas></div>
+                </div>
 
-                <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Total Cost (Permanent)</h3><div class="kpi-value" id="valPermTotal">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartPermTotal"></canvas></div>
-                </div>
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Total Cost (Permanent)</h3><div class="kpi-value" id="valPermTotal">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartPermTotal"></canvas></div>
+                </div>
 
-                <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Per Head Cost (Permanent)</h3><div class="kpi-value" id="valPermHead">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartPermHead"></canvas></div>
-                </div>
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Per Head Cost (Permanent)</h3><div class="kpi-value" id="valPermHead">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartPermHead"></canvas></div>
+                </div>
 
-                <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Total Cost (Third Party)</h3><div class="kpi-value" id="valTPTotal">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartTPTotal"></canvas></div>
-                </div>
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Total Cost (Third Party)</h3><div class="kpi-value" id="valTPTotal">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartTPTotal"></canvas></div>
+                </div>
 
-                <div class="kpi-widget">
-                    <div class="kpi-header"><div class="kpi-title"><h3>Per Head Cost (Third Party)</h3><div class="kpi-value" id="valTPHead">...</div></div></div>
-                    <div class="chart-wrapper"><canvas id="chartTPHead"></canvas></div>
-                </div>
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Per Head Cost (Third Party)</h3><div class="kpi-value" id="valTPHead">...</div></div></div>
+                    <div class="chart-wrapper"><canvas id="chartTPHead"></canvas></div>
+                </div>
 
-            </div>
-        </div>
-    </div>
+            </div>
+        </div>
+    </div>
 
-    <script>
-        // LIVE CSV LINK
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=1994039092&single=true&output=csv';
+    <script>
+        // LIVE CSV LINK
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=1994039092&single=true&output=csv';
 
-        let sheetData = [];
-        let headers = [];
-        const charts = {};
+        let sheetData = [];
+        let headers = [];
+        const charts = {};
 
-        const G_BLUE = '#4285F4'; const G_RED = '#EA4335'; const G_YELLOW = '#FBBC05'; const G_GREEN = '#34A853';
-        const BG_BLUE = 'rgba(66, 133, 244, 0.2)'; const BG_RED = 'rgba(234, 67, 53, 0.2)'; const BG_YELLOW = 'rgba(251, 188, 5, 0.2)'; const BG_GREEN = 'rgba(52, 168, 83, 0.2)';
+        const G_BLUE = '#4285F4'; const G_RED = '#EA4335'; const G_YELLOW = '#FBBC05'; const G_GREEN = '#34A853';
+        const BG_BLUE = 'rgba(66, 133, 244, 0.15)'; const BG_RED = 'rgba(234, 67, 53, 0.15)'; const BG_YELLOW = 'rgba(251, 188, 5, 0.15)'; const BG_GREEN = 'rgba(52, 168, 83, 0.15)';
 
-        function parseCSV(str) {
-            const arr = []; let quote = false; let row = 0, col = 0;
-            for (let c = 0; c < str.length; c++) {
-                let cc = str[c], nc = str[c+1];
-                arr[row] = arr[row] || []; arr[row][col] = arr[row][col] || '';
-                if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
-                if (cc == '"') { quote = !quote; continue; }
-                if (cc == ',' && !quote) { ++col; continue; }
-                if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
-                if (cc == '\n' && !quote) { ++row; col = 0; continue; }
-                if (cc == '\r' && !quote) { ++row; col = 0; continue; }
-                arr[row][col] += cc;
-            }
-            return arr;
-        }
+        function parseCSV(str) {
+            const arr = []; let quote = false; let row = 0, col = 0;
+            for (let c = 0; c < str.length; c++) {
+                let cc = str[c], nc = str[c+1];
+                arr[row] = arr[row] || []; arr[row][col] = arr[row][col] || '';
+                if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
+                if (cc == '"') { quote = !quote; continue; }
+                if (cc == ',' && !quote) { ++col; continue; }
+                if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
+                if (cc == '\n' && !quote) { ++row; col = 0; continue; }
+                if (cc == '\r' && !quote) { ++row; col = 0; continue; }
+                arr[row][col] += cc;
+            }
+            return arr;
+        }
 
-        function findColumn(row, keywords) {
-            if(!row) return null;
-            return Object.keys(row).find(key => keywords.some(kw => key.toLowerCase().includes(kw)));
-        }
+        function findColumn(row, keywords) {
+            if(!row) return null;
+            return Object.keys(row).find(key => keywords.some(kw => key.toLowerCase().includes(kw)));
+        }
 
-        function cleanNumber(val) {
-            if (!val) return 0;
-            if (typeof val === 'number') return val;
-            let cleaned = val.toString().replace(/,/g, '').replace(/%/g, '').replace(/[^\d.-]/g, '');
-            return parseFloat(cleaned) || 0;
-        }
+        function cleanNumber(val) {
+            if (!val) return 0;
+            if (typeof val === 'number') return val;
+            let cleaned = val.toString().replace(/,/g, '').replace(/%/g, '').replace(/[^\d.-]/g, '');
+            return parseFloat(cleaned) || 0;
+        }
 
-        function formatNum(num) {
-            return num.toLocaleString('en-US', { maximumFractionDigits: 1 });
-        }
+        function formatNum(num) {
+            return num.toLocaleString('en-US', { maximumFractionDigits: 1 });
+        }
 
-        function createChart(canvasId, type, colorLine, colorBg) {
-            const ctx = document.getElementById(canvasId).getContext('2d');
-            return new Chart(ctx, {
-                type: type,
-                data: { labels: [], datasets: [{ backgroundColor: type === 'line' ? colorBg : colorLine, borderColor: colorLine, borderWidth: 3, fill: type === 'line', tension: 0.4, pointRadius: 3, borderRadius: type === 'bar' ? 6 : 0, data: [] }] },
-                options: {
-                    responsive: true, maintainAspectRatio: false, animation: { duration: 800, easing: 'easeOutQuart' },
-                    plugins: { legend: { display: false }, tooltip: { titleFont: { size: 11 }, bodyFont: { size: 11 } } },
-                    scales: { 
-                        y: { display: true, beginAtZero: true, grid: { drawBorder: false, color: '#d1d8e0' }, ticks: { font: { size: 10 }, color: '#718096', maxTicksLimit: 5 } },
-                        x: { display: true, grid: { display: false }, ticks: { font: { size: 10 }, color: '#718096', maxRotation: 45, minRotation: 0 } }
-                    }
-                }
-            });
-        }
+        function createChart(canvasId, type, colorLine, colorBg) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            return new Chart(ctx, {
+                type: type,
+                data: { labels: [], datasets: [{ backgroundColor: type === 'line' ? colorBg : colorLine, borderColor: colorLine, borderWidth: 2, fill: type === 'line', tension: 0.4, pointRadius: 3, borderRadius: type === 'bar' ? 4 : 0, data: [] }] },
+                options: {
+                    responsive: true, maintainAspectRatio: false, animation: { duration: 800, easing: 'easeOutQuart' },
+                    plugins: { legend: { display: false }, tooltip: { titleFont: { size: 10 }, bodyFont: { size: 10 } } },
+                    scales: { 
+                        y: { display: true, beginAtZero: true, grid: { drawBorder: false, color: '#f1f3f4' }, ticks: { font: { size: 9 }, color: '#9aa0a6', maxTicksLimit: 5 } },
+                        x: { display: true, grid: { display: false }, ticks: { font: { size: 9 }, color: '#9aa0a6', maxRotation: 45, minRotation: 0 } }
+                    }
+                }
+            });
+        }
 
-        function initCharts() {
-            // Colors cycle: Blue(1), Red(2), Yellow(3), Green(4)
-            charts.messCost = createChart('chartMessCost', 'bar', G_BLUE, BG_BLUE);          // 1
-            charts.ctc = createChart('chartCTC', 'bar', G_RED, BG_RED);                      // 2
-            charts.grocery = createChart('chartGrocery', 'bar', G_YELLOW, BG_YELLOW);        // 3
-            charts.veg = createChart('chartVeg', 'bar', G_GREEN, BG_GREEN);                  // 4
-            
-            charts.meat = createChart('chartMeat', 'bar', G_BLUE, BG_BLUE);                  // 5
-            charts.water = createChart('chartWater', 'bar', G_RED, BG_RED);                  // 6
-            charts.permTotal = createChart('chartPermTotal', 'bar', G_YELLOW, BG_YELLOW);    // 7
-            charts.permHead = createChart('chartPermHead', 'line', G_GREEN, BG_GREEN);       // 8
-            
-            charts.tpTotal = createChart('chartTPTotal', 'bar', G_BLUE, BG_BLUE);            // 9
-            charts.tpHead = createChart('chartTPHead', 'line', G_RED, BG_RED);               // 10
-        }
+        function initCharts() {
+            // Colors cycle: Blue(1), Red(2), Yellow(3), Green(4)
+            charts.messCost = createChart('chartMessCost', 'bar', G_BLUE, BG_BLUE);          // 1
+            charts.ctc = createChart('chartCTC', 'bar', G_RED, BG_RED);                      // 2
+            charts.grocery = createChart('chartGrocery', 'bar', G_YELLOW, BG_YELLOW);        // 3
+            charts.veg = createChart('chartVeg', 'bar', G_GREEN, BG_GREEN);                  // 4
+            
+            charts.meat = createChart('chartMeat', 'bar', G_BLUE, BG_BLUE);                  // 5
+            charts.water = createChart('chartWater', 'bar', G_RED, BG_RED);                  // 6
+            charts.permTotal = createChart('chartPermTotal', 'bar', G_YELLOW, BG_YELLOW);    // 7
+            charts.permHead = createChart('chartPermHead', 'line', G_GREEN, BG_GREEN);       // 8
+            
+            charts.tpTotal = createChart('chartTPTotal', 'bar', G_BLUE, BG_BLUE);            // 9
+            charts.tpHead = createChart('chartTPHead', 'line', G_RED, BG_RED);               // 10
+        }
 
-        function populateDropdowns() {
-            const monthColRaw = findColumn(sheetData[0], ['month', 'mahina']);
-            const compColRaw = findColumn(sheetData[0], ['company']);
+        function populateDropdowns() {
+            const monthColRaw = findColumn(sheetData[0], ['month', 'mahina']);
+            const compColRaw = findColumn(sheetData[0], ['company']);
 
-            const years = new Set();
-            const months = new Set();
-            const companies = new Set();
+            const years = new Set();
+            const months = new Set();
+            const companies = new Set();
 
-            sheetData.forEach(row => {
-                let mRaw = row[monthColRaw] || "";
-                if(mRaw.includes('-')) {
-                    let parts = mRaw.split('-');
-                    let mth = parts[0].trim();
-                    let yr = "20" + parts[1].trim();
-                    months.add(mth);
-                    years.add(yr); 
-                    row['ExtractedYear'] = yr;
-                    row['ExtractedMonth'] = mth;
-                } else {
-                    months.add(mRaw.trim());
-                    row['ExtractedMonth'] = mRaw.trim();
-                    row['ExtractedYear'] = "All"; 
-                }
+            sheetData.forEach(row => {
+                let mRaw = row[monthColRaw] || "";
+                if(mRaw.includes('-')) {
+                    let parts = mRaw.split('-');
+                    let mth = parts[0].trim();
+                    let yr = "20" + parts[1].trim();
+                    months.add(mth);
+                    years.add(yr); 
+                    row['ExtractedYear'] = yr;
+                    row['ExtractedMonth'] = mth;
+                } else {
+                    months.add(mRaw.trim());
+                    row['ExtractedMonth'] = mRaw.trim();
+                    row['ExtractedYear'] = "All"; 
+                }
 
-                let cRaw = row[compColRaw];
-                if (cRaw && cRaw.toLowerCase() !== 'group') companies.add(cRaw.trim());
-            });
+                let cRaw = row[compColRaw];
+                if (cRaw && cRaw.toLowerCase() !== 'group') companies.add(cRaw.trim());
+            });
 
-            const addOptions = (setId, dataSet) => {
-                const select = document.getElementById(setId);
-                select.innerHTML = `<option value="All">All</option>`;
-                dataSet.forEach(val => {
-                    if(!val) return;
-                    let opt = document.createElement('option');
-                    opt.value = val; opt.innerHTML = val;
-                    select.appendChild(opt);
-                });
-            };
+            const addOptions = (setId, dataSet) => {
+                const select = document.getElementById(setId);
+                select.innerHTML = `<option value="All">All</option>`;
+                dataSet.forEach(val => {
+                    if(!val) return;
+                    let opt = document.createElement('option');
+                    opt.value = val; opt.innerHTML = val;
+                    select.appendChild(opt);
+                });
+            };
 
-            addOptions('filterYear', years);
-            addOptions('filterMonth', months);
-            addOptions('filterCompany', companies);
-        }
+            addOptions('filterYear', years);
+            addOptions('filterMonth', months);
+            addOptions('filterCompany', companies);
+        }
 
-        async function fetchGoogleSheetData() {
-            try {
-                const response = await fetch(csvUrl);
-                const csvText = await response.text();
-                
-                const rows = parseCSV(csvText);
-                headers = rows[0].map(h => h.trim());
-                
-                sheetData = rows.slice(1).map(row => {
-                    let obj = {};
-                    row.forEach((cell, i) => { obj[headers[i]] = cell ? cell.trim() : ""; });
-                    return obj;
-                });
+        async function fetchGoogleSheetData() {
+            try {
+                const response = await fetch(csvUrl);
+                const csvText = await response.text();
+                
+                const rows = parseCSV(csvText);
+                headers = rows[0].map(h => h.trim());
+                
+                sheetData = rows.slice(1).map(row => {
+                    let obj = {};
+                    row.forEach((cell, i) => { obj[headers[i]] = cell ? cell.trim() : ""; });
+                    return obj;
+                });
 
-                sheetData = sheetData.filter(row => Object.values(row).some(x => x !== ""));
+                sheetData = sheetData.filter(row => Object.values(row).some(x => x !== ""));
 
-                document.getElementById('loadingMsg').style.display = 'none';
-                document.getElementById('dashboardContent').style.display = 'grid'; 
+                document.getElementById('loadingMsg').style.display = 'none';
+                document.getElementById('dashboardContent').style.display = 'grid'; 
 
-                populateDropdowns();
-                updateDashboard(); 
-            } catch (error) {
-                console.error("Data loading error:", error);
-                document.getElementById('loadingMsg').innerText = "Failed to load data. Please check the console.";
-            }
-        }
+                populateDropdowns();
+                updateDashboard(); 
+            } catch (error) {
+                console.error("Data loading error:", error);
+                document.getElementById('loadingMsg').innerText = "Failed to load data. Please check the console.";
+            }
+        }
 
-        function updateDashboard() {
-            if(sheetData.length === 0) return;
+        function updateDashboard() {
+            if(sheetData.length === 0) return;
 
-            const selectedYear = document.getElementById('filterYear').value;
-            const selectedMonth = document.getElementById('filterMonth').value;
-            const selectedComp = document.getElementById('filterCompany').value;
+            const selectedYear = document.getElementById('filterYear').value;
+            const selectedMonth = document.getElementById('filterMonth').value;
+            const selectedComp = document.getElementById('filterCompany').value;
 
-            const compCol = findColumn(sheetData[0], ['company']);
+            const compCol = findColumn(sheetData[0], ['company']);
 
-            let filteredData = sheetData.filter(item => {
-                let match = true;
-                
-                if(selectedComp === "All" && item[compCol] && item[compCol].toLowerCase() === 'group') return false;
-                
-                if(selectedComp !== "All" && item[compCol] !== selectedComp) match = false;
-                if(selectedYear !== "All" && item['ExtractedYear'] !== selectedYear) match = false;
-                if(selectedMonth !== "All" && item['ExtractedMonth'] !== selectedMonth) match = false;
-                return match;
-            });
+            let filteredData = sheetData.filter(item => {
+                let match = true;
+                
+                if(selectedComp === "All" && item[compCol] && item[compCol].toLowerCase() === 'group') return false;
+                
+                if(selectedComp !== "All" && item[compCol] !== selectedComp) match = false;
+                if(selectedYear !== "All" && item['ExtractedYear'] !== selectedYear) match = false;
+                if(selectedMonth !== "All" && item['ExtractedMonth'] !== selectedMonth) match = false;
+                return match;
+            });
 
-            // Column Mapping
-            const grocCol = findColumn(sheetData[0], ['mess grocery', 'grocery']);
-            const waterCol = findColumn(sheetData[0], ['water']);
-            const vegCol = findColumn(sheetData[0], ['vegitables', 'fruits', 'veg']);
-            const meatCol = findColumn(sheetData[0], ['meat']);
-            const messCostCol = findColumn(sheetData[0], ['mess cost']);
-            const ctcCol = findColumn(sheetData[0], ['cost to company', 'ctc']);
-            const permTotCol = findColumn(sheetData[0], ['permanent employee cost - total', 'permanent total']);
-            const permHeadCol = findColumn(sheetData[0], ['permanent - per employee cost', 'permanent per head']);
-            const tpTotCol = findColumn(sheetData[0], ['third party employee cost', 'third party total']);
-            const tpHeadCol = findColumn(sheetData[0], ['third party - per employee cost', 'tp per head']);
+            // Column Mapping
+            const grocCol = findColumn(sheetData[0], ['mess grocery', 'grocery']);
+            const waterCol = findColumn(sheetData[0], ['water']);
+            const vegCol = findColumn(sheetData[0], ['vegitables', 'fruits', 'veg']);
+            const meatCol = findColumn(sheetData[0], ['meat']);
+            const messCostCol = findColumn(sheetData[0], ['mess cost']);
+            const ctcCol = findColumn(sheetData[0], ['cost to company', 'ctc']);
+            const permTotCol = findColumn(sheetData[0], ['permanent employee cost - total', 'permanent total']);
+            const permHeadCol = findColumn(sheetData[0], ['permanent - per employee cost', 'permanent per head']);
+            const tpTotCol = findColumn(sheetData[0], ['third party employee cost', 'third party total']);
+            const tpHeadCol = findColumn(sheetData[0], ['third party - per employee cost', 'tp per head']);
 
-            // X-Axis locked to Month
-            let groupByCol = 'ExtractedMonth'; 
+            // X-Axis locked to Month
+            let groupByCol = 'ExtractedMonth'; 
 
-            // Globals
-            let gGroc = 0, gWat = 0, gVeg = 0, gMeat = 0;
-            let gMessCost = 0, gCTC = 0, gPTot = 0, gTPTot = 0;
-            
-            // Averages
-            let sumPHead = 0, cntPHead = 0;
-            let sumTPHead = 0, cntTPHead = 0;
+            // Globals
+            let gGroc = 0, gWat = 0, gVeg = 0, gMeat = 0;
+            let gMessCost = 0, gCTC = 0, gPTot = 0, gTPTot = 0;
+            
+            // Averages
+            let sumPHead = 0, cntPHead = 0;
+            let sumTPHead = 0, cntTPHead = 0;
 
-            let groupedStats = {};
+            let groupedStats = {};
 
-            filteredData.forEach(item => {
-                let label = item[groupByCol] || "Unknown";
+            filteredData.forEach(item => {
+                let label = item[groupByCol] || "Unknown";
 
-                let vGroc = cleanNumber(item[grocCol]);
-                let vWat = cleanNumber(item[waterCol]);
-                let vVeg = cleanNumber(item[vegCol]);
-                let vMeat = cleanNumber(item[meatCol]);
-                let vMCost = cleanNumber(item[messCostCol]);
-                let vCTC = cleanNumber(item[ctcCol]);
-                let vPTot = cleanNumber(item[permTotCol]);
-                let vTPTot = cleanNumber(item[tpTotCol]);
-                let vPHead = cleanNumber(item[permHeadCol]);
-                let vTPHead = cleanNumber(item[tpHeadCol]);
+                let vGroc = cleanNumber(item[grocCol]);
+                let vWat = cleanNumber(item[waterCol]);
+                let vVeg = cleanNumber(item[vegCol]);
+                let vMeat = cleanNumber(item[meatCol]);
+                let vMCost = cleanNumber(item[messCostCol]);
+                let vCTC = cleanNumber(item[ctcCol]);
+                let vPTot = cleanNumber(item[permTotCol]);
+                let vTPTot = cleanNumber(item[tpTotCol]);
+                let vPHead = cleanNumber(item[permHeadCol]);
+                let vTPHead = cleanNumber(item[tpHeadCol]);
 
-                gGroc += vGroc; gWat += vWat; gVeg += vVeg; gMeat += vMeat;
-                gMessCost += vMCost; gCTC += vCTC; gPTot += vPTot; gTPTot += vTPTot;
+                gGroc += vGroc; gWat += vWat; gVeg += vVeg; gMeat += vMeat;
+                gMessCost += vMCost; gCTC += vCTC; gPTot += vPTot; gTPTot += vTPTot;
 
-                if(vPHead > 0) { sumPHead += vPHead; cntPHead++; }
-                if(vTPHead > 0) { sumTPHead += vTPHead; cntTPHead++; }
+                if(vPHead > 0) { sumPHead += vPHead; cntPHead++; }
+                if(vTPHead > 0) { sumTPHead += vTPHead; cntTPHead++; }
 
-                if (!groupedStats[label]) {
-                    groupedStats[label] = {
-                        gr:0, wa:0, vg:0, me:0, mc:0, ctc:0, pt:0, tpt:0,
-                        ph_s:0, ph_c:0, tph_s:0, tph_c:0
-                    };
-                }
+                if (!groupedStats[label]) {
+                    groupedStats[label] = {
+                        gr:0, wa:0, vg:0, me:0, mc:0, ctc:0, pt:0, tpt:0,
+                        ph_s:0, ph_c:0, tph_s:0, tph_c:0
+                    };
+                }
 
-                groupedStats[label].gr += vGroc; groupedStats[label].wa += vWat; groupedStats[label].vg += vVeg;
-                groupedStats[label].me += vMeat; groupedStats[label].mc += vMCost; groupedStats[label].ctc += vCTC;
-                groupedStats[label].pt += vPTot; groupedStats[label].tpt += vTPTot;
+                groupedStats[label].gr += vGroc; groupedStats[label].wa += vWat; groupedStats[label].vg += vVeg;
+                groupedStats[label].me += vMeat; groupedStats[label].mc += vMCost; groupedStats[label].ctc += vCTC;
+                groupedStats[label].pt += vPTot; groupedStats[label].tpt += vTPTot;
 
-                if(vPHead > 0) { groupedStats[label].ph_s += vPHead; groupedStats[label].ph_c++; }
-                if(vTPHead > 0) { groupedStats[label].tph_s += vTPHead; groupedStats[label].tph_c++; }
-            });
+                if(vPHead > 0) { groupedStats[label].ph_s += vPHead; groupedStats[label].ph_c++; }
+                if(vTPHead > 0) { groupedStats[label].tph_s += vTPHead; groupedStats[label].tph_c++; }
+            });
 
-            // Update UI 
-            document.getElementById('valGrocery').innerText = "Rs " + formatNum(gGroc);
-            document.getElementById('valWater').innerText = "Rs " + formatNum(gWat);
-            document.getElementById('valVeg').innerText = "Rs " + formatNum(gVeg);
-            document.getElementById('valMeat').innerText = "Rs " + formatNum(gMeat);
-            document.getElementById('valMessCost').innerText = "Rs " + formatNum(gMessCost);
-            document.getElementById('valCTC').innerText = "Rs " + formatNum(gCTC);
-            document.getElementById('valPermTotal').innerText = "Rs " + formatNum(gPTot);
-            document.getElementById('valTPTotal').innerText = "Rs " + formatNum(gTPTot);
+            // Update UI 
+            document.getElementById('valGrocery').innerText = "Rs " + formatNum(gGroc);
+            document.getElementById('valWater').innerText = "Rs " + formatNum(gWat);
+            document.getElementById('valVeg').innerText = "Rs " + formatNum(gVeg);
+            document.getElementById('valMeat').innerText = "Rs " + formatNum(gMeat);
+            document.getElementById('valMessCost').innerText = "Rs " + formatNum(gMessCost);
+            document.getElementById('valCTC').innerText = "Rs " + formatNum(gCTC);
+            document.getElementById('valPermTotal').innerText = "Rs " + formatNum(gPTot);
+            document.getElementById('valTPTotal').innerText = "Rs " + formatNum(gTPTot);
 
-            document.getElementById('valPermHead').innerText = "Rs " + (cntPHead > 0 ? formatNum(sumPHead / cntPHead) : "0");
-            document.getElementById('valTPHead').innerText = "Rs " + (cntTPHead > 0 ? formatNum(sumTPHead / cntTPHead) : "0");
+            document.getElementById('valPermHead').innerText = "Rs " + (cntPHead > 0 ? formatNum(sumPHead / cntPHead) : "0");
+            document.getElementById('valTPHead').innerText = "Rs " + (cntTPHead > 0 ? formatNum(sumTPHead / cntTPHead) : "0");
 
-            // Charts Data Setup
-            let labels = Object.keys(groupedStats);
-            const monthOrder = { "jan":1, "feb":2, "mar":3, "apr":4, "may":5, "jun":6, "jul":7, "aug":8, "sep":9, "oct":10, "nov":11, "dec":12 };
-            labels.sort((a, b) => {
-                let numA = monthOrder[a.toLowerCase().substring(0,3)] || 99;
-                let numB = monthOrder[b.toLowerCase().substring(0,3)] || 99;
-                return numA - numB;
-            });
+            // Charts Data Setup
+            let labels = Object.keys(groupedStats);
+            const monthOrder = { "jan":1, "feb":2, "mar":3, "apr":4, "may":5, "jun":6, "jul":7, "aug":8, "sep":9, "oct":10, "nov":11, "dec":12 };
+            labels.sort((a, b) => {
+                let numA = monthOrder[a.toLowerCase().substring(0,3)] || 99;
+                let numB = monthOrder[b.toLowerCase().substring(0,3)] || 99;
+                return numA - numB;
+            });
 
-            let dMC=[], dCTC=[], dGr=[], dVg=[], dMe=[], dWa=[], dPTot=[], dPHead=[], dTPTot=[], dTPHead=[];
+            let dMC=[], dCTC=[], dGr=[], dVg=[], dMe=[], dWa=[], dPTot=[], dPHead=[], dTPTot=[], dTPHead=[];
 
-            labels.forEach(lbl => {
-                let s = groupedStats[lbl];
-                dMC.push(s.mc); dCTC.push(s.ctc); dGr.push(s.gr);
-                dVg.push(s.vg); dMe.push(s.me); dWa.push(s.wa);
-                dPTot.push(s.pt); dTPTot.push(s.tpt);
+            labels.forEach(lbl => {
+                let s = groupedStats[lbl];
+                dMC.push(s.mc); dCTC.push(s.ctc); dGr.push(s.gr);
+                dVg.push(s.vg); dMe.push(s.me); dWa.push(s.wa);
+                dPTot.push(s.pt); dTPTot.push(s.tpt);
 
-                dPHead.push(s.ph_c > 0 ? (s.ph_s / s.ph_c).toFixed(1) : 0);
-                dTPHead.push(s.tph_c > 0 ? (s.tph_s / s.tph_c).toFixed(1) : 0);
-            });
+                dPHead.push(s.ph_c > 0 ? (s.ph_s / s.ph_c).toFixed(1) : 0);
+                dTPHead.push(s.tph_c > 0 ? (s.tph_s / s.tph_c).toFixed(1) : 0);
+            });
 
-            function updateC(chartInst, lbs, dta) {
-                chartInst.data.labels = lbs;
-                chartInst.data.datasets[0].data = dta;
-                chartInst.update();
-            }
+            function updateC(chartInst, lbs, dta) {
+                chartInst.data.labels = lbs;
+                chartInst.data.datasets[0].data = dta;
+                chartInst.update();
+            }
 
-            updateC(charts.messCost, labels, dMC);
-            updateC(charts.ctc, labels, dCTC);
-            updateC(charts.grocery, labels, dGr);
-            updateC(charts.veg, labels, dVg);
-            updateC(charts.meat, labels, dMe);
-            updateC(charts.water, labels, dWa);
-            updateC(charts.permTotal, labels, dPTot);
-            updateC(charts.permHead, labels, dPHead);
-            updateC(charts.tpTotal, labels, dTPTot);
-            updateC(charts.tpHead, labels, dTPHead);
-        }
+            updateC(charts.messCost, labels, dMC);
+            updateC(charts.ctc, labels, dCTC);
+            updateC(charts.grocery, labels, dGr);
+            updateC(charts.veg, labels, dVg);
+            updateC(charts.meat, labels, dMe);
+            updateC(charts.water, labels, dWa);
+            updateC(charts.permTotal, labels, dPTot);
+            updateC(charts.permHead, labels, dPHead);
+            updateC(charts.tpTotal, labels, dTPTot);
+            updateC(charts.tpHead, labels, dTPHead);
+        }
 
-        // Filters Event Listeners
-        document.querySelectorAll('select').forEach(select => {
-            select.addEventListener('change', updateDashboard);
-        });
+        // Filters Event Listeners
+        document.querySelectorAll('select').forEach(select => {
+            select.addEventListener('change', updateDashboard);
+        });
 
-        document.getElementById('clearFiltersBtn').addEventListener('click', () => {
-            document.querySelectorAll('select').forEach(select => select.value = 'All');
-            updateDashboard(); 
-        });
+        document.getElementById('clearFiltersBtn').addEventListener('click', () => {
+            document.querySelectorAll('select').forEach(select => select.value = 'All');
+            updateDashboard(); 
+        });
 
-        // Share & Print Logic
-        const shareBtn = document.getElementById('shareBtn');
-        const sharePopup = document.getElementById('sharePopup');
-        const printBtn = document.getElementById('printBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
+        // Share & Print Logic
+        const shareBtn = document.getElementById('shareBtn');
+        const sharePopup = document.getElementById('sharePopup');
+        const printBtn = document.getElementById('printBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
 
-        shareBtn.addEventListener('click', (e) => { sharePopup.classList.toggle('show'); e.stopPropagation(); });
-        document.addEventListener('click', (e) => { if (!sharePopup.contains(e.target) && !shareBtn.contains(e.target)) sharePopup.classList.remove('show'); });
-        printBtn.addEventListener('click', () => { sharePopup.classList.remove('show'); setTimeout(() => window.print(), 200); });
-        downloadBtn.addEventListener('click', () => { sharePopup.classList.remove('show'); alert("Select 'Save as PDF' in the print dialog."); setTimeout(() => window.print(), 200); });
+        shareBtn.addEventListener('click', (e) => { sharePopup.classList.toggle('show'); e.stopPropagation(); });
+        document.addEventListener('click', (e) => { if (!sharePopup.contains(e.target) && !shareBtn.contains(e.target)) sharePopup.classList.remove('show'); });
+        printBtn.addEventListener('click', () => { sharePopup.classList.remove('show'); setTimeout(() => window.print(), 200); });
+        downloadBtn.addEventListener('click', () => { sharePopup.classList.remove('show'); alert("Select 'Save as PDF' in the print dialog."); setTimeout(() => window.print(), 200); });
 
-        window.onload = () => {
-            initCharts();
-            fetchGoogleSheetData();
-        };
-    </script>
+        window.onload = () => {
+            initCharts();
+            fetchGoogleSheetData();
+        };
+    </script>
 </body>
 </html>
