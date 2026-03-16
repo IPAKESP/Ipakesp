@@ -69,6 +69,7 @@
             object-fit: contain;
         }
 
+        /* Changed to Green */
         .top-header h1 {
             color: var(--google-green);
             margin: 0;
@@ -81,6 +82,7 @@
         /* Share Button & Popup */
         .share-container { position: relative; }
         
+        /* Changed Share Button to Green */
         .share-btn {
             display: flex; align-items: center; gap: 8px;
             background: var(--google-green); color: white;
@@ -134,8 +136,11 @@
         .filter-group { margin-bottom: 20px; }
         .filter-group label { display: block; margin-bottom: 8px; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 500; }
         .filter-group select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: #F1F3F4; color: var(--text-main); font-size: 0.9rem; cursor: pointer; outline: none; }
+        
+        /* Changed Focus Ring to Green */
         .filter-group select:focus { background: var(--surface); border-color: var(--google-green); box-shadow: 0 0 0 2px rgba(52, 168, 83, 0.2); }
 
+        /* Changed Clear Filters Button to Green */
         .clear-btn {
             width: 100%; padding: 10px; margin-top: 10px; background-color: transparent;
             color: var(--google-green); border: 1px solid var(--google-green); border-radius: 8px;
@@ -149,7 +154,9 @@
             flex-grow: 1; padding: 30px 40px; overflow-y: auto; box-sizing: border-box; position: relative;
         }
 
-        /* NAVIGATION TABS */
+        /* ---------------------------------
+           NAVIGATION TABS
+        --------------------------------- */
         .nav-tabs {
             display: flex;
             align-items: center;
@@ -192,8 +199,19 @@
             background-color: white;
         }
 
-        .nav-tabs a.home-icon:hover { background-color: var(--bg-light); }
-        .nav-tabs a.home-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .nav-tabs a.home-icon:hover {
+            background-color: var(--bg-light);
+        }
+
+        .nav-tabs a.home-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
 
         /* Unified Card & Graph Widget Grid */
         .dashboard-grid {
@@ -217,10 +235,25 @@
         .kpi-value { font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin: 0; }
         .chart-wrapper { position: relative; height: 140px; width: 100%; }
         
+        /* Changed loading text color to Green */
         #loadingMsg { 
             position: absolute; color: var(--google-green); font-weight: 500; 
             top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; 
             background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* A4 PRINT / DOWNLOAD LOGIC */
+        @media print {
+            @page { size: A4 landscape; margin: 10mm; }
+            body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .sidebar, .share-container, .nav-tabs, #loadingMsg { display: none !important; }
+            .layout-container { margin-top: 0 !important; height: auto !important; }
+            .main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; overflow: visible !important; }
+            .top-header { position: relative !important; margin-bottom: 15px !important; padding: 0 0 10px 0 !important; border-bottom: 2px solid #000; box-shadow: none !important; }
+            .dashboard-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 10px !important; }
+            .kpi-widget { page-break-inside: avoid; box-shadow: none !important; border: 1px solid var(--border-color); padding: 10px 15px 5px 15px !important; border-top-width: 4px !important; }
+            .kpi-value { font-size: 1.1rem !important; }
+            .chart-wrapper { height: 90px !important; }
         }
     </style>
 </head>
@@ -268,7 +301,7 @@
                 <a href="index.html">HR Dashboard</a>
                 <a href="admin.html">Admin Dashboard</a>
                 <a href="#" class="active">Cost Dashboard</a>
-                <a href="pool.html">Pool & Transport</a>
+                <a href="transport.html">Pool & Transport</a>
                 
                 <a href="index.html" class="home-icon" title="Home">
                     <svg viewBox="0 0 24 24">
@@ -286,38 +319,47 @@
                     <div class="kpi-header"><div class="kpi-title"><h3>Mess Cost</h3><div class="kpi-value" id="valMessCost">...</div></div></div>
                     <div class="chart-wrapper"><canvas id="chartMessCost"></canvas></div>
                 </div>
+
                 <div class="kpi-widget">
                     <div class="kpi-header"><div class="kpi-title"><h3>Cost to Company</h3><div class="kpi-value" id="valCTC">...</div></div></div>
                     <div class="chart-wrapper"><canvas id="chartCTC"></canvas></div>
                 </div>
+
                 <div class="kpi-widget">
                     <div class="kpi-header"><div class="kpi-title"><h3>Mess Grocery</h3><div class="kpi-value" id="valGrocery">...</div></div></div>
                     <div class="chart-wrapper"><canvas id="chartGrocery"></canvas></div>
                 </div>
+
                 <div class="kpi-widget">
                     <div class="kpi-header"><div class="kpi-title"><h3>Vegitables & Fruits</h3><div class="kpi-value" id="valVeg">...</div></div></div>
                     <div class="chart-wrapper"><canvas id="chartVeg"></canvas></div>
                 </div>
+
                 <div class="kpi-widget">
                     <div class="kpi-header"><div class="kpi-title"><h3>Meat Cost</h3><div class="kpi-value" id="valMeat">...</div></div></div>
                     <div class="chart-wrapper"><canvas id="chartMeat"></canvas></div>
                 </div>
+
                 <div class="kpi-widget">
                     <div class="kpi-header"><div class="kpi-title"><h3>Water Cost</h3><div class="kpi-value" id="valWater">...</div></div></div>
                     <div class="chart-wrapper"><canvas id="chartWater"></canvas></div>
                 </div>
+
                 <div class="kpi-widget">
                     <div class="kpi-header"><div class="kpi-title"><h3>Total Cost (Permanent)</h3><div class="kpi-value" id="valPermTotal">...</div></div></div>
                     <div class="chart-wrapper"><canvas id="chartPermTotal"></canvas></div>
                 </div>
+
                 <div class="kpi-widget">
                     <div class="kpi-header"><div class="kpi-title"><h3>Per Head Cost (Permanent)</h3><div class="kpi-value" id="valPermHead">...</div></div></div>
                     <div class="chart-wrapper"><canvas id="chartPermHead"></canvas></div>
                 </div>
+
                 <div class="kpi-widget">
                     <div class="kpi-header"><div class="kpi-title"><h3>Total Cost (Third Party)</h3><div class="kpi-value" id="valTPTotal">...</div></div></div>
                     <div class="chart-wrapper"><canvas id="chartTPTotal"></canvas></div>
                 </div>
+
                 <div class="kpi-widget">
                     <div class="kpi-header"><div class="kpi-title"><h3>Per Head Cost (Third Party)</h3><div class="kpi-value" id="valTPHead">...</div></div></div>
                     <div class="chart-wrapper"><canvas id="chartTPHead"></canvas></div>
@@ -328,6 +370,7 @@
     </div>
 
     <script>
+        // LIVE CSV LINK
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=1994039092&single=true&output=csv';
 
         let sheetData = [];
@@ -353,26 +396,16 @@
             return arr;
         }
 
-        // FIXED: Robust Column Finder
         function findColumn(row, keywords) {
             if(!row) return null;
-            let keys = Object.keys(row);
-            for(let key of keys) {
-                let cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
-                for(let kw of keywords) {
-                    let cleanKw = kw.toLowerCase().replace(/[^a-z0-9]/g, '');
-                    if(cleanKey.includes(cleanKw) && cleanKw.length >= 3) return key;
-                }
-            }
-            return null;
+            return Object.keys(row).find(key => keywords.some(kw => key.toLowerCase().includes(kw)));
         }
 
         function cleanNumber(val) {
-            if (val === undefined || val === null || val.toString().trim() === '') return 0;
+            if (!val) return 0;
             if (typeof val === 'number') return val;
             let cleaned = val.toString().replace(/,/g, '').replace(/%/g, '').replace(/[^\d.-]/g, '');
-            let num = parseFloat(cleaned);
-            return isNaN(num) ? 0 : num;
+            return parseFloat(cleaned) || 0;
         }
 
         function formatNum(num) {
@@ -396,31 +429,32 @@
         }
 
         function initCharts() {
-            charts.messCost = createChart('chartMessCost', 'bar', G_BLUE, BG_BLUE);          
-            charts.ctc = createChart('chartCTC', 'bar', G_RED, BG_RED);                      
-            charts.grocery = createChart('chartGrocery', 'bar', G_YELLOW, BG_YELLOW);        
-            charts.veg = createChart('chartVeg', 'bar', G_GREEN, BG_GREEN);                  
-            charts.meat = createChart('chartMeat', 'bar', G_BLUE, BG_BLUE);                  
-            charts.water = createChart('chartWater', 'bar', G_RED, BG_RED);                  
-            charts.permTotal = createChart('chartPermTotal', 'bar', G_YELLOW, BG_YELLOW);    
-            charts.permHead = createChart('chartPermHead', 'line', G_GREEN, BG_GREEN);       
-            charts.tpTotal = createChart('chartTPTotal', 'bar', G_BLUE, BG_BLUE);            
-            charts.tpHead = createChart('chartTPHead', 'line', G_RED, BG_RED);               
+            // Colors cycle: Blue(1), Red(2), Yellow(3), Green(4)
+            charts.messCost = createChart('chartMessCost', 'bar', G_BLUE, BG_BLUE);          // 1
+            charts.ctc = createChart('chartCTC', 'bar', G_RED, BG_RED);                      // 2
+            charts.grocery = createChart('chartGrocery', 'bar', G_YELLOW, BG_YELLOW);        // 3
+            charts.veg = createChart('chartVeg', 'bar', G_GREEN, BG_GREEN);                  // 4
+            
+            charts.meat = createChart('chartMeat', 'bar', G_BLUE, BG_BLUE);                  // 5
+            charts.water = createChart('chartWater', 'bar', G_RED, BG_RED);                  // 6
+            charts.permTotal = createChart('chartPermTotal', 'bar', G_YELLOW, BG_YELLOW);    // 7
+            charts.permHead = createChart('chartPermHead', 'line', G_GREEN, BG_GREEN);       // 8
+            
+            charts.tpTotal = createChart('chartTPTotal', 'bar', G_BLUE, BG_BLUE);            // 9
+            charts.tpHead = createChart('chartTPHead', 'line', G_RED, BG_RED);               // 10
         }
 
         function populateDropdowns() {
-            if (sheetData.length === 0) return;
-            
             const monthColRaw = findColumn(sheetData[0], ['month', 'mahina']);
-            const compColRaw = findColumn(sheetData[0], ['company', 'comp']);
+            const compColRaw = findColumn(sheetData[0], ['company']);
 
             const years = new Set();
             const months = new Set();
             const companies = new Set();
 
             sheetData.forEach(row => {
-                let mRaw = monthColRaw ? (row[monthColRaw] || "") : "";
-                if(mRaw && mRaw.includes('-')) {
+                let mRaw = row[monthColRaw] || "";
+                if(mRaw.includes('-')) {
                     let parts = mRaw.split('-');
                     let mth = parts[0].trim();
                     let yr = "20" + parts[1].trim();
@@ -428,13 +462,13 @@
                     years.add(yr); 
                     row['ExtractedYear'] = yr;
                     row['ExtractedMonth'] = mth;
-                } else if (mRaw) {
+                } else {
                     months.add(mRaw.trim());
                     row['ExtractedMonth'] = mRaw.trim();
                     row['ExtractedYear'] = "All"; 
                 }
 
-                let cRaw = compColRaw ? row[compColRaw] : null;
+                let cRaw = row[compColRaw];
                 if (cRaw && cRaw.toLowerCase() !== 'group') companies.add(cRaw.trim());
             });
 
@@ -442,11 +476,10 @@
                 const select = document.getElementById(setId);
                 select.innerHTML = `<option value="All">All</option>`;
                 dataSet.forEach(val => {
-                    if(val) {
-                        let opt = document.createElement('option');
-                        opt.value = val; opt.innerHTML = val;
-                        select.appendChild(opt);
-                    }
+                    if(!val) return;
+                    let opt = document.createElement('option');
+                    opt.value = val; opt.innerHTML = val;
+                    select.appendChild(opt);
                 });
             };
 
@@ -459,31 +492,17 @@
             try {
                 const response = await fetch(csvUrl);
                 const csvText = await response.text();
+                
                 const rows = parseCSV(csvText);
+                headers = rows[0].map(h => h.trim());
                 
-                if (!rows || rows.length === 0) throw new Error("Sheet is empty");
-
-                // FIXED: SMART HEADER DETECTION 
-                let headerIdx = 0;
-                for(let i=0; i<Math.min(15, rows.length); i++) {
-                    let rowStr = rows[i].join("").toLowerCase().replace(/\s/g, '');
-                    if(rowStr.includes("month") || rowStr.includes("company") || rowStr.includes("cost")) {
-                        headerIdx = i; 
-                        break;
-                    }
-                }
-
-                headers = rows[headerIdx].map(h => h ? h.trim() : `Col_${Math.random()}`);
-                
-                sheetData = rows.slice(headerIdx + 1).map(row => {
+                sheetData = rows.slice(1).map(row => {
                     let obj = {};
-                    row.forEach((cell, i) => { if(headers[i]) obj[headers[i]] = cell ? cell.trim() : ""; });
+                    row.forEach((cell, i) => { obj[headers[i]] = cell ? cell.trim() : ""; });
                     return obj;
                 });
 
                 sheetData = sheetData.filter(row => Object.values(row).some(x => x !== ""));
-
-                if(sheetData.length === 0) throw new Error("No valid data rows found after headers");
 
                 document.getElementById('loadingMsg').style.display = 'none';
                 document.getElementById('dashboardContent').style.display = 'grid'; 
@@ -492,7 +511,7 @@
                 updateDashboard(); 
             } catch (error) {
                 console.error("Data loading error:", error);
-                document.getElementById('loadingMsg').innerHTML = `<span style="color:var(--google-red)">Error loading data. Check sheet format.</span>`;
+                document.getElementById('loadingMsg').innerText = "Failed to load data. Please check the console.";
             }
         }
 
@@ -503,35 +522,42 @@
             const selectedMonth = document.getElementById('filterMonth').value;
             const selectedComp = document.getElementById('filterCompany').value;
 
-            const compCol = findColumn(sheetData[0], ['company', 'comp']);
+            const compCol = findColumn(sheetData[0], ['company']);
 
             let filteredData = sheetData.filter(item => {
                 let match = true;
-                if(selectedComp === "All" && compCol && item[compCol] && item[compCol].toLowerCase() === 'group') return false;
                 
-                if(selectedComp !== "All" && compCol && item[compCol] !== selectedComp) match = false;
+                if(selectedComp === "All" && item[compCol] && item[compCol].toLowerCase() === 'group') return false;
+                
+                if(selectedComp !== "All" && item[compCol] !== selectedComp) match = false;
                 if(selectedYear !== "All" && item['ExtractedYear'] !== selectedYear) match = false;
                 if(selectedMonth !== "All" && item['ExtractedMonth'] !== selectedMonth) match = false;
                 return match;
             });
 
+            // Column Mapping
             const grocCol = findColumn(sheetData[0], ['mess grocery', 'grocery']);
             const waterCol = findColumn(sheetData[0], ['water']);
             const vegCol = findColumn(sheetData[0], ['vegitables', 'fruits', 'veg']);
             const meatCol = findColumn(sheetData[0], ['meat']);
             const messCostCol = findColumn(sheetData[0], ['mess cost']);
             const ctcCol = findColumn(sheetData[0], ['cost to company', 'ctc']);
-            const permTotCol = findColumn(sheetData[0], ['permanent employee cost - total', 'permanent total', 'perm total']);
-            const permHeadCol = findColumn(sheetData[0], ['permanent - per employee cost', 'permanent per head', 'perm head']);
-            const tpTotCol = findColumn(sheetData[0], ['third party employee cost', 'third party total', 'tp total']);
-            const tpHeadCol = findColumn(sheetData[0], ['third party - per employee cost', 'tp per head', 'tp head']);
+            const permTotCol = findColumn(sheetData[0], ['permanent employee cost - total', 'permanent total']);
+            const permHeadCol = findColumn(sheetData[0], ['permanent - per employee cost', 'permanent per head']);
+            const tpTotCol = findColumn(sheetData[0], ['third party employee cost', 'third party total']);
+            const tpHeadCol = findColumn(sheetData[0], ['third party - per employee cost', 'tp per head']);
 
+            // X-Axis locked to Month
             let groupByCol = 'ExtractedMonth'; 
 
+            // Globals
             let gGroc = 0, gWat = 0, gVeg = 0, gMeat = 0;
             let gMessCost = 0, gCTC = 0, gPTot = 0, gTPTot = 0;
+            
+            // Averages
             let sumPHead = 0, cntPHead = 0;
             let sumTPHead = 0, cntTPHead = 0;
+
             let groupedStats = {};
 
             filteredData.forEach(item => {
@@ -555,7 +581,10 @@
                 if(vTPHead > 0) { sumTPHead += vTPHead; cntTPHead++; }
 
                 if (!groupedStats[label]) {
-                    groupedStats[label] = { gr:0, wa:0, vg:0, me:0, mc:0, ctc:0, pt:0, tpt:0, ph_s:0, ph_c:0, tph_s:0, tph_c:0 };
+                    groupedStats[label] = {
+                        gr:0, wa:0, vg:0, me:0, mc:0, ctc:0, pt:0, tpt:0,
+                        ph_s:0, ph_c:0, tph_s:0, tph_c:0
+                    };
                 }
 
                 groupedStats[label].gr += vGroc; groupedStats[label].wa += vWat; groupedStats[label].vg += vVeg;
@@ -566,6 +595,7 @@
                 if(vTPHead > 0) { groupedStats[label].tph_s += vTPHead; groupedStats[label].tph_c++; }
             });
 
+            // Update UI 
             document.getElementById('valGrocery').innerText = "Rs " + formatNum(gGroc);
             document.getElementById('valWater').innerText = "Rs " + formatNum(gWat);
             document.getElementById('valVeg').innerText = "Rs " + formatNum(gVeg);
@@ -578,6 +608,7 @@
             document.getElementById('valPermHead').innerText = "Rs " + (cntPHead > 0 ? formatNum(sumPHead / cntPHead) : "0");
             document.getElementById('valTPHead').innerText = "Rs " + (cntTPHead > 0 ? formatNum(sumTPHead / cntTPHead) : "0");
 
+            // Charts Data Setup
             let labels = Object.keys(groupedStats);
             const monthOrder = { "jan":1, "feb":2, "mar":3, "apr":4, "may":5, "jun":6, "jul":7, "aug":8, "sep":9, "oct":10, "nov":11, "dec":12 };
             labels.sort((a, b) => {
@@ -593,16 +624,15 @@
                 dMC.push(s.mc); dCTC.push(s.ctc); dGr.push(s.gr);
                 dVg.push(s.vg); dMe.push(s.me); dWa.push(s.wa);
                 dPTot.push(s.pt); dTPTot.push(s.tpt);
+
                 dPHead.push(s.ph_c > 0 ? (s.ph_s / s.ph_c).toFixed(1) : 0);
                 dTPHead.push(s.tph_c > 0 ? (s.tph_s / s.tph_c).toFixed(1) : 0);
             });
 
             function updateC(chartInst, lbs, dta) {
-                if(chartInst) {
-                    chartInst.data.labels = lbs;
-                    chartInst.data.datasets[0].data = dta;
-                    chartInst.update();
-                }
+                chartInst.data.labels = lbs;
+                chartInst.data.datasets[0].data = dta;
+                chartInst.update();
             }
 
             updateC(charts.messCost, labels, dMC);
@@ -617,6 +647,7 @@
             updateC(charts.tpHead, labels, dTPHead);
         }
 
+        // Filters Event Listeners
         document.querySelectorAll('select').forEach(select => {
             select.addEventListener('change', updateDashboard);
         });
@@ -626,6 +657,7 @@
             updateDashboard(); 
         });
 
+        // Share & Print Logic
         const shareBtn = document.getElementById('shareBtn');
         const sharePopup = document.getElementById('sharePopup');
         const printBtn = document.getElementById('printBtn');
