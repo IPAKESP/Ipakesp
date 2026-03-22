@@ -1,924 +1,717 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Corporate Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        /* Google Material Design Variables */
-        :root {
-            --google-blue: #4285F4;
-            --google-red: #EA4335;
-            --google-yellow: #FBBC05;
-            --google-green: #34A853;
-            
-            --bg-blue-light: rgba(66, 133, 244, 0.1);
-            --bg-red-light: rgba(234, 67, 53, 0.1);
-            --bg-yellow-light: rgba(251, 188, 5, 0.1);
-            --bg-green-light: rgba(52, 168, 83, 0.1);
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corporate Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Google Material Design Variables */
+        :root {
+            --google-blue: #4285F4;
+            --google-red: #EA4335;
+            --google-yellow: #FBBC05;
+            --google-green: #34A853;
+            
+            --bg-blue-light: rgba(66, 133, 244, 0.1);
+            --bg-red-light: rgba(234, 67, 53, 0.1);
+            --bg-yellow-light: rgba(251, 188, 5, 0.1);
+            --bg-green-light: rgba(52, 168, 83, 0.1);
 
-            --bg-light: #F8F9FA;
-            --surface: #FFFFFF;
-            --text-main: #202124;
-            --text-muted: #5F6368;
-            --border-color: #DADCE0;
-            --header-height: 80px;
-        }
+            --bg-light: #F8F9FA;
+            --surface: #FFFFFF;
+            --text-main: #202124;
+            --text-muted: #5F6368;
+            --border-color: #DADCE0;
+            --header-height: 85px; /* Increased to fit the stats */
+        }
 
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column; 
-            background-color: var(--bg-light);
-            color: var(--text-main);
-            height: 100vh;
-        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column; 
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            height: 100vh;
+        }
 
-        /* ---------------------------------
-           FULL-WIDTH TOP HEADER
-        --------------------------------- */
-        .top-header {
-            width: 100%;
-            height: var(--header-height);
-            background-color: var(--surface);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            padding: 0 30px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-            z-index: 200;
-            position: fixed;
-            top: 0;
-            left: 0;
-            box-sizing: border-box;
-        }
+        /* ---------------------------------
+           FULL-WIDTH TOP HEADER (UPDATED)
+        --------------------------------- */
+        .top-header {
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between; /* Creates space between Logo and Stats */
+            align-items: center;
+            padding: 0 40px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            z-index: 200;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-sizing: border-box;
+        }
 
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .logo { height: 50px; width: auto; object-fit: contain; margin-right: 20px; }
+        .top-header h1 { color: var(--google-green); margin: 0; font-size: 1.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .logo {
-            height: 50px; 
-            width: auto;
-            object-fit: contain;
-            margin-right: 20px;
-        }
+        /* ---------------------------------
+           HEADER RIGHT STATS (MINIMAL TEXT DESIGN)
+        --------------------------------- */
+        .header-right-stats {
+            display: flex;
+            gap: 15px; 
+            height: 60px;
+            align-items: center;
+        }
 
-        /* Changed from Blue to Green */
-        .top-header h1 {
-            color: var(--google-green);
-            margin: 0;
-            font-size: 1.6rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        .h-stat-card {
+            background: #ffffff;
+            border-radius: 8px; /* Clean flat border-radius */
+            display: flex;
+            height: 100%;
+            min-width: 160px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02); 
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+        }
+        .h-stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 
-        /* ---------------------------------
-           LAYOUT WRAPPER (Below Header)
-        --------------------------------- */
-        .layout-container {
-            display: flex;
-            margin-top: var(--header-height); 
-            height: calc(100vh - var(--header-height));
-        }
+        .h-accent { height: 4px; width: 100%; position: absolute; top: 0; left: 0; }
 
-        /* Clean Sidebar */
-        .sidebar {
-            width: 260px;
-            background-color: var(--surface);
-            border-right: 1px solid var(--border-color);
-            padding: 25px 20px;
-            overflow-y: auto;
-            box-sizing: border-box;
-            flex-shrink: 0;
-        }
+        .h-stat-content {
+            display: flex;
+            flex: 1;
+            align-items: center;
+            padding: 10px 12px; 
+            justify-content: space-between;
+            margin-top: 4px; 
+        }
 
-        .sidebar h2 {
-            color: var(--text-main);
-            font-size: 1.1rem;
-            font-weight: 500;
-            margin-top: 0;
-            margin-bottom: 25px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        .h-stat-left {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 50px;
+        }
 
-        .filter-group {
-            margin-bottom: 20px;
-        }
+        .h-stat-title-text { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .h-stat-icon svg { width: 22px; height: 22px; fill: none; stroke: var(--text-muted); stroke-width: 1.5; }
+        .h-stat-main { font-size: 1.3rem; font-weight: 700; color: #111; margin-top: 4px; line-height: 1; }
 
-        .filter-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
+        .h-stat-divider { width: 1px; height: 80%; background-color: #eee; margin: 0 10px; }
 
-        .filter-group select {
-            width: 100%;
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: #F1F3F4;
-            color: var(--text-main);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            outline: none;
-        }
+        .h-stat-right {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex: 1;
+        }
 
-        /* Changed Focus ring to Green */
-        .filter-group select:focus {
-            background: var(--surface);
-            border-color: var(--google-green);
-            box-shadow: 0 0 0 2px rgba(52, 168, 83, 0.2);
-        }
+        .h-stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.7rem;
+            margin-bottom: 3px;
+            gap: 8px;
+        }
+        .h-stat-row:last-child { margin-bottom: 0; }
 
-        /* Changed Button to Green */
-        .clear-btn {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            background-color: transparent;
-            color: var(--google-green);
-            border: 1px solid var(--google-green);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: 'Roboto', sans-serif;
-        }
+        .h-stat-label { color: var(--text-muted); font-weight: 400; }
+        .h-stat-val { font-weight: 600; color: #333; }
 
-        .clear-btn:hover {
-            background-color: rgba(52, 168, 83, 0.08);
-        }
+        .h-stat-huge {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #111;
+            line-height: 1;
+            text-align: center;
+        }
 
-        /* Main Content Area */
-        .main-content {
-            flex-grow: 1;
-            padding: 30px 40px;
-            overflow-y: auto;
-            box-sizing: border-box;
-            position: relative;
-        }
+        /* ---------------------------------
+           LAYOUT WRAPPER (Below Header)
+        --------------------------------- */
+        .layout-container {
+            display: flex; margin-top: var(--header-height); height: calc(100vh - var(--header-height));
+        }
 
-        /* ---------------------------------
-           NAVIGATION TABS (UPDATED)
-        --------------------------------- */
-        .nav-tabs {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap; /* Helps on smaller screens */
-        }
+        /* Clean Sidebar */
+        .sidebar {
+            width: 260px; background-color: var(--surface); border-right: 1px solid var(--border-color); padding: 25px 20px; overflow-y: auto; box-sizing: border-box; flex-shrink: 0;
+        }
 
-        .nav-tabs a {
-            text-decoration: none;
-            padding: 10px 24px;
-            font-size: 1rem;
-            font-weight: 500;
-            color: var(--text-muted);
-            background-color: white;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
+        .sidebar h2 { color: var(--text-main); font-size: 1.1rem; font-weight: 500; margin-top: 0; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .filter-group { margin-bottom: 20px; }
+        .filter-group label { display: block; margin-bottom: 8px; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 500; letter-spacing: 0.5px; }
+        .filter-group select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: #F1F3F4; color: var(--text-main); font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; outline: none; }
+        .filter-group select:focus { background: var(--surface); border-color: var(--google-green); box-shadow: 0 0 0 2px rgba(52, 168, 83, 0.2); }
 
-        .nav-tabs a:hover {
-            color: var(--text-main);
-            background-color: var(--bg-light);
-            border-color: #c0c4c9;
-        }
+        .clear-btn { width: 100%; padding: 10px; margin-top: 10px; background-color: transparent; color: var(--google-green); border: 1px solid var(--google-green); border-radius: 8px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; font-family: 'Roboto', sans-serif; }
+        .clear-btn:hover { background-color: rgba(52, 168, 83, 0.08); }
 
-        .nav-tabs a.active {
-            background-color: var(--google-green);
-            color: white;
-            border-color: var(--google-green);
-            box-shadow: 0 2px 6px rgba(52, 168, 83, 0.3);
-        }
+        /* Main Content Area */
+        .main-content { flex-grow: 1; padding: 30px 40px; overflow-y: auto; box-sizing: border-box; position: relative; }
 
-        .nav-tabs a.home-icon {
-            margin-left: auto; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
-            border-radius: 8px;
-            background-color: white;
-        }
+        /* ---------------------------------
+           NAVIGATION TABS
+        --------------------------------- */
+        .nav-tabs { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
+        .nav-tabs a { text-decoration: none; padding: 10px 24px; font-size: 1rem; font-weight: 500; color: var(--text-muted); background-color: white; border: 1px solid var(--border-color); border-radius: 8px; transition: all 0.3s ease; }
+        .nav-tabs a:hover { color: var(--text-main); background-color: var(--bg-light); border-color: #c0c4c9; }
+        .nav-tabs a.active { background-color: var(--google-green); color: white; border-color: var(--google-green); box-shadow: 0 2px 6px rgba(52, 168, 83, 0.3); }
+        .nav-tabs a.home-icon { margin-left: auto; display: flex; align-items: center; justify-content: center; padding: 10px; border-radius: 8px; background-color: white; }
+        .nav-tabs a.home-icon:hover { background-color: var(--bg-light); }
+        .nav-tabs a.home-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-        .nav-tabs a.home-icon:hover {
-            background-color: var(--bg-light);
-        }
+        /* Unified Card & Graph Widget Grid */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 40px; }
 
-        .nav-tabs a.home-icon svg {
-            width: 20px;
-            height: 20px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
+        .kpi-widget { background: var(--surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(60,64,67,0.1), 0 1px 2px rgba(60,64,67,0.06); display: flex; flex-direction: column; overflow: hidden; border-top: 4px solid var(--border-color); padding: 18px 20px 10px 20px; }
 
-        /* Unified Card & Graph Widget Grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
+        .kpi-widget:nth-child(4n+1) { border-top-color: var(--google-blue); }
+        .kpi-widget:nth-child(4n+2) { border-top-color: var(--google-red); }
+        .kpi-widget:nth-child(4n+3) { border-top-color: var(--google-yellow); }
+        .kpi-widget:nth-child(4n+4) { border-top-color: var(--google-green); }
 
-        .kpi-widget {
-            background: var(--surface);
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(60,64,67,0.1), 0 1px 2px rgba(60,64,67,0.06);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            border-top: 4px solid var(--border-color);
-            padding: 18px 20px 10px 20px;
-        }
+        .kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .kpi-title h3 { margin: 0 0 5px 0; font-size: 0.8rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; }
+        .kpi-value { font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0; }
+        .chart-wrapper { position: relative; height: 140px; width: 100%; }
 
-        /* Cyclic Google Colors matching the Charts exactly */
-        .kpi-widget:nth-child(4n+1) { border-top-color: var(--google-blue); }
-        .kpi-widget:nth-child(4n+2) { border-top-color: var(--google-red); }
-        .kpi-widget:nth-child(4n+3) { border-top-color: var(--google-yellow); }
-        .kpi-widget:nth-child(4n+4) { border-top-color: var(--google-green); }
-
-        .kpi-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-        }
-
-        .kpi-title h3 {
-            margin: 0 0 5px 0;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .kpi-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin: 0;
-        }
-
-        .chart-wrapper {
-            position: relative;
-            height: 140px; 
-            width: 100%;
-        }
-
-        /* Changed loading text color to Green */
-        #loadingMsg {
-            position: absolute;
-            color: var(--google-green);
-            font-weight: 500;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-            background: white; 
-            padding: 15px 25px; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        /* A4 PRINT LOGIC */
-        @media print {
-            @page { size: A4 landscape; margin: 10mm; }
-            body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .sidebar, .nav-tabs, #loadingMsg { display: none !important; }
-            .layout-container { margin-top: 0 !important; height: auto !important; }
-            .main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; overflow: visible !important; }
-            .top-header { position: relative !important; margin-bottom: 15px !important; padding: 0 0 10px 0 !important; border-bottom: 2px solid #000; box-shadow: none !important; }
-            .dashboard-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 10px !important; }
-            .kpi-widget { page-break-inside: avoid; box-shadow: none !important; border: 1px solid var(--border-color); padding: 10px 15px 5px 15px !important; border-top-width: 4px !important; }
-            .kpi-value { font-size: 1.1rem !important; }
-            .chart-wrapper { height: 90px !important; }
-        }
-    </style>
+        #loadingMsg { position: absolute; color: var(--google-green); font-weight: 500; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; background: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    </style>
 </head>
 <body>
 
-    <header class="top-header">
-        <div class="header-left">
-            <img src="Logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
-            <h1>Corporate Dashboard</h1>
-        </div>
-    </header>
-
-    <div class="layout-container">
-        
-        <div class="sidebar">
-            <h2>Filters</h2>
-            <div class="filter-group">
-                <label>Year</label>
-                <select id="filterYear"><option value="All">All Years</option></select>
-            </div>
-            <div class="filter-group">
-                <label>Month</label>
-                <select id="filterMonth"><option value="All">All Months</option></select>
-            </div>
-            <div class="filter-group">
-                <label>Department</label>
-                <select id="filterDept"><option value="All">All Departments</option></select>
-            </div>
-            <div class="filter-group">
-                <label>Section</label>
-                <select id="filterSection"><option value="All">All Sections</option></select>
-            </div>
-            <button id="clearFiltersBtn" class="clear-btn">Clear Filters</button>
-        </div>
-
-        <div class="main-content">
-            
-            <div class="nav-tabs">
-                <a href="#" class="active">HR Dashboard</a>
-                <a href="admin.html">Admin Dashboard</a>
-                <a href="cost.html">Cost Dashboard</a>
-                <a href="transport.html">Pool & Transport</a> <a href="index.html" class="home-icon" title="Home">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                    </svg>
-                </a>
-            </div>
-
-            <div id="loadingMsg">Fetching live data...</div>
-
-            <div class="dashboard-grid" id="dashboardContent" style="display: none;">
-                
-                <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Act vs Std Hours %</h3>
-                            <div class="kpi-value" id="valActVsStd">...</div>
-                        </div>
-                    </div>
-                    <div class="chart-wrapper"><canvas id="chartActVsStd"></canvas></div>
-                </div>
-
-                <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Total OT Hours</h3>
-                            <div class="kpi-value" id="valOTHours">...</div>
-                        </div>
-                    </div>
-                    <div class="chart-wrapper"><canvas id="chartOTHours"></canvas></div>
-                </div>
-
-                <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>OT Cost</h3>
-                            <div class="kpi-value" id="valOTCost">...</div>
-                        </div>
-                    </div>
-                    <div class="chart-wrapper"><canvas id="chartOTCost"></canvas></div>
-                </div>
-
-                <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>OT %</h3>
-                            <div class="kpi-value" id="valOTPercent">...</div>
-                        </div>
-                    </div>
-                    <div class="chart-wrapper"><canvas id="chartOTPercent"></canvas></div>
-                </div>
-
-                <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>TP Total OT Hours</h3>
-                            <div class="kpi-value" id="valTPOTHours">...</div>
-                        </div>
-                    </div>
-                    <div class="chart-wrapper"><canvas id="chartTPOTHours"></canvas></div>
-                </div>
-
-                <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>TP OT Cost</h3>
-                            <div class="kpi-value" id="valTPOTCost">...</div>
-                        </div>
-                    </div>
-                    <div class="chart-wrapper"><canvas id="chartTPOTCost"></canvas></div>
-                </div>
-
-                <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Absenteeism %</h3>
-                            <div class="kpi-value" id="valAbsent">...</div>
-                        </div>
-                    </div>
-                    <div class="chart-wrapper"><canvas id="chartAbsent"></canvas></div>
-                </div>
-
-                <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Leaves %</h3>
-                            <div class="kpi-value" id="valLeave">...</div>
-                        </div>
-                    </div>
-                    <div class="chart-wrapper"><canvas id="chartLeave"></canvas></div>
-                </div>
-
-                <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Late Arrival %</h3>
-                            <div class="kpi-value" id="valLate">...</div>
-                        </div>
-                    </div>
-                    <div class="chart-wrapper"><canvas id="chartLate"></canvas></div>
-                </div>
-
-                <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Early Out %</h3>
-                            <div class="kpi-value" id="valEarly">...</div>
-                        </div>
-                    </div>
-                    <div class="chart-wrapper"><canvas id="chartEarly"></canvas></div>
-                </div>
-
-                <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Active Employee %</h3>
-                            <div class="kpi-value" id="valActive">...</div>
-                        </div>
-                    </div>
-                    <div class="chart-wrapper"><canvas id="chartActive"></canvas></div>
-                </div>
-
-                <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Joiners</h3>
-                            <div class="kpi-value" id="valJoiners">...</div>
-                        </div>
-                    </div>
-                    <div class="chart-wrapper"><canvas id="chartJoiners"></canvas></div>
-                </div>
-
-                <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Leavers</h3>
-                            <div class="kpi-value" id="valLeavers">...</div>
-                        </div>
-                    </div>
-                    <div class="chart-wrapper"><canvas id="chartLeavers"></canvas></div>
-                </div>
-
-                <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Pending Final Settlement</h3>
-                            <div class="kpi-value" id="valPending">...</div>
-                        </div>
-                    </div>
-                    <div class="chart-wrapper"><canvas id="chartPending"></canvas></div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=798992094&single=true&output=csv';
-
-        let sheetData = [];
-        let headers = [];
-        const charts = {};
-
-        const G_BLUE = '#4285F4';
-        const G_RED = '#EA4335';
-        const G_YELLOW = '#FBBC05';
-        const G_GREEN = '#34A853';
-
-        const BG_BLUE = 'rgba(66, 133, 244, 0.15)';
-        const BG_RED = 'rgba(234, 67, 53, 0.15)';
-        const BG_YELLOW = 'rgba(251, 188, 5, 0.15)';
-        const BG_GREEN = 'rgba(52, 168, 83, 0.15)';
-
-        function parseCSV(str) {
-            const arr = [];
-            let quote = false;
-            let row = 0, col = 0;
-            for (let c = 0; c < str.length; c++) {
-                let cc = str[c], nc = str[c+1];
-                arr[row] = arr[row] || [];
-                arr[row][col] = arr[row][col] || '';
-                
-                if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
-                if (cc == '"') { quote = !quote; continue; }
-                if (cc == ',' && !quote) { ++col; continue; }
-                if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
-                if (cc == '\n' && !quote) { ++row; col = 0; continue; }
-                if (cc == '\r' && !quote) { ++row; col = 0; continue; }
-                
-                arr[row][col] += cc;
-            }
-            return arr;
-        }
-
-        function findColumn(row, keywords) {
-            if(!row) return null;
-            return Object.keys(row).find(key => keywords.some(kw => key.toLowerCase().includes(kw)));
-        }
-
-        function cleanNumber(val) {
-            if (!val) return 0;
-            if (typeof val === 'number') return val;
-            let cleaned = val.toString().replace(/,/g, '').replace(/%/g, '').replace(/[^\d.-]/g, '');
-            return parseFloat(cleaned) || 0;
-        }
-
-        function formatNum(num) {
-            return num.toLocaleString('en-US', { maximumFractionDigits: 1 });
-        }
-
-        function createChart(canvasId, type, colorLine, colorBg) {
-            const ctx = document.getElementById(canvasId).getContext('2d');
-            return new Chart(ctx, {
-                type: type,
-                data: { 
-                    labels: [], 
-                    datasets: [{ 
-                        backgroundColor: type === 'line' ? colorBg : colorLine, 
-                        borderColor: colorLine,
-                        borderWidth: 2,
-                        fill: type === 'line', 
-                        tension: 0.4,
-                        pointRadius: 3,
-                        borderRadius: type === 'bar' ? 4 : 0,
-                        data: [] 
-                    }] 
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: { duration: 800, easing: 'easeOutQuart' },
-                    plugins: { 
-                        legend: { display: false },
-                        tooltip: { titleFont: { size: 11 }, bodyFont: { size: 11 } }
-                    },
-                    scales: { 
-                        y: { 
-                            display: true, 
-                            beginAtZero: true, 
-                            grid: { drawBorder: false, color: '#f1f3f4' },
-                            ticks: { font: { size: 10 }, color: '#9aa0a6' }
-                        },
-                        x: { 
-                            display: true, 
-                            grid: { display: false },
-                            ticks: { font: { size: 10 }, color: '#9aa0a6', maxRotation: 45, minRotation: 0 }
-                        }
-                    }
-                }
-            });
-        }
-
-        function initCharts() {
-            charts.actStd = createChart('chartActVsStd', 'line', G_BLUE, BG_BLUE);       
-            charts.otHours = createChart('chartOTHours', 'bar', G_RED, BG_RED);          
-            charts.otCost = createChart('chartOTCost', 'bar', G_YELLOW, BG_YELLOW);      
-            charts.otPct = createChart('chartOTPercent', 'line', G_GREEN, BG_GREEN);     
-            
-            charts.tpOTHours = createChart('chartTPOTHours', 'bar', G_BLUE, BG_BLUE);    
-            charts.tpOTCost = createChart('chartTPOTCost', 'bar', G_RED, BG_RED);        
-            charts.absent = createChart('chartAbsent', 'line', G_YELLOW, BG_YELLOW);     
-            charts.leave = createChart('chartLeave', 'line', G_GREEN, BG_GREEN);         
-            
-            charts.late = createChart('chartLate', 'line', G_BLUE, BG_BLUE);             
-            charts.early = createChart('chartEarly', 'line', G_RED, BG_RED);             
-            charts.active = createChart('chartActive', 'line', G_YELLOW, BG_YELLOW);     
-            charts.joiners = createChart('chartJoiners', 'bar', G_GREEN, BG_GREEN);      
-            
-            charts.leavers = createChart('chartLeavers', 'bar', G_BLUE, BG_BLUE);        
-            charts.pending = createChart('chartPending', 'bar', G_RED, BG_RED);          
-        }
-
-        function updateSectionDropdown() {
-            const selectedDept = document.getElementById('filterDept').value;
-            const deptCol = findColumn(sheetData[0], ['department', 'dept']);
-            const sectionCol = findColumn(sheetData[0], ['section', 'sec']);
-
-            if (!sectionCol) return;
-
-            const sections = new Set();
-            sheetData.forEach(row => {
-                if (selectedDept === "All" || row[deptCol] === selectedDept) {
-                    if (row[sectionCol]) sections.add(row[sectionCol]);
-                }
-            });
-
-            const sectionSelect = document.getElementById('filterSection');
-            const currentSelection = sectionSelect.value;
-
-            sectionSelect.innerHTML = `<option value="All">All Sections</option>`;
-            
-            sections.forEach(val => {
-                let opt = document.createElement('option');
-                opt.value = val;
-                opt.innerHTML = val;
-                sectionSelect.appendChild(opt);
-            });
-
-            if (sections.has(currentSelection)) {
-                sectionSelect.value = currentSelection;
-            } else {
-                sectionSelect.value = "All";
-            }
-        }
-
-        function populateDropdowns() {
-            const yearCol = findColumn(sheetData[0], ['year', 'saal']);
-            const monthCol = findColumn(sheetData[0], ['month', 'mahina']);
-            const deptCol = findColumn(sheetData[0], ['department', 'dept']);
-
-            const years = new Set();
-            const months = new Set();
-            const depts = new Set();
-
-            sheetData.forEach(row => {
-                if (yearCol && row[yearCol]) years.add(row[yearCol]);
-                if (monthCol && row[monthCol]) months.add(row[monthCol]);
-                if (deptCol && row[deptCol]) depts.add(row[deptCol]);
-            });
-
-            const addOptions = (setId, dataSet) => {
-                const select = document.getElementById(setId);
-                select.innerHTML = `<option value="All">All ${setId.replace('filter', '')}s</option>`;
-                dataSet.forEach(val => {
-                    let opt = document.createElement('option');
-                    opt.value = val;
-                    opt.innerHTML = val;
-                    select.appendChild(opt);
-                });
-            };
-
-            addOptions('filterYear', years);
-            addOptions('filterMonth', months);
-            addOptions('filterDept', depts);
-            
-            updateSectionDropdown();
-        }
-
-        async function fetchGoogleSheetData() {
-            try {
-                const response = await fetch(csvUrl);
-                const csvText = await response.text();
-                
-                const rows = parseCSV(csvText);
-                headers = rows[0].map(h => h.trim());
-                
-                sheetData = rows.slice(1).map(row => {
-                    let obj = {};
-                    row.forEach((cell, i) => {
-                        obj[headers[i]] = cell ? cell.trim() : "";
-                    });
-                    return obj;
-                });
-
-                sheetData = sheetData.filter(row => Object.values(row).some(x => x !== ""));
-
-                document.getElementById('loadingMsg').style.display = 'none';
-                document.getElementById('dashboardContent').style.display = 'grid'; 
-
-                populateDropdowns();
-                updateDashboard(); 
-            } catch (error) {
-                console.error("Data uthane mein masla:", error);
-                document.getElementById('loadingMsg').innerText = "Failed to load data. Check console.";
-            }
-        }
-
-        function updateDashboard() {
-            if(sheetData.length === 0) return;
-
-            const selectedYear = document.getElementById('filterYear').value;
-            const selectedMonth = document.getElementById('filterMonth').value;
-            const selectedDept = document.getElementById('filterDept').value;
-            const selectedSection = document.getElementById('filterSection').value;
-
-            // Dimensions
-            const yearCol = findColumn(sheetData[0], ['year']);
-            const monthCol = findColumn(sheetData[0], ['month']);
-            const deptCol = findColumn(sheetData[0], ['department', 'dept']);
-            const sectionCol = findColumn(sheetData[0], ['section', 'sec']);
-
-            let filteredData = sheetData.filter(item => {
-                let match = true;
-                if(selectedYear !== "All" && yearCol && item[yearCol] !== selectedYear) match = false;
-                if(selectedMonth !== "All" && monthCol && item[monthCol] !== selectedMonth) match = false;
-                if(selectedDept !== "All" && deptCol && item[deptCol] !== selectedDept) match = false;
-                if(selectedSection !== "All" && sectionCol && item[sectionCol] !== selectedSection) match = false;
-                return match;
-            });
-
-            // KPI Columns Mapping
-            const actVsStdCol = findColumn(sheetData[0], ['actual vs standard', 'actual vs std']);
-            const otHoursCol = findColumn(sheetData[0], ['overtime hours', 'total ot hours']);
-            const otCostCol = findColumn(sheetData[0], ['ot cost', 'overtime cost']);
-            const otPercentCol = findColumn(sheetData[0], ['ot%', 'ot %', 'overtime %']);
-            const tpOTHoursCol = findColumn(sheetData[0], ['tp total ot hours', 'tp ot hour', 'tp ot hrs']);
-            const tpOTCostCol = findColumn(sheetData[0], ['tp ot cost', 'tp cost']);
-            const absentCol = findColumn(sheetData[0], ['absenteeism', 'absent']);
-            const leaveCol = findColumn(sheetData[0], ['leaves', 'leave %']);
-            const lateCol = findColumn(sheetData[0], ['late arrival', 'late']);
-            const earlyCol = findColumn(sheetData[0], ['early out', 'early']);
-            const activeEmpCol = findColumn(sheetData[0], ['active employee', 'active %']);
-            const joinersCol = findColumn(sheetData[0], ['joiners', 'join']);
-            const leaversCol = findColumn(sheetData[0], ['leavers', 'leave count']);
-            const pendingCol = findColumn(sheetData[0], ['pending final settlement', 'pending settlement', 'settlement']);
-
-            // FORCE GROUP BY MONTH FOR TREND ANALYSIS
-            let groupByCol = monthCol || headers[0];
-
-            let gOtHours = 0, gOtCost = 0, gTpOTHours = 0, gTpOTCost = 0, gJoiners = 0, gLeavers = 0, gPending = 0;
-            let sumActStd = 0, cntActStd = 0;
-            let sumOtPct = 0, cntOtPct = 0;
-            let sumAbsent = 0, cntAbsent = 0;
-            let sumLeave = 0, cntLeave = 0;
-            let sumLate = 0, cntLate = 0;
-            let sumEarly = 0, cntEarly = 0;
-            let sumActive = 0, cntActive = 0;
-
-            let groupedStats = {};
-
-            filteredData.forEach(item => {
-                let label = item[groupByCol] || "Unknown";
-
-                let vActStd = cleanNumber(item[actVsStdCol]);
-                let vOtHrs = cleanNumber(item[otHoursCol]);
-                let vOtCost = cleanNumber(item[otCostCol]);
-                let vOtPct = cleanNumber(item[otPercentCol]);
-                let vTpHrs = cleanNumber(item[tpOTHoursCol]);
-                let vTpCost = cleanNumber(item[tpOTCostCol]);
-                let vAbs = cleanNumber(item[absentCol]);
-                let vLev = cleanNumber(item[leaveCol]);
-                let vLat = cleanNumber(item[lateCol]);
-                let vEar = cleanNumber(item[earlyCol]);
-                let vAct = cleanNumber(item[activeEmpCol]);
-                let vJoin = cleanNumber(item[joinersCol]);
-                let vLeav = cleanNumber(item[leaversCol]);
-                let vPend = cleanNumber(item[pendingCol]);
-
-                gOtHours += vOtHrs; gOtCost += vOtCost; 
-                gTpOTHours += vTpHrs; gTpOTCost += vTpCost;
-                gJoiners += vJoin; gLeavers += vLeav; gPending += vPend;
-
-                if (vActStd > 0) { sumActStd += vActStd; cntActStd++; }
-                if (vOtPct > 0) { sumOtPct += vOtPct; cntOtPct++; }
-                if (vAbs > 0) { sumAbsent += vAbs; cntAbsent++; }
-                if (vLev > 0) { sumLeave += vLev; cntLeave++; }
-                if (vLat > 0) { sumLate += vLat; cntLate++; }
-                if (vEar > 0) { sumEarly += vEar; cntEarly++; }
-                if (vAct > 0) { sumActive += vAct; cntActive++; }
-
-                if (!groupedStats[label]) {
-                    groupedStats[label] = {
-                        otH:0, otC:0, tpH:0, tpC:0, jn:0, lv:0, pnd:0,
-                        aS_p:0, aS_c:0,
-                        otP_p:0, otP_c:0,
-                        ab_p:0, ab_c:0,
-                        le_p:0, le_c:0,
-                        la_p:0, la_c:0,
-                        ea_p:0, ea_c:0,
-                        ac_p:0, ac_c:0
-                    };
-                }
-
-                groupedStats[label].otH += vOtHrs;
-                groupedStats[label].otC += vOtCost;
-                groupedStats[label].tpH += vTpHrs;
-                groupedStats[label].tpC += vTpCost;
-                groupedStats[label].jn += vJoin;
-                groupedStats[label].lv += vLeav;
-                groupedStats[label].pnd += vPend;
-
-                if (vActStd > 0) { groupedStats[label].aS_p += vActStd; groupedStats[label].aS_c++; }
-                if (vOtPct > 0) { groupedStats[label].otP_p += vOtPct; groupedStats[label].otP_c++; }
-                if (vAbs > 0) { groupedStats[label].ab_p += vAbs; groupedStats[label].ab_c++; }
-                if (vLev > 0) { groupedStats[label].le_p += vLev; groupedStats[label].le_c++; }
-                if (vLat > 0) { groupedStats[label].la_p += vLat; groupedStats[label].la_c++; }
-                if (vEar > 0) { groupedStats[label].ea_p += vEar; groupedStats[label].ea_c++; }
-                if (vAct > 0) { groupedStats[label].ac_p += vAct; groupedStats[label].ac_c++; }
-            });
-
-            // Update Header Values
-            document.getElementById('valActVsStd').innerText = cntActStd > 0 ? (sumActStd / cntActStd).toFixed(2) + "%" : "0%";
-            document.getElementById('valOTHours').innerText = formatNum(gOtHours);
-            document.getElementById('valOTCost').innerText = "Rs " + formatNum(gOtCost);
-            document.getElementById('valOTPercent').innerText = cntOtPct > 0 ? (sumOtPct / cntOtPct).toFixed(2) + "%" : "0%";
-            document.getElementById('valTPOTHours').innerText = formatNum(gTpOTHours);
-            document.getElementById('valTPOTCost').innerText = "Rs " + formatNum(gTpOTCost);
-            document.getElementById('valAbsent').innerText = cntAbsent > 0 ? (sumAbsent / cntAbsent).toFixed(2) + "%" : "0%";
-            document.getElementById('valLeave').innerText = cntLeave > 0 ? (sumLeave / cntLeave).toFixed(2) + "%" : "0%";
-            document.getElementById('valLate').innerText = cntLate > 0 ? (sumLate / cntLate).toFixed(2) + "%" : "0%";
-            document.getElementById('valEarly').innerText = cntEarly > 0 ? (sumEarly / cntEarly).toFixed(2) + "%" : "0%";
-            document.getElementById('valActive').innerText = cntActive > 0 ? (sumActive / cntActive).toFixed(2) + "%" : "0%";
-            document.getElementById('valJoiners').innerText = formatNum(gJoiners);
-            document.getElementById('valLeavers').innerText = formatNum(gLeavers);
-            document.getElementById('valPending').innerText = formatNum(gPending);
-
-            let chartLabels = Object.keys(groupedStats);
-
-            // Tarteeb (Chronological sorting for months)
-            const monthsMap = { "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6, "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12 };
-            chartLabels.sort((a, b) => {
-                let valA = monthsMap[a.toLowerCase().substring(0, 3)] || 99;
-                let valB = monthsMap[b.toLowerCase().substring(0, 3)] || 99;
-                return valA - valB;
-            });
-
-            let dActStd=[], dOtHrs=[], dOtCost=[], dOtPct=[], dTpHrs=[], dTpCost=[], dAbs=[], dLev=[], dLat=[], dEar=[], dAct=[], dJoin=[], dLeav=[], dPend=[];
-
-            chartLabels.forEach(lbl => {
-                let s = groupedStats[lbl];
-                dOtHrs.push(s.otH); dOtCost.push(s.otC);
-                dTpHrs.push(s.tpH); dTpCost.push(s.tpC);
-                dJoin.push(s.jn); dLeav.push(s.lv); dPend.push(s.pnd);
-
-                dActStd.push(s.aS_c > 0 ? (s.aS_p / s.aS_c).toFixed(2) : 0);
-                dOtPct.push(s.otP_c > 0 ? (s.otP_p / s.otP_c).toFixed(2) : 0);
-                dAbs.push(s.ab_c > 0 ? (s.ab_p / s.ab_c).toFixed(2) : 0);
-                dLev.push(s.le_c > 0 ? (s.le_p / s.le_c).toFixed(2) : 0);
-                dLat.push(s.la_c > 0 ? (s.la_p / s.la_c).toFixed(2) : 0);
-                dEar.push(s.ea_c > 0 ? (s.ea_p / s.ea_c).toFixed(2) : 0);
-                dAct.push(s.ac_c > 0 ? (s.ac_p / s.ac_c).toFixed(2) : 0);
-            });
-
-            function updateC(chartInst, lbs, dta) {
-                chartInst.data.labels = lbs;
-                chartInst.data.datasets[0].data = dta;
-                chartInst.update();
-            }
-
-            updateC(charts.actStd, chartLabels, dActStd);
-            updateC(charts.otHours, chartLabels, dOtHrs);
-            updateC(charts.otCost, chartLabels, dOtCost);
-            updateC(charts.otPct, chartLabels, dOtPct);
-            updateC(charts.tpOTHours, chartLabels, dTpHrs);
-            updateC(charts.tpOTCost, chartLabels, dTpCost);
-            updateC(charts.absent, chartLabels, dAbs);
-            updateC(charts.leave, chartLabels, dLev);
-            updateC(charts.late, chartLabels, dLat);
-            updateC(charts.early, chartLabels, dEar);
-            updateC(charts.active, chartLabels, dAct);
-            updateC(charts.joiners, chartLabels, dJoin);
-            updateC(charts.leavers, chartLabels, dLeav);
-            updateC(charts.pending, chartLabels, dPend);
-        }
-
-        // Filters
-        document.getElementById('filterDept').addEventListener('change', () => {
-            updateSectionDropdown(); 
-            updateDashboard();       
-        });
-        document.getElementById('filterYear').addEventListener('change', updateDashboard);
-        document.getElementById('filterMonth').addEventListener('change', updateDashboard);
-        document.getElementById('filterSection').addEventListener('change', updateDashboard);
-
-        document.getElementById('clearFiltersBtn').addEventListener('click', () => {
-            document.querySelectorAll('select').forEach(select => select.value = 'All');
-            updateSectionDropdown(); 
-            updateDashboard(); 
-        });
-
-        window.onload = () => {
-            initCharts();
-            fetchGoogleSheetData();
-        };
-    </script>
+    <header class="top-header">
+        <div class="header-left">
+            <img src="Logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
+            <h1>Corporate Dashboard</h1>
+        </div>
+
+        <div class="header-right-stats">
+            <div class="h-stat-card">
+                <div class="h-accent" style="background-color: var(--google-yellow);"></div>
+                <div class="h-stat-content">
+                    <div class="h-stat-left">
+                        <span class="h-stat-title-text">Total</span>
+                        <span class="h-stat-main">1021</span>
+                    </div>
+                    <div class="h-stat-divider"></div>
+                    <div class="h-stat-right">
+                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">661</span></div>
+                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">360</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-stat-card">
+                <div class="h-accent" style="background-color: #A4C639;"></div>
+                <div class="h-stat-content">
+                    <div class="h-stat-left">
+                        <span class="h-stat-title-text">KHI</span>
+                        <span class="h-stat-main">82</span>
+                    </div>
+                    <div class="h-stat-divider"></div>
+                    <div class="h-stat-right">
+                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">70</span></div>
+                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">12</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-stat-card">
+                <div class="h-accent" style="background-color: var(--google-green);"></div>
+                <div class="h-stat-content">
+                    <div class="h-stat-left">
+                        <span class="h-stat-title-text">LHR</span>
+                        <span class="h-stat-main">408</span>
+                    </div>
+                    <div class="h-stat-divider"></div>
+                    <div class="h-stat-right">
+                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">283</span></div>
+                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">125</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-stat-card">
+                <div class="h-accent" style="background-color: #FF5722;"></div>
+                <div class="h-stat-content">
+                    <div class="h-stat-left">
+                        <span class="h-stat-title-text">SKP</span>
+                        <span class="h-stat-main">531</span>
+                    </div>
+                    <div class="h-stat-divider"></div>
+                    <div class="h-stat-right">
+                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">308</span></div>
+                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">223</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-stat-card" style="min-width: 110px;">
+                <div class="h-accent" style="background-color: var(--google-green);"></div>
+                <div class="h-stat-content" style="justify-content: center; gap: 8px;">
+                    <div class="h-stat-icon">
+                        <svg viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                    </div>
+                    <span class="h-stat-huge">96%</span>
+                </div>
+            </div>
+
+            <div class="h-stat-card" style="min-width: 110px;">
+                <div class="h-accent" style="background-color: #FF5722;"></div>
+                <div class="h-stat-content" style="justify-content: center; gap: 8px;">
+                    <div class="h-stat-icon">
+                        <svg viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13.608 8.908a3.188 3.188 0 10-1.608-4.908" /></svg>
+                    </div>
+                    <span class="h-stat-huge">4%</span>
+                </div>
+            </div>
+        </div>
+
+    </header>
+
+    <div class="layout-container">
+        
+        <div class="sidebar">
+            <h2>Filters</h2>
+            <div class="filter-group">
+                <label>Year</label>
+                <select id="filterYear"><option value="All">All Years</option></select>
+            </div>
+            <div class="filter-group">
+                <label>Month</label>
+                <select id="filterMonth"><option value="All">All Months</option></select>
+            </div>
+            <div class="filter-group">
+                <label>Department</label>
+                <select id="filterDept"><option value="All">All Departments</option></select>
+            </div>
+            <div class="filter-group">
+                <label>Section</label>
+                <select id="filterSection"><option value="All">All Sections</option></select>
+            </div>
+            <button id="clearFiltersBtn" class="clear-btn">Clear Filters</button>
+        </div>
+
+        <div class="main-content">
+            
+            <div class="nav-tabs">
+                <a href="#" class="active">HR Dashboard</a>
+                <a href="admin.html">Admin Dashboard</a>
+                <a href="cost.html">Cost Dashboard</a>
+                <a href="transport.html">Pool & Transport</a>
+                
+                <a href="index.html" class="home-icon" title="Home">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </a>
+            </div>
+
+            <div id="loadingMsg">Fetching live data...</div>
+
+            <div class="dashboard-grid" id="dashboardContent" style="display: none;">
+                
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Act vs Std Hours %</h3></div><div class="kpi-value" id="valActVsStd">...</div></div>
+                    <div class="chart-wrapper"><canvas id="chartActVsStd"></canvas></div>
+                </div>
+
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Total OT Hours</h3></div><div class="kpi-value" id="valOTHours">...</div></div>
+                    <div class="chart-wrapper"><canvas id="chartOTHours"></canvas></div>
+                </div>
+
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>OT Cost</h3></div><div class="kpi-value" id="valOTCost">...</div></div>
+                    <div class="chart-wrapper"><canvas id="chartOTCost"></canvas></div>
+                </div>
+
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>OT %</h3></div><div class="kpi-value" id="valOTPercent">...</div></div>
+                    <div class="chart-wrapper"><canvas id="chartOTPercent"></canvas></div>
+                </div>
+
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>TP Total OT Hours</h3></div><div class="kpi-value" id="valTPOTHours">...</div></div>
+                    <div class="chart-wrapper"><canvas id="chartTPOTHours"></canvas></div>
+                </div>
+
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>TP OT Cost</h3></div><div class="kpi-value" id="valTPOTCost">...</div></div>
+                    <div class="chart-wrapper"><canvas id="chartTPOTCost"></canvas></div>
+                </div>
+
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Absenteeism %</h3></div><div class="kpi-value" id="valAbsent">...</div></div>
+                    <div class="chart-wrapper"><canvas id="chartAbsent"></canvas></div>
+                </div>
+
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Leaves %</h3></div><div class="kpi-value" id="valLeave">...</div></div>
+                    <div class="chart-wrapper"><canvas id="chartLeave"></canvas></div>
+                </div>
+
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Late Arrival %</h3></div><div class="kpi-value" id="valLate">...</div></div>
+                    <div class="chart-wrapper"><canvas id="chartLate"></canvas></div>
+                </div>
+
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Early Out %</h3></div><div class="kpi-value" id="valEarly">...</div></div>
+                    <div class="chart-wrapper"><canvas id="chartEarly"></canvas></div>
+                </div>
+
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Active Employee %</h3></div><div class="kpi-value" id="valActive">...</div></div>
+                    <div class="chart-wrapper"><canvas id="chartActive"></canvas></div>
+                </div>
+
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Joiners</h3></div><div class="kpi-value" id="valJoiners">...</div></div>
+                    <div class="chart-wrapper"><canvas id="chartJoiners"></canvas></div>
+                </div>
+
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Leavers</h3></div><div class="kpi-value" id="valLeavers">...</div></div>
+                    <div class="chart-wrapper"><canvas id="chartLeavers"></canvas></div>
+                </div>
+
+                <div class="kpi-widget">
+                    <div class="kpi-header"><div class="kpi-title"><h3>Pending Final Settlement</h3></div><div class="kpi-value" id="valPending">...</div></div>
+                    <div class="chart-wrapper"><canvas id="chartPending"></canvas></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=798992094&single=true&output=csv';
+
+        let sheetData = [];
+        let headers = [];
+        const charts = {};
+
+        const G_BLUE = '#4285F4'; const G_RED = '#EA4335'; const G_YELLOW = '#FBBC05'; const G_GREEN = '#34A853';
+        const BG_BLUE = 'rgba(66, 133, 244, 0.15)'; const BG_RED = 'rgba(234, 67, 53, 0.15)'; const BG_YELLOW = 'rgba(251, 188, 5, 0.15)'; const BG_GREEN = 'rgba(52, 168, 83, 0.15)';
+
+        function parseCSV(str) {
+            const arr = []; let quote = false; let row = 0, col = 0;
+            for (let c = 0; c < str.length; c++) {
+                let cc = str[c], nc = str[c+1];
+                arr[row] = arr[row] || []; arr[row][col] = arr[row][col] || '';
+                if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
+                if (cc == '"') { quote = !quote; continue; }
+                if (cc == ',' && !quote) { ++col; continue; }
+                if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
+                if (cc == '\n' && !quote) { ++row; col = 0; continue; }
+                if (cc == '\r' && !quote) { ++row; col = 0; continue; }
+                arr[row][col] += cc;
+            }
+            return arr;
+        }
+
+        function findColumn(row, keywords) {
+            if(!row) return null;
+            return Object.keys(row).find(key => keywords.some(kw => key.toLowerCase().includes(kw)));
+        }
+
+        function cleanNumber(val) {
+            if (val === undefined || val === null || val.toString().trim() === '') return 0;
+            if (typeof val === 'number') return val;
+            let cleaned = val.toString().replace(/,/g, '').replace(/%/g, '').replace(/[^\d.-]/g, '');
+            let num = parseFloat(cleaned);
+            return isNaN(num) ? 0 : num;
+        }
+
+        function formatNum(num) { return num.toLocaleString('en-US', { maximumFractionDigits: 1 }); }
+
+        function createChart(canvasId, type, colorLine, colorBg) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            return new Chart(ctx, {
+                type: type,
+                data: { labels: [], datasets: [{ backgroundColor: type === 'line' ? colorBg : colorLine, borderColor: colorLine, borderWidth: 2, fill: type === 'line', tension: 0.4, pointRadius: 3, borderRadius: type === 'bar' ? 4 : 0, data: [] }] },
+                options: {
+                    responsive: true, maintainAspectRatio: false, animation: { duration: 800, easing: 'easeOutQuart' },
+                    plugins: { legend: { display: false }, tooltip: { titleFont: { size: 10 }, bodyFont: { size: 10 } } },
+                    scales: { 
+                        y: { display: true, beginAtZero: true, grid: { drawBorder: false, color: '#f1f3f4' }, ticks: { font: { size: 9 }, color: '#9aa0a6', maxTicksLimit: 5 } },
+                        x: { display: true, grid: { display: false }, ticks: { font: { size: 9 }, color: '#9aa0a6', maxRotation: 45, minRotation: 0 } }
+                    }
+                }
+            });
+        }
+
+        function initCharts() {
+            charts.actStd = createChart('chartActVsStd', 'line', G_BLUE, BG_BLUE);       
+            charts.otHours = createChart('chartOTHours', 'bar', G_RED, BG_RED);          
+            charts.otCost = createChart('chartOTCost', 'bar', G_YELLOW, BG_YELLOW);      
+            charts.otPct = createChart('chartOTPercent', 'line', G_GREEN, BG_GREEN);     
+            charts.tpOTHours = createChart('chartTPOTHours', 'bar', G_BLUE, BG_BLUE);    
+            charts.tpOTCost = createChart('chartTPOTCost', 'bar', G_RED, BG_RED);        
+            charts.absent = createChart('chartAbsent', 'line', G_YELLOW, BG_YELLOW);     
+            charts.leave = createChart('chartLeave', 'line', G_GREEN, BG_GREEN);         
+            charts.late = createChart('chartLate', 'line', G_BLUE, BG_BLUE);             
+            charts.early = createChart('chartEarly', 'line', G_RED, BG_RED);             
+            charts.active = createChart('chartActive', 'line', G_YELLOW, BG_YELLOW);     
+            charts.joiners = createChart('chartJoiners', 'bar', G_GREEN, BG_GREEN);      
+            charts.leavers = createChart('chartLeavers', 'bar', G_BLUE, BG_BLUE);        
+            charts.pending = createChart('chartPending', 'bar', G_RED, BG_RED);          
+        }
+
+        function updateSectionDropdown() {
+            const selectedDept = document.getElementById('filterDept').value;
+            const deptCol = findColumn(sheetData[0], ['department', 'dept']);
+            const sectionCol = findColumn(sheetData[0], ['section', 'sec']);
+
+            if (!sectionCol) return;
+
+            const sections = new Set();
+            sheetData.forEach(row => {
+                if (selectedDept === "All" || row[deptCol] === selectedDept) {
+                    if (row[sectionCol]) sections.add(row[sectionCol]);
+                }
+            });
+
+            const sectionSelect = document.getElementById('filterSection');
+            const currentSelection = sectionSelect.value;
+
+            sectionSelect.innerHTML = `<option value="All">All Sections</option>`;
+            
+            sections.forEach(val => {
+                let opt = document.createElement('option');
+                opt.value = val; opt.innerHTML = val;
+                sectionSelect.appendChild(opt);
+            });
+
+            if (sections.has(currentSelection)) { sectionSelect.value = currentSelection; } 
+            else { sectionSelect.value = "All"; }
+        }
+
+        function populateDropdowns() {
+            if (sheetData.length === 0) return;
+            const yearCol = findColumn(sheetData[0], ['year', 'saal']);
+            const monthCol = findColumn(sheetData[0], ['month', 'mahina']);
+            const deptCol = findColumn(sheetData[0], ['department', 'dept']);
+
+            const years = new Set(); const months = new Set(); const depts = new Set();
+
+            sheetData.forEach(row => {
+                if (yearCol && row[yearCol]) years.add(row[yearCol]);
+                if (monthCol && row[monthCol]) months.add(row[monthCol]);
+                if (deptCol && row[deptCol]) depts.add(row[deptCol]);
+            });
+
+            const addOptions = (setId, dataSet) => {
+                const select = document.getElementById(setId);
+                select.innerHTML = `<option value="All">All</option>`;
+                dataSet.forEach(val => {
+                    let opt = document.createElement('option');
+                    opt.value = val; opt.innerHTML = val;
+                    select.appendChild(opt);
+                });
+            };
+
+            addOptions('filterYear', years); addOptions('filterMonth', months); addOptions('filterDept', depts);
+            updateSectionDropdown();
+        }
+
+        async function fetchGoogleSheetData() {
+            try {
+                const response = await fetch(csvUrl);
+                const csvText = await response.text();
+                const rows = parseCSV(csvText);
+                
+                if (!rows || rows.length === 0) throw new Error("Sheet is empty");
+
+                let headerIdx = 0;
+                for(let i=0; i<Math.min(15, rows.length); i++) {
+                    let rowStr = rows[i].join("").toLowerCase().replace(/\s/g, '');
+                    if(rowStr.includes("month") || rowStr.includes("company") || rowStr.includes("cost")) {
+                        headerIdx = i; break;
+                    }
+                }
+
+                headers = rows[headerIdx].map(h => h ? h.trim() : `Col_${Math.random()}`);
+                
+                sheetData = rows.slice(headerIdx + 1).map(row => {
+                    let obj = {};
+                    row.forEach((cell, i) => { if(headers[i]) obj[headers[i]] = cell ? cell.trim() : ""; });
+                    return obj;
+                });
+
+                sheetData = sheetData.filter(row => Object.values(row).some(x => x !== ""));
+
+                if(sheetData.length === 0) throw new Error("No data found");
+
+                document.getElementById('loadingMsg').style.display = 'none';
+                document.getElementById('dashboardContent').style.display = 'grid'; 
+
+                populateDropdowns();
+                updateDashboard(); 
+            } catch (error) {
+                console.error("Data error:", error);
+                document.getElementById('loadingMsg').innerHTML = `<span style="color:var(--google-red)">Error loading data.</span>`;
+            }
+        }
+
+        function updateDashboard() {
+            if(sheetData.length === 0) return;
+
+            const selectedYear = document.getElementById('filterYear').value;
+            const selectedMonth = document.getElementById('filterMonth').value;
+            const selectedDept = document.getElementById('filterDept').value;
+            const selectedSection = document.getElementById('filterSection').value;
+
+            const yearCol = findColumn(sheetData[0], ['year']);
+            const monthCol = findColumn(sheetData[0], ['month']);
+            const deptCol = findColumn(sheetData[0], ['department', 'dept']);
+            const sectionCol = findColumn(sheetData[0], ['section', 'sec']);
+
+            let filteredData = sheetData.filter(item => {
+                let match = true;
+                if(selectedYear !== "All" && yearCol && item[yearCol] !== selectedYear) match = false;
+                if(selectedMonth !== "All" && monthCol && item[monthCol] !== selectedMonth) match = false;
+                if(selectedDept !== "All" && deptCol && item[deptCol] !== selectedDept) match = false;
+                if(selectedSection !== "All" && sectionCol && item[sectionCol] !== selectedSection) match = false;
+                return match;
+            });
+
+            const actVsStdCol = findColumn(sheetData[0], ['actual vs standard', 'actual vs std']);
+            const otHoursCol = findColumn(sheetData[0], ['overtime hours', 'total ot hours']);
+            const otCostCol = findColumn(sheetData[0], ['ot cost', 'overtime cost']);
+            const otPercentCol = findColumn(sheetData[0], ['ot%', 'ot %', 'overtime %']);
+            const tpOTHoursCol = findColumn(sheetData[0], ['tp total ot hours', 'tp ot hour', 'tp ot hrs']);
+            const tpOTCostCol = findColumn(sheetData[0], ['tp ot cost', 'tp cost']);
+            const absentCol = findColumn(sheetData[0], ['absenteeism', 'absent']);
+            const leaveCol = findColumn(sheetData[0], ['leaves', 'leave %']);
+            const lateCol = findColumn(sheetData[0], ['late arrival', 'late']);
+            const earlyCol = findColumn(sheetData[0], ['early out', 'early']);
+            const activeEmpCol = findColumn(sheetData[0], ['active employee', 'active %']);
+            const joinersCol = findColumn(sheetData[0], ['joiners', 'join']);
+            const leaversCol = findColumn(sheetData[0], ['leavers', 'leave count']);
+            const pendingCol = findColumn(sheetData[0], ['pending final settlement', 'pending settlement', 'settlement']);
+
+            let groupByCol = monthCol || headers[0];
+
+            let gOtHours = 0, gOtCost = 0, gTpOTHours = 0, gTpOTCost = 0, gJoiners = 0, gLeavers = 0, gPending = 0;
+            let sumActStd = 0, cntActStd = 0, sumOtPct = 0, cntOtPct = 0, sumAbsent = 0, cntAbsent = 0;
+            let sumLeave = 0, cntLeave = 0, sumLate = 0, cntLate = 0, sumEarly = 0, cntEarly = 0, sumActive = 0, cntActive = 0;
+            let groupedStats = {};
+
+            filteredData.forEach(item => {
+                let label = item[groupByCol] || "Unknown";
+
+                let vActStd = cleanNumber(item[actVsStdCol]); let vOtHrs = cleanNumber(item[otHoursCol]);
+                let vOtCost = cleanNumber(item[otCostCol]); let vOtPct = cleanNumber(item[otPercentCol]);
+                let vTpHrs = cleanNumber(item[tpOTHoursCol]); let vTpCost = cleanNumber(item[tpOTCostCol]);
+                let vAbs = cleanNumber(item[absentCol]); let vLev = cleanNumber(item[leaveCol]);
+                let vLat = cleanNumber(item[lateCol]); let vEar = cleanNumber(item[earlyCol]);
+                let vAct = cleanNumber(item[activeEmpCol]); let vJoin = cleanNumber(item[joinersCol]);
+                let vLeav = cleanNumber(item[leaversCol]); let vPend = cleanNumber(item[pendingCol]);
+
+                gOtHours += vOtHrs; gOtCost += vOtCost; gTpOTHours += vTpHrs; gTpOTCost += vTpCost;
+                gJoiners += vJoin; gLeavers += vLeav; gPending += vPend;
+
+                if (vActStd > 0) { sumActStd += vActStd; cntActStd++; }
+                if (vOtPct > 0) { sumOtPct += vOtPct; cntOtPct++; }
+                if (vAbs > 0) { sumAbsent += vAbs; cntAbsent++; }
+                if (vLev > 0) { sumLeave += vLev; cntLeave++; }
+                if (vLat > 0) { sumLate += vLat; cntLate++; }
+                if (vEar > 0) { sumEarly += vEar; cntEarly++; }
+                if (vAct > 0) { sumActive += vAct; cntActive++; }
+
+                if (!groupedStats[label]) {
+                    groupedStats[label] = { otH:0, otC:0, tpH:0, tpC:0, jn:0, lv:0, pnd:0, aS_p:0, aS_c:0, otP_p:0, otP_c:0, ab_p:0, ab_c:0, le_p:0, le_c:0, la_p:0, la_c:0, ea_p:0, ea_c:0, ac_p:0, ac_c:0 };
+                }
+
+                groupedStats[label].otH += vOtHrs; groupedStats[label].otC += vOtCost; groupedStats[label].tpH += vTpHrs; groupedStats[label].tpC += vTpCost;
+                groupedStats[label].jn += vJoin; groupedStats[label].lv += vLeav; groupedStats[label].pnd += vPend;
+
+                if (vActStd > 0) { groupedStats[label].aS_p += vActStd; groupedStats[label].aS_c++; }
+                if (vOtPct > 0) { groupedStats[label].otP_p += vOtPct; groupedStats[label].otP_c++; }
+                if (vAbs > 0) { groupedStats[label].ab_p += vAbs; groupedStats[label].ab_c++; }
+                if (vLev > 0) { groupedStats[label].le_p += vLev; groupedStats[label].le_c++; }
+                if (vLat > 0) { groupedStats[label].la_p += vLat; groupedStats[label].la_c++; }
+                if (vEar > 0) { groupedStats[label].ea_p += vEar; groupedStats[label].ea_c++; }
+                if (vAct > 0) { groupedStats[label].ac_p += vAct; groupedStats[label].ac_c++; }
+            });
+
+            document.getElementById('valActVsStd').innerText = cntActStd > 0 ? (sumActStd / cntActStd).toFixed(2) + "%" : "0%";
+            document.getElementById('valOTHours').innerText = formatNum(gOtHours);
+            document.getElementById('valOTCost').innerText = "Rs " + formatNum(gOtCost);
+            document.getElementById('valOTPercent').innerText = cntOtPct > 0 ? (sumOtPct / cntOtPct).toFixed(2) + "%" : "0%";
+            document.getElementById('valTPOTHours').innerText = formatNum(gTpOTHours);
+            document.getElementById('valTPOTCost').innerText = "Rs " + formatNum(gTpOTCost);
+            document.getElementById('valAbsent').innerText = cntAbsent > 0 ? (sumAbsent / cntAbsent).toFixed(2) + "%" : "0%";
+            document.getElementById('valLeave').innerText = cntLeave > 0 ? (sumLeave / cntLeave).toFixed(2) + "%" : "0%";
+            document.getElementById('valLate').innerText = cntLate > 0 ? (sumLate / cntLate).toFixed(2) + "%" : "0%";
+            document.getElementById('valEarly').innerText = cntEarly > 0 ? (sumEarly / cntEarly).toFixed(2) + "%" : "0%";
+            document.getElementById('valActive').innerText = cntActive > 0 ? (sumActive / cntActive).toFixed(2) + "%" : "0%";
+            document.getElementById('valJoiners').innerText = formatNum(gJoiners);
+            document.getElementById('valLeavers').innerText = formatNum(gLeavers);
+            document.getElementById('valPending').innerText = formatNum(gPending);
+
+            let chartLabels = Object.keys(groupedStats);
+            const monthOrder = { "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6, "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12 };
+            chartLabels.sort((a, b) => {
+                let valA = monthOrder[a.toLowerCase().substring(0, 3)] || 99;
+                let valB = monthOrder[b.toLowerCase().substring(0, 3)] || 99;
+                return valA - valB;
+            });
+
+            let dActStd=[], dOtHrs=[], dOtCost=[], dOtPct=[], dTpHrs=[], dTpCost=[], dAbs=[], dLev=[], dLat=[], dEar=[], dAct=[], dJoin=[], dLeav=[], dPend=[];
+
+            chartLabels.forEach(lbl => {
+                let s = groupedStats[lbl];
+                dOtHrs.push(s.otH); dOtCost.push(s.otC); dTpHrs.push(s.tpH); dTpCost.push(s.tpC); dJoin.push(s.jn); dLeav.push(s.lv); dPend.push(s.pnd);
+                dActStd.push(s.aS_c > 0 ? (s.aS_p / s.aS_c).toFixed(2) : 0);
+                dOtPct.push(s.otP_c > 0 ? (s.otP_p / s.otP_c).toFixed(2) : 0);
+                dAbs.push(s.ab_c > 0 ? (s.ab_p / s.ab_c).toFixed(2) : 0);
+                dLev.push(s.le_c > 0 ? (s.le_p / s.le_c).toFixed(2) : 0);
+                dLat.push(s.la_c > 0 ? (s.la_p / s.la_c).toFixed(2) : 0);
+                dEar.push(s.ea_c > 0 ? (s.ea_p / s.ea_c).toFixed(2) : 0);
+                dAct.push(s.ac_c > 0 ? (s.ac_p / s.ac_c).toFixed(2) : 0);
+            });
+
+            function updateC(chartInst, lbs, dta) {
+                if(chartInst) {
+                    chartInst.data.labels = lbs;
+                    chartInst.data.datasets[0].data = dta;
+                    chartInst.update();
+                }
+            }
+
+            updateC(charts.actStd, chartLabels, dActStd); updateC(charts.otHours, chartLabels, dOtHrs); updateC(charts.otCost, chartLabels, dOtCost); updateC(charts.otPct, chartLabels, dOtPct); updateC(charts.tpOTHours, chartLabels, dTpHrs); updateC(charts.tpOTCost, chartLabels, dTpCost); updateC(charts.absent, chartLabels, dAbs); updateC(charts.leave, chartLabels, dLev); updateC(charts.late, chartLabels, dLat); updateC(charts.early, chartLabels, dEar); updateC(charts.active, chartLabels, dAct); updateC(charts.joiners, chartLabels, dJoin); updateC(charts.leavers, chartLabels, dLeav); updateC(charts.pending, chartLabels, dPend);
+        }
+
+        document.getElementById('filterDept').addEventListener('change', () => { updateSectionDropdown(); updateDashboard(); });
+        document.getElementById('filterYear').addEventListener('change', updateDashboard);
+        document.getElementById('filterMonth').addEventListener('change', updateDashboard);
+        document.getElementById('filterSection').addEventListener('change', updateDashboard);
+
+        document.getElementById('clearFiltersBtn').addEventListener('click', () => {
+            document.querySelectorAll('select').forEach(select => select.value = 'All');
+            updateSectionDropdown(); updateDashboard(); 
+        });
+
+        window.onload = () => { initCharts(); fetchGoogleSheetData(); };
+    </script>
 </body>
 </html>
-is code mn adjust karna hai baqi kuch b change nai karna same theme rahay ge ,
+this code needs to be fixed , when fetching live data , after fetched graph dont show there values like Act vs Std Hours % is shown but the graph dont have any value when hovered and Total Ot Hours also only showing heading but no hover value and graph
