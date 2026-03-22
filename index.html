@@ -24,7 +24,7 @@
             --text-main: #202124;
             --text-muted: #5F6368;
             --border-color: #DADCE0;
-            --header-height: 85px; /* Increased to fit the stats */
+            --header-height: 85px; /* Increased slightly for better fit with text stats */
         }
 
         body {
@@ -38,7 +38,7 @@
         }
 
         /* ---------------------------------
-           FULL-WIDTH TOP HEADER (UPDATED)
+           FULL-WIDTH TOP HEADER (UPDATED WITH STATS SECTION)
         --------------------------------- */
         .top-header {
             width: 100%;
@@ -46,7 +46,7 @@
             background-color: var(--surface);
             border-bottom: 1px solid var(--border-color);
             display: flex;
-            justify-content: space-between; /* Creates space between Logo and Stats */
+            justify-content: space-between; /* Pushes text-based stats to the right */
             align-items: center;
             padding: 0 40px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.05);
@@ -61,9 +61,7 @@
         .logo { height: 50px; width: auto; object-fit: contain; margin-right: 20px; }
         .top-header h1 { color: var(--google-green); margin: 0; font-size: 1.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* ---------------------------------
-           HEADER RIGHT STATS (MINIMAL TEXT DESIGN)
-        --------------------------------- */
+        /* HEADER RIGHT STATS (MINIMAL TEXT DESIGN) */
         .header-right-stats {
             display: flex;
             gap: 15px; 
@@ -184,8 +182,10 @@
         .kpi-widget:nth-child(4n+4) { border-top-color: var(--google-green); }
 
         .kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-        .kpi-title h3 { margin: 0 0 5px 0; font-size: 0.8rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; }
-        .kpi-value { font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0; }
+        /* Apply smaller, uppercase gray heading style from image_4.png */
+        .kpi-title h3 { margin: 0 0 5px 0; font-size: 0.8rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        /* Apply bold, black larger value style from image_4.png */
+        .kpi-value { font-size: 1.5rem; font-weight: 700; color: #000000; margin: 0; }
         .chart-wrapper { position: relative; height: 140px; width: 100%; }
 
         #loadingMsg { position: absolute; color: var(--google-green); font-weight: 500; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; background: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
@@ -680,13 +680,13 @@
             chartLabels.forEach(lbl => {
                 let s = groupedStats[lbl];
                 dOtHrs.push(s.otH); dOtCost.push(s.otC); dTpHrs.push(s.tpH); dTpCost.push(s.tpC); dJoin.push(s.jn); dLeav.push(s.lv); dPend.push(s.pnd);
-                dActStd.push(s.aS_c > 0 ? (s.aS_p / s.aS_c).toFixed(2) : 0);
-                dOtPct.push(s.otP_c > 0 ? (s.otP_p / s.otP_c).toFixed(2) : 0);
-                dAbs.push(s.ab_c > 0 ? (s.ab_p / s.ab_c).toFixed(2) : 0);
-                dLev.push(s.le_c > 0 ? (s.le_p / s.le_c).toFixed(2) : 0);
-                dLat.push(s.la_c > 0 ? (s.la_p / s.la_c).toFixed(2) : 0);
-                dEar.push(s.ea_c > 0 ? (s.ea_p / s.ea_c).toFixed(2) : 0);
-                dAct.push(s.ac_c > 0 ? (s.ac_p / s.ac_c).toFixed(2) : 0);
+                dActStd.push(s.aS_c > 0 ? parseFloat((s.aS_p / s.aS_c).toFixed(2)) : 0);
+                dOtPct.push(s.otP_c > 0 ? parseFloat((s.otP_p / s.otP_c).toFixed(2)) : 0);
+                dAbs.push(s.ab_c > 0 ? parseFloat((s.ab_p / s.ab_c).toFixed(2)) : 0);
+                dLev.push(s.le_c > 0 ? parseFloat((s.le_p / s.le_c).toFixed(2)) : 0);
+                dLat.push(s.la_c > 0 ? parseFloat((s.la_p / s.la_c).toFixed(2)) : 0);
+                dEar.push(s.ea_c > 0 ? parseFloat((s.ea_p / s.ea_c).toFixed(2)) : 0);
+                dAct.push(s.ac_c > 0 ? parseFloat((s.ac_p / s.ac_c).toFixed(2)) : 0);
             });
 
             function updateC(chartInst, lbs, dta) {
@@ -714,4 +714,3 @@
     </script>
 </body>
 </html>
-this code needs to be fixed , when fetching live data , after fetched graph dont show there values like Act vs Std Hours % is shown but the graph dont have any value when hovered and Total Ot Hours also only showing heading but no hover value and graph
