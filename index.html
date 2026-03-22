@@ -24,7 +24,7 @@
             --text-main: #202124;
             --text-muted: #5F6368;
             --border-color: #DADCE0;
-            --header-height: 85px; /* Increased slightly for better fit with text stats */
+            --header-height: 85px; 
         }
 
         body {
@@ -38,7 +38,7 @@
         }
 
         /* ---------------------------------
-           FULL-WIDTH TOP HEADER (UPDATED WITH STATS SECTION)
+           FULL-WIDTH TOP HEADER
         --------------------------------- */
         .top-header {
             width: 100%;
@@ -46,10 +46,10 @@
             background-color: var(--surface);
             border-bottom: 1px solid var(--border-color);
             display: flex;
-            justify-content: space-between; /* Pushes text-based stats to the right */
+            justify-content: space-between;
             align-items: center;
-            padding: 0 40px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            padding: 0 40px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03); 
             z-index: 200;
             position: fixed;
             top: 0;
@@ -59,9 +59,11 @@
 
         .header-left { display: flex; align-items: center; gap: 15px; }
         .logo { height: 50px; width: auto; object-fit: contain; margin-right: 20px; }
-        .top-header h1 { color: var(--google-green); margin: 0; font-size: 1.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .top-header h1 { color: var(--google-green); margin: 0; font-size: 1.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* HEADER RIGHT STATS (MINIMAL TEXT DESIGN) */
+        /* ---------------------------------
+           HEADER RIGHT STATS (MINIMAL TEXT DESIGN)
+        --------------------------------- */
         .header-right-stats {
             display: flex;
             gap: 15px; 
@@ -71,7 +73,7 @@
 
         .h-stat-card {
             background: #ffffff;
-            border-radius: 8px; /* Clean flat border-radius */
+            border-radius: 8px; 
             display: flex;
             height: 100%;
             min-width: 160px;
@@ -171,8 +173,22 @@
         .nav-tabs a.home-icon:hover { background-color: var(--bg-light); }
         .nav-tabs a.home-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
+        /* ---------------------------------
+           SMOOTH TRANSITION CLASSES 
+        --------------------------------- */
+        .chart-wrapper, .kpi-value, .surveyor-rounds-container {
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .fade-out {
+            opacity: 0 !important;
+            transform: scale(0.92) !important;
+        }
+
         /* Unified Card & Graph Widget Grid */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px; }
 
         .kpi-widget { background: var(--surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(60,64,67,0.1), 0 1px 2px rgba(60,64,67,0.06); display: flex; flex-direction: column; overflow: hidden; border-top: 4px solid var(--border-color); padding: 18px 20px 10px 20px; }
 
@@ -182,10 +198,9 @@
         .kpi-widget:nth-child(4n+4) { border-top-color: var(--google-green); }
 
         .kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-        /* Apply smaller, uppercase gray heading style from image_4.png */
-        .kpi-title h3 { margin: 0 0 5px 0; font-size: 0.8rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
-        /* Apply bold, black larger value style from image_4.png */
-        .kpi-value { font-size: 1.5rem; font-weight: 700; color: #000000; margin: 0; }
+        .kpi-title { width: 100%; }
+        .kpi-title h3 { margin: 0 0 2px 0; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .kpi-value { font-size: 1.3rem; font-weight: 700; color: var(--text-main); margin: 0; }
         .chart-wrapper { position: relative; height: 140px; width: 100%; }
 
         #loadingMsg { position: absolute; color: var(--google-green); font-weight: 500; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; background: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
@@ -439,7 +454,9 @@
             return isNaN(num) ? 0 : num;
         }
 
-        function formatNum(num) { return num.toLocaleString('en-US', { maximumFractionDigits: 1 }); }
+        function formatNum(num) {
+            return num.toLocaleString('en-US', { maximumFractionDigits: 1 });
+        }
 
         function createChart(canvasId, type, colorLine, colorBg) {
             const ctx = document.getElementById(canvasId).getContext('2d');
@@ -448,7 +465,21 @@
                 data: { labels: [], datasets: [{ backgroundColor: type === 'line' ? colorBg : colorLine, borderColor: colorLine, borderWidth: 2, fill: type === 'line', tension: 0.4, pointRadius: 3, borderRadius: type === 'bar' ? 4 : 0, data: [] }] },
                 options: {
                     responsive: true, maintainAspectRatio: false, animation: { duration: 800, easing: 'easeOutQuart' },
-                    plugins: { legend: { display: false }, tooltip: { titleFont: { size: 10 }, bodyFont: { size: 10 } } },
+                    plugins: { 
+                        legend: { display: false }, 
+                        tooltip: { 
+                            titleFont: { size: 11 }, bodyFont: { size: 11 },
+                            callbacks: {
+                                label: function(context) {
+                                    // Make sure values format correctly in tooltip
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    if (context.parsed.y !== null) label += formatNum(context.parsed.y);
+                                    return label;
+                                }
+                            }
+                        } 
+                    },
                     scales: { 
                         y: { display: true, beginAtZero: true, grid: { drawBorder: false, color: '#f1f3f4' }, ticks: { font: { size: 9 }, color: '#9aa0a6', maxTicksLimit: 5 } },
                         x: { display: true, grid: { display: false }, ticks: { font: { size: 9 }, color: '#9aa0a6', maxRotation: 45, minRotation: 0 } }
@@ -462,14 +493,17 @@
             charts.otHours = createChart('chartOTHours', 'bar', G_RED, BG_RED);          
             charts.otCost = createChart('chartOTCost', 'bar', G_YELLOW, BG_YELLOW);      
             charts.otPct = createChart('chartOTPercent', 'line', G_GREEN, BG_GREEN);     
+            
             charts.tpOTHours = createChart('chartTPOTHours', 'bar', G_BLUE, BG_BLUE);    
             charts.tpOTCost = createChart('chartTPOTCost', 'bar', G_RED, BG_RED);        
             charts.absent = createChart('chartAbsent', 'line', G_YELLOW, BG_YELLOW);     
             charts.leave = createChart('chartLeave', 'line', G_GREEN, BG_GREEN);         
+            
             charts.late = createChart('chartLate', 'line', G_BLUE, BG_BLUE);             
             charts.early = createChart('chartEarly', 'line', G_RED, BG_RED);             
             charts.active = createChart('chartActive', 'line', G_YELLOW, BG_YELLOW);     
             charts.joiners = createChart('chartJoiners', 'bar', G_GREEN, BG_GREEN);      
+            
             charts.leavers = createChart('chartLeavers', 'bar', G_BLUE, BG_BLUE);        
             charts.pending = createChart('chartPending', 'bar', G_RED, BG_RED);          
         }
@@ -519,7 +553,7 @@
 
             const addOptions = (setId, dataSet) => {
                 const select = document.getElementById(setId);
-                select.innerHTML = `<option value="All">All</option>`;
+                select.innerHTML = `<option value="All">All ${setId.replace('filter', '')}s</option>`;
                 dataSet.forEach(val => {
                     let opt = document.createElement('option');
                     opt.value = val; opt.innerHTML = val;
@@ -551,13 +585,13 @@
                 
                 sheetData = rows.slice(headerIdx + 1).map(row => {
                     let obj = {};
-                    row.forEach((cell, i) => { if(headers[i]) obj[headers[i]] = cell ? cell.trim() : ""; });
+                    row.forEach((cell, i) => { obj[headers[i]] = cell ? cell.trim() : ""; });
                     return obj;
                 });
 
                 sheetData = sheetData.filter(row => Object.values(row).some(x => x !== ""));
 
-                if(sheetData.length === 0) throw new Error("No data found");
+                if(sheetData.length === 0) throw new Error("No valid data rows found after headers");
 
                 document.getElementById('loadingMsg').style.display = 'none';
                 document.getElementById('dashboardContent').style.display = 'grid'; 
@@ -565,9 +599,18 @@
                 populateDropdowns();
                 updateDashboard(); 
             } catch (error) {
-                console.error("Data error:", error);
-                document.getElementById('loadingMsg').innerHTML = `<span style="color:var(--google-red)">Error loading data.</span>`;
+                console.error("Data loading error:", error);
+                document.getElementById('loadingMsg').innerHTML = `<span style="color:var(--google-red)">Error loading data. Check sheet format.</span>`;
             }
+        }
+
+        function triggerUpdate() {
+            const elementsToFade = document.querySelectorAll('.chart-wrapper, .kpi-value');
+            elementsToFade.forEach(el => el.classList.add('fade-out'));
+            setTimeout(() => {
+                updateDashboard();
+                elementsToFade.forEach(el => el.classList.remove('fade-out'));
+            }, 400);
         }
 
         function updateDashboard() {
@@ -700,14 +743,14 @@
             updateC(charts.actStd, chartLabels, dActStd); updateC(charts.otHours, chartLabels, dOtHrs); updateC(charts.otCost, chartLabels, dOtCost); updateC(charts.otPct, chartLabels, dOtPct); updateC(charts.tpOTHours, chartLabels, dTpHrs); updateC(charts.tpOTCost, chartLabels, dTpCost); updateC(charts.absent, chartLabels, dAbs); updateC(charts.leave, chartLabels, dLev); updateC(charts.late, chartLabels, dLat); updateC(charts.early, chartLabels, dEar); updateC(charts.active, chartLabels, dAct); updateC(charts.joiners, chartLabels, dJoin); updateC(charts.leavers, chartLabels, dLeav); updateC(charts.pending, chartLabels, dPend);
         }
 
-        document.getElementById('filterDept').addEventListener('change', () => { updateSectionDropdown(); updateDashboard(); });
-        document.getElementById('filterYear').addEventListener('change', updateDashboard);
-        document.getElementById('filterMonth').addEventListener('change', updateDashboard);
-        document.getElementById('filterSection').addEventListener('change', updateDashboard);
+        document.getElementById('filterDept').addEventListener('change', () => { updateSectionDropdown(); triggerUpdate(); });
+        document.getElementById('filterYear').addEventListener('change', triggerUpdate);
+        document.getElementById('filterMonth').addEventListener('change', triggerUpdate);
+        document.getElementById('filterSection').addEventListener('change', triggerUpdate);
 
         document.getElementById('clearFiltersBtn').addEventListener('click', () => {
             document.querySelectorAll('select').forEach(select => select.value = 'All');
-            updateSectionDropdown(); updateDashboard(); 
+            updateSectionDropdown(); triggerUpdate(); 
         });
 
         window.onload = () => { initCharts(); fetchGoogleSheetData(); };
