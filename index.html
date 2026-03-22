@@ -24,7 +24,7 @@
             --text-main: #202124;
             --text-muted: #5F6368;
             --border-color: #DADCE0;
-            --header-height: 80px;
+            --header-height: 85px; /* Increased to fit the stats */
         }
 
         body {
@@ -38,7 +38,7 @@
         }
 
         /* ---------------------------------
-           FULL-WIDTH TOP HEADER
+           FULL-WIDTH TOP HEADER (UPDATED)
         --------------------------------- */
         .top-header {
             width: 100%;
@@ -46,8 +46,9 @@
             background-color: var(--surface);
             border-bottom: 1px solid var(--border-color);
             display: flex;
+            justify-content: space-between; /* Creates space between Logo and Stats */
             align-items: center;
-            padding: 0 30px;
+            padding: 0 40px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.05);
             z-index: 200;
             position: fixed;
@@ -59,6 +60,83 @@
         .header-left { display: flex; align-items: center; gap: 15px; }
         .logo { height: 50px; width: auto; object-fit: contain; margin-right: 20px; }
         .top-header h1 { color: var(--google-green); margin: 0; font-size: 1.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* ---------------------------------
+           HEADER RIGHT STATS (MINIMAL TEXT DESIGN)
+        --------------------------------- */
+        .header-right-stats {
+            display: flex;
+            gap: 15px; 
+            height: 60px;
+            align-items: center;
+        }
+
+        .h-stat-card {
+            background: #ffffff;
+            border-radius: 8px; /* Clean flat border-radius */
+            display: flex;
+            height: 100%;
+            min-width: 160px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02); 
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+        }
+        .h-stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+        .h-accent { height: 4px; width: 100%; position: absolute; top: 0; left: 0; }
+
+        .h-stat-content {
+            display: flex;
+            flex: 1;
+            align-items: center;
+            padding: 10px 12px; 
+            justify-content: space-between;
+            margin-top: 4px; 
+        }
+
+        .h-stat-left {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 50px;
+        }
+
+        .h-stat-title-text { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .h-stat-icon svg { width: 22px; height: 22px; fill: none; stroke: var(--text-muted); stroke-width: 1.5; }
+        .h-stat-main { font-size: 1.3rem; font-weight: 700; color: #111; margin-top: 4px; line-height: 1; }
+
+        .h-stat-divider { width: 1px; height: 80%; background-color: #eee; margin: 0 10px; }
+
+        .h-stat-right {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .h-stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.7rem;
+            margin-bottom: 3px;
+            gap: 8px;
+        }
+        .h-stat-row:last-child { margin-bottom: 0; }
+
+        .h-stat-label { color: var(--text-muted); font-weight: 400; }
+        .h-stat-val { font-weight: 600; color: #333; }
+
+        .h-stat-huge {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #111;
+            line-height: 1;
+            text-align: center;
+        }
 
         /* ---------------------------------
            LAYOUT WRAPPER (Below Header)
@@ -83,53 +161,6 @@
 
         /* Main Content Area */
         .main-content { flex-grow: 1; padding: 30px 40px; overflow-y: auto; box-sizing: border-box; position: relative; }
-
-        /* ---------------------------------
-           STATS HEADER SECTION (NEW)
-        --------------------------------- */
-        .stats-header-container {
-            background-color: #006ab6;
-            padding: 15px 20px;
-            display: flex;
-            gap: 12px;
-            justify-content: space-between;
-            align-items: stretch;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            overflow-x: auto;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .stat-card {
-            background-color: #ffffff;
-            border-radius: 8px;
-            display: flex;
-            flex: 1;
-            min-width: 170px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-            overflow: hidden;
-        }
-
-        .stat-accent { width: 12px; flex-shrink: 0; }
-        .stat-content { display: flex; flex: 1; align-items: center; padding: 8px 10px; }
-        
-        .stat-left { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 45px; }
-        .stat-icon svg { width: 32px; height: 32px; fill: #000000; }
-        .stat-main-val { font-size: 1.4rem; font-weight: 700; color: #000000; margin-top: 4px; line-height: 1; }
-
-        .stat-divider { width: 2px; height: 80%; margin: 0 12px; border-radius: 2px; }
-
-        .stat-right { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; text-align: center; }
-        .stat-label { font-size: 0.75rem; color: #111; font-weight: 400; margin-bottom: 2px; }
-        .stat-sub-val { font-size: 0.95rem; font-weight: 700; color: #000000; margin-bottom: 6px; line-height: 1; }
-        .stat-sub-val:last-child { margin-bottom: 0; }
-
-        .stat-huge-val { font-size: 2rem; font-weight: 700; color: #000000; line-height: 1; margin-top: 5px; }
-
-        .bg-yellow { background-color: #ffb703; }
-        .bg-light-green { background-color: #8bc34a; }
-        .bg-dark-green { background-color: #0f9d58; }
-        .bg-orange { background-color: #ff5722; }
 
         /* ---------------------------------
            NAVIGATION TABS
@@ -167,6 +198,89 @@
             <img src="Logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
             <h1>Corporate Dashboard</h1>
         </div>
+
+        <div class="header-right-stats">
+            <div class="h-stat-card">
+                <div class="h-accent" style="background-color: var(--google-yellow);"></div>
+                <div class="h-stat-content">
+                    <div class="h-stat-left">
+                        <span class="h-stat-title-text">Total</span>
+                        <span class="h-stat-main">1021</span>
+                    </div>
+                    <div class="h-stat-divider"></div>
+                    <div class="h-stat-right">
+                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">661</span></div>
+                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">360</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-stat-card">
+                <div class="h-accent" style="background-color: #A4C639;"></div>
+                <div class="h-stat-content">
+                    <div class="h-stat-left">
+                        <span class="h-stat-title-text">KHI</span>
+                        <span class="h-stat-main">82</span>
+                    </div>
+                    <div class="h-stat-divider"></div>
+                    <div class="h-stat-right">
+                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">70</span></div>
+                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">12</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-stat-card">
+                <div class="h-accent" style="background-color: var(--google-green);"></div>
+                <div class="h-stat-content">
+                    <div class="h-stat-left">
+                        <span class="h-stat-title-text">LHR</span>
+                        <span class="h-stat-main">408</span>
+                    </div>
+                    <div class="h-stat-divider"></div>
+                    <div class="h-stat-right">
+                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">283</span></div>
+                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">125</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-stat-card">
+                <div class="h-accent" style="background-color: #FF5722;"></div>
+                <div class="h-stat-content">
+                    <div class="h-stat-left">
+                        <span class="h-stat-title-text">SKP</span>
+                        <span class="h-stat-main">531</span>
+                    </div>
+                    <div class="h-stat-divider"></div>
+                    <div class="h-stat-right">
+                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">308</span></div>
+                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">223</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-stat-card" style="min-width: 110px;">
+                <div class="h-accent" style="background-color: var(--google-green);"></div>
+                <div class="h-stat-content" style="justify-content: center; gap: 8px;">
+                    <div class="h-stat-icon">
+                        <svg viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                    </div>
+                    <span class="h-stat-huge">96%</span>
+                </div>
+            </div>
+
+            <div class="h-stat-card" style="min-width: 110px;">
+                <div class="h-accent" style="background-color: #FF5722;"></div>
+                <div class="h-stat-content" style="justify-content: center; gap: 8px;">
+                    <div class="h-stat-icon">
+                        <svg viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13.608 8.908a3.188 3.188 0 10-1.608-4.908" /></svg>
+                    </div>
+                    <span class="h-stat-huge">4%</span>
+                </div>
+            </div>
+        </div>
+
     </header>
 
     <div class="layout-container">
@@ -193,117 +307,7 @@
         </div>
 
         <div class="main-content">
-
-            <div class="stats-header-container">
-                <div class="stat-card">
-                    <div class="stat-accent bg-yellow"></div>
-                    <div class="stat-content">
-                        <div class="stat-left">
-                            <div class="stat-icon">
-                                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                            </div>
-                            <div class="stat-main-val">1021</div>
-                        </div>
-                        <div class="stat-divider bg-yellow"></div>
-                        <div class="stat-right">
-                            <div class="stat-label">Permanent</div>
-                            <div class="stat-sub-val">661</div>
-                            <div class="stat-label">Third Party</div>
-                            <div class="stat-sub-val">360</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-accent bg-light-green"></div>
-                    <div class="stat-content">
-                        <div class="stat-left">
-                            <div class="stat-icon">
-                                <svg viewBox="0 0 24 24"><path d="M21 9v4h-2v9H5v-9H3V9h2V7c0-1.1.9-2 2-2h4v2H7v2h4v-2h2v2h4V7h-4V5h4c1.1 0 2 .9 2 2v2h2zm-9 4h-4v9h4v-9z"/></svg>
-                            </div>
-                            <div class="stat-main-val">82</div>
-                        </div>
-                        <div class="stat-divider bg-light-green"></div>
-                        <div class="stat-right">
-                            <div class="stat-label">Permanent</div>
-                            <div class="stat-sub-val">70</div>
-                            <div class="stat-label">Third Party</div>
-                            <div class="stat-sub-val">12</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-accent bg-dark-green"></div>
-                    <div class="stat-content">
-                        <div class="stat-left">
-                            <div class="stat-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 2L10 8h4l-2-6zm-1 7H8v4h2v8H7v2h10v-2h-3v-8h2V9h-3V7h-2v2z"/></svg>
-                            </div>
-                            <div class="stat-main-val">408</div>
-                        </div>
-                        <div class="stat-divider bg-dark-green"></div>
-                        <div class="stat-right">
-                            <div class="stat-label">Permanent</div>
-                            <div class="stat-sub-val">283</div>
-                            <div class="stat-label">Third Party</div>
-                            <div class="stat-sub-val">125</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-accent bg-orange"></div>
-                    <div class="stat-content">
-                        <div class="stat-left">
-                            <div class="stat-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 3c-2.21 0-4 1.79-4 4h8c0-2.21-1.79-4-4-4zm4 5H8v3h8V8zm-1 4H9v6H5v2h14v-2h-4v-6zm-3-2h2v6h-2v-6z"/></svg>
-                            </div>
-                            <div class="stat-main-val">531</div>
-                        </div>
-                        <div class="stat-divider bg-orange"></div>
-                        <div class="stat-right">
-                            <div class="stat-label">Permanent</div>
-                            <div class="stat-sub-val">308</div>
-                            <div class="stat-label">Third Party</div>
-                            <div class="stat-sub-val">223</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-accent bg-dark-green"></div>
-                    <div class="stat-content">
-                        <div class="stat-left" style="min-width: 35px;">
-                            <div class="stat-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                            </div>
-                        </div>
-                        <div class="stat-divider bg-dark-green"></div>
-                        <div class="stat-right">
-                            <div class="stat-label">Male</div>
-                            <div class="stat-huge-val">96%</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-accent bg-orange"></div>
-                    <div class="stat-content">
-                        <div class="stat-left" style="min-width: 35px;">
-                            <div class="stat-icon">
-                                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                            </div>
-                        </div>
-                        <div class="stat-divider bg-orange"></div>
-                        <div class="stat-right">
-                            <div class="stat-label">Female</div>
-                            <div class="stat-huge-val">4%</div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
+            
             <div class="nav-tabs">
                 <a href="#" class="active">HR Dashboard</a>
                 <a href="admin.html">Admin Dashboard</a>
@@ -323,142 +327,72 @@
             <div class="dashboard-grid" id="dashboardContent" style="display: none;">
                 
                 <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Act vs Std Hours %</h3>
-                            <div class="kpi-value" id="valActVsStd">...</div>
-                        </div>
-                    </div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>Act vs Std Hours %</h3></div><div class="kpi-value" id="valActVsStd">...</div></div>
                     <div class="chart-wrapper"><canvas id="chartActVsStd"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Total OT Hours</h3>
-                            <div class="kpi-value" id="valOTHours">...</div>
-                        </div>
-                    </div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>Total OT Hours</h3></div><div class="kpi-value" id="valOTHours">...</div></div>
                     <div class="chart-wrapper"><canvas id="chartOTHours"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>OT Cost</h3>
-                            <div class="kpi-value" id="valOTCost">...</div>
-                        </div>
-                    </div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>OT Cost</h3></div><div class="kpi-value" id="valOTCost">...</div></div>
                     <div class="chart-wrapper"><canvas id="chartOTCost"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>OT %</h3>
-                            <div class="kpi-value" id="valOTPercent">...</div>
-                        </div>
-                    </div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>OT %</h3></div><div class="kpi-value" id="valOTPercent">...</div></div>
                     <div class="chart-wrapper"><canvas id="chartOTPercent"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>TP Total OT Hours</h3>
-                            <div class="kpi-value" id="valTPOTHours">...</div>
-                        </div>
-                    </div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>TP Total OT Hours</h3></div><div class="kpi-value" id="valTPOTHours">...</div></div>
                     <div class="chart-wrapper"><canvas id="chartTPOTHours"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>TP OT Cost</h3>
-                            <div class="kpi-value" id="valTPOTCost">...</div>
-                        </div>
-                    </div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>TP OT Cost</h3></div><div class="kpi-value" id="valTPOTCost">...</div></div>
                     <div class="chart-wrapper"><canvas id="chartTPOTCost"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Absenteeism %</h3>
-                            <div class="kpi-value" id="valAbsent">...</div>
-                        </div>
-                    </div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>Absenteeism %</h3></div><div class="kpi-value" id="valAbsent">...</div></div>
                     <div class="chart-wrapper"><canvas id="chartAbsent"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Leaves %</h3>
-                            <div class="kpi-value" id="valLeave">...</div>
-                        </div>
-                    </div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>Leaves %</h3></div><div class="kpi-value" id="valLeave">...</div></div>
                     <div class="chart-wrapper"><canvas id="chartLeave"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Late Arrival %</h3>
-                            <div class="kpi-value" id="valLate">...</div>
-                        </div>
-                    </div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>Late Arrival %</h3></div><div class="kpi-value" id="valLate">...</div></div>
                     <div class="chart-wrapper"><canvas id="chartLate"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Early Out %</h3>
-                            <div class="kpi-value" id="valEarly">...</div>
-                        </div>
-                    </div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>Early Out %</h3></div><div class="kpi-value" id="valEarly">...</div></div>
                     <div class="chart-wrapper"><canvas id="chartEarly"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Active Employee %</h3>
-                            <div class="kpi-value" id="valActive">...</div>
-                        </div>
-                    </div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>Active Employee %</h3></div><div class="kpi-value" id="valActive">...</div></div>
                     <div class="chart-wrapper"><canvas id="chartActive"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Joiners</h3>
-                            <div class="kpi-value" id="valJoiners">...</div>
-                        </div>
-                    </div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>Joiners</h3></div><div class="kpi-value" id="valJoiners">...</div></div>
                     <div class="chart-wrapper"><canvas id="chartJoiners"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Leavers</h3>
-                            <div class="kpi-value" id="valLeavers">...</div>
-                        </div>
-                    </div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>Leavers</h3></div><div class="kpi-value" id="valLeavers">...</div></div>
                     <div class="chart-wrapper"><canvas id="chartLeavers"></canvas></div>
                 </div>
 
                 <div class="kpi-widget">
-                    <div class="kpi-header">
-                        <div class="kpi-title">
-                            <h3>Pending Final Settlement</h3>
-                            <div class="kpi-value" id="valPending">...</div>
-                        </div>
-                    </div>
+                    <div class="kpi-header"><div class="kpi-title"><h3>Pending Final Settlement</h3></div><div class="kpi-value" id="valPending">...</div></div>
                     <div class="chart-wrapper"><canvas id="chartPending"></canvas></div>
                 </div>
 
@@ -473,32 +407,20 @@
         let headers = [];
         const charts = {};
 
-        const G_BLUE = '#4285F4';
-        const G_RED = '#EA4335';
-        const G_YELLOW = '#FBBC05';
-        const G_GREEN = '#34A853';
-
-        const BG_BLUE = 'rgba(66, 133, 244, 0.15)';
-        const BG_RED = 'rgba(234, 67, 53, 0.15)';
-        const BG_YELLOW = 'rgba(251, 188, 5, 0.15)';
-        const BG_GREEN = 'rgba(52, 168, 83, 0.15)';
+        const G_BLUE = '#4285F4'; const G_RED = '#EA4335'; const G_YELLOW = '#FBBC05'; const G_GREEN = '#34A853';
+        const BG_BLUE = 'rgba(66, 133, 244, 0.15)'; const BG_RED = 'rgba(234, 67, 53, 0.15)'; const BG_YELLOW = 'rgba(251, 188, 5, 0.15)'; const BG_GREEN = 'rgba(52, 168, 83, 0.15)';
 
         function parseCSV(str) {
-            const arr = [];
-            let quote = false;
-            let row = 0, col = 0;
+            const arr = []; let quote = false; let row = 0, col = 0;
             for (let c = 0; c < str.length; c++) {
                 let cc = str[c], nc = str[c+1];
-                arr[row] = arr[row] || [];
-                arr[row][col] = arr[row][col] || '';
-                
+                arr[row] = arr[row] || []; arr[row][col] = arr[row][col] || '';
                 if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
                 if (cc == '"') { quote = !quote; continue; }
                 if (cc == ',' && !quote) { ++col; continue; }
                 if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
                 if (cc == '\n' && !quote) { ++row; col = 0; continue; }
                 if (cc == '\r' && !quote) { ++row; col = 0; continue; }
-                
                 arr[row][col] += cc;
             }
             return arr;
@@ -510,53 +432,26 @@
         }
 
         function cleanNumber(val) {
-            if (!val) return 0;
+            if (val === undefined || val === null || val.toString().trim() === '') return 0;
             if (typeof val === 'number') return val;
             let cleaned = val.toString().replace(/,/g, '').replace(/%/g, '').replace(/[^\d.-]/g, '');
-            return parseFloat(cleaned) || 0;
+            let num = parseFloat(cleaned);
+            return isNaN(num) ? 0 : num;
         }
 
-        function formatNum(num) {
-            return num.toLocaleString('en-US', { maximumFractionDigits: 1 });
-        }
+        function formatNum(num) { return num.toLocaleString('en-US', { maximumFractionDigits: 1 }); }
 
         function createChart(canvasId, type, colorLine, colorBg) {
             const ctx = document.getElementById(canvasId).getContext('2d');
             return new Chart(ctx, {
                 type: type,
-                data: { 
-                    labels: [], 
-                    datasets: [{ 
-                        backgroundColor: type === 'line' ? colorBg : colorLine, 
-                        borderColor: colorLine,
-                        borderWidth: 2,
-                        fill: type === 'line', 
-                        tension: 0.4,
-                        pointRadius: 3,
-                        borderRadius: type === 'bar' ? 4 : 0,
-                        data: [] 
-                    }] 
-                },
+                data: { labels: [], datasets: [{ backgroundColor: type === 'line' ? colorBg : colorLine, borderColor: colorLine, borderWidth: 2, fill: type === 'line', tension: 0.4, pointRadius: 3, borderRadius: type === 'bar' ? 4 : 0, data: [] }] },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: { duration: 800, easing: 'easeOutQuart' },
-                    plugins: { 
-                        legend: { display: false },
-                        tooltip: { titleFont: { size: 11 }, bodyFont: { size: 11 } }
-                    },
+                    responsive: true, maintainAspectRatio: false, animation: { duration: 800, easing: 'easeOutQuart' },
+                    plugins: { legend: { display: false }, tooltip: { titleFont: { size: 10 }, bodyFont: { size: 10 } } },
                     scales: { 
-                        y: { 
-                            display: true, 
-                            beginAtZero: true, 
-                            grid: { drawBorder: false, color: '#f1f3f4' },
-                            ticks: { font: { size: 10 }, color: '#9aa0a6' }
-                        },
-                        x: { 
-                            display: true, 
-                            grid: { display: false },
-                            ticks: { font: { size: 10 }, color: '#9aa0a6', maxRotation: 45, minRotation: 0 }
-                        }
+                        y: { display: true, beginAtZero: true, grid: { drawBorder: false, color: '#f1f3f4' }, ticks: { font: { size: 9 }, color: '#9aa0a6', maxTicksLimit: 5 } },
+                        x: { display: true, grid: { display: false }, ticks: { font: { size: 9 }, color: '#9aa0a6', maxRotation: 45, minRotation: 0 } }
                     }
                 }
             });
@@ -567,17 +462,14 @@
             charts.otHours = createChart('chartOTHours', 'bar', G_RED, BG_RED);          
             charts.otCost = createChart('chartOTCost', 'bar', G_YELLOW, BG_YELLOW);      
             charts.otPct = createChart('chartOTPercent', 'line', G_GREEN, BG_GREEN);     
-            
             charts.tpOTHours = createChart('chartTPOTHours', 'bar', G_BLUE, BG_BLUE);    
             charts.tpOTCost = createChart('chartTPOTCost', 'bar', G_RED, BG_RED);        
             charts.absent = createChart('chartAbsent', 'line', G_YELLOW, BG_YELLOW);     
             charts.leave = createChart('chartLeave', 'line', G_GREEN, BG_GREEN);         
-            
             charts.late = createChart('chartLate', 'line', G_BLUE, BG_BLUE);             
             charts.early = createChart('chartEarly', 'line', G_RED, BG_RED);             
             charts.active = createChart('chartActive', 'line', G_YELLOW, BG_YELLOW);     
             charts.joiners = createChart('chartJoiners', 'bar', G_GREEN, BG_GREEN);      
-            
             charts.leavers = createChart('chartLeavers', 'bar', G_BLUE, BG_BLUE);        
             charts.pending = createChart('chartPending', 'bar', G_RED, BG_RED);          
         }
@@ -603,26 +495,21 @@
             
             sections.forEach(val => {
                 let opt = document.createElement('option');
-                opt.value = val;
-                opt.innerHTML = val;
+                opt.value = val; opt.innerHTML = val;
                 sectionSelect.appendChild(opt);
             });
 
-            if (sections.has(currentSelection)) {
-                sectionSelect.value = currentSelection;
-            } else {
-                sectionSelect.value = "All";
-            }
+            if (sections.has(currentSelection)) { sectionSelect.value = currentSelection; } 
+            else { sectionSelect.value = "All"; }
         }
 
         function populateDropdowns() {
+            if (sheetData.length === 0) return;
             const yearCol = findColumn(sheetData[0], ['year', 'saal']);
             const monthCol = findColumn(sheetData[0], ['month', 'mahina']);
             const deptCol = findColumn(sheetData[0], ['department', 'dept']);
 
-            const years = new Set();
-            const months = new Set();
-            const depts = new Set();
+            const years = new Set(); const months = new Set(); const depts = new Set();
 
             sheetData.forEach(row => {
                 if (yearCol && row[yearCol]) years.add(row[yearCol]);
@@ -632,19 +519,15 @@
 
             const addOptions = (setId, dataSet) => {
                 const select = document.getElementById(setId);
-                select.innerHTML = `<option value="All">All ${setId.replace('filter', '')}s</option>`;
+                select.innerHTML = `<option value="All">All</option>`;
                 dataSet.forEach(val => {
                     let opt = document.createElement('option');
-                    opt.value = val;
-                    opt.innerHTML = val;
+                    opt.value = val; opt.innerHTML = val;
                     select.appendChild(opt);
                 });
             };
 
-            addOptions('filterYear', years);
-            addOptions('filterMonth', months);
-            addOptions('filterDept', depts);
-            
+            addOptions('filterYear', years); addOptions('filterMonth', months); addOptions('filterDept', depts);
             updateSectionDropdown();
         }
 
@@ -652,19 +535,29 @@
             try {
                 const response = await fetch(csvUrl);
                 const csvText = await response.text();
-                
                 const rows = parseCSV(csvText);
-                headers = rows[0].map(h => h.trim());
                 
-                sheetData = rows.slice(1).map(row => {
+                if (!rows || rows.length === 0) throw new Error("Sheet is empty");
+
+                let headerIdx = 0;
+                for(let i=0; i<Math.min(15, rows.length); i++) {
+                    let rowStr = rows[i].join("").toLowerCase().replace(/\s/g, '');
+                    if(rowStr.includes("month") || rowStr.includes("company") || rowStr.includes("cost")) {
+                        headerIdx = i; break;
+                    }
+                }
+
+                headers = rows[headerIdx].map(h => h ? h.trim() : `Col_${Math.random()}`);
+                
+                sheetData = rows.slice(headerIdx + 1).map(row => {
                     let obj = {};
-                    row.forEach((cell, i) => {
-                        obj[headers[i]] = cell ? cell.trim() : "";
-                    });
+                    row.forEach((cell, i) => { if(headers[i]) obj[headers[i]] = cell ? cell.trim() : ""; });
                     return obj;
                 });
 
                 sheetData = sheetData.filter(row => Object.values(row).some(x => x !== ""));
+
+                if(sheetData.length === 0) throw new Error("No data found");
 
                 document.getElementById('loadingMsg').style.display = 'none';
                 document.getElementById('dashboardContent').style.display = 'grid'; 
@@ -672,8 +565,8 @@
                 populateDropdowns();
                 updateDashboard(); 
             } catch (error) {
-                console.error("Data uthane mein masla:", error);
-                document.getElementById('loadingMsg').innerText = "Failed to load data. Check console.";
+                console.error("Data error:", error);
+                document.getElementById('loadingMsg').innerHTML = `<span style="color:var(--google-red)">Error loading data.</span>`;
             }
         }
 
@@ -685,7 +578,6 @@
             const selectedDept = document.getElementById('filterDept').value;
             const selectedSection = document.getElementById('filterSection').value;
 
-            // Dimensions
             const yearCol = findColumn(sheetData[0], ['year']);
             const monthCol = findColumn(sheetData[0], ['month']);
             const deptCol = findColumn(sheetData[0], ['department', 'dept']);
@@ -700,7 +592,6 @@
                 return match;
             });
 
-            // KPI Columns Mapping
             const actVsStdCol = findColumn(sheetData[0], ['actual vs standard', 'actual vs std']);
             const otHoursCol = findColumn(sheetData[0], ['overtime hours', 'total ot hours']);
             const otCostCol = findColumn(sheetData[0], ['ot cost', 'overtime cost']);
@@ -716,40 +607,25 @@
             const leaversCol = findColumn(sheetData[0], ['leavers', 'leave count']);
             const pendingCol = findColumn(sheetData[0], ['pending final settlement', 'pending settlement', 'settlement']);
 
-            // FORCE GROUP BY MONTH FOR TREND ANALYSIS
             let groupByCol = monthCol || headers[0];
 
             let gOtHours = 0, gOtCost = 0, gTpOTHours = 0, gTpOTCost = 0, gJoiners = 0, gLeavers = 0, gPending = 0;
-            let sumActStd = 0, cntActStd = 0;
-            let sumOtPct = 0, cntOtPct = 0;
-            let sumAbsent = 0, cntAbsent = 0;
-            let sumLeave = 0, cntLeave = 0;
-            let sumLate = 0, cntLate = 0;
-            let sumEarly = 0, cntEarly = 0;
-            let sumActive = 0, cntActive = 0;
-
+            let sumActStd = 0, cntActStd = 0, sumOtPct = 0, cntOtPct = 0, sumAbsent = 0, cntAbsent = 0;
+            let sumLeave = 0, cntLeave = 0, sumLate = 0, cntLate = 0, sumEarly = 0, cntEarly = 0, sumActive = 0, cntActive = 0;
             let groupedStats = {};
 
             filteredData.forEach(item => {
                 let label = item[groupByCol] || "Unknown";
 
-                let vActStd = cleanNumber(item[actVsStdCol]);
-                let vOtHrs = cleanNumber(item[otHoursCol]);
-                let vOtCost = cleanNumber(item[otCostCol]);
-                let vOtPct = cleanNumber(item[otPercentCol]);
-                let vTpHrs = cleanNumber(item[tpOTHoursCol]);
-                let vTpCost = cleanNumber(item[tpOTCostCol]);
-                let vAbs = cleanNumber(item[absentCol]);
-                let vLev = cleanNumber(item[leaveCol]);
-                let vLat = cleanNumber(item[lateCol]);
-                let vEar = cleanNumber(item[earlyCol]);
-                let vAct = cleanNumber(item[activeEmpCol]);
-                let vJoin = cleanNumber(item[joinersCol]);
-                let vLeav = cleanNumber(item[leaversCol]);
-                let vPend = cleanNumber(item[pendingCol]);
+                let vActStd = cleanNumber(item[actVsStdCol]); let vOtHrs = cleanNumber(item[otHoursCol]);
+                let vOtCost = cleanNumber(item[otCostCol]); let vOtPct = cleanNumber(item[otPercentCol]);
+                let vTpHrs = cleanNumber(item[tpOTHoursCol]); let vTpCost = cleanNumber(item[tpOTCostCol]);
+                let vAbs = cleanNumber(item[absentCol]); let vLev = cleanNumber(item[leaveCol]);
+                let vLat = cleanNumber(item[lateCol]); let vEar = cleanNumber(item[earlyCol]);
+                let vAct = cleanNumber(item[activeEmpCol]); let vJoin = cleanNumber(item[joinersCol]);
+                let vLeav = cleanNumber(item[leaversCol]); let vPend = cleanNumber(item[pendingCol]);
 
-                gOtHours += vOtHrs; gOtCost += vOtCost; 
-                gTpOTHours += vTpHrs; gTpOTCost += vTpCost;
+                gOtHours += vOtHrs; gOtCost += vOtCost; gTpOTHours += vTpHrs; gTpOTCost += vTpCost;
                 gJoiners += vJoin; gLeavers += vLeav; gPending += vPend;
 
                 if (vActStd > 0) { sumActStd += vActStd; cntActStd++; }
@@ -761,25 +637,11 @@
                 if (vAct > 0) { sumActive += vAct; cntActive++; }
 
                 if (!groupedStats[label]) {
-                    groupedStats[label] = {
-                        otH:0, otC:0, tpH:0, tpC:0, jn:0, lv:0, pnd:0,
-                        aS_p:0, aS_c:0,
-                        otP_p:0, otP_c:0,
-                        ab_p:0, ab_c:0,
-                        le_p:0, le_c:0,
-                        la_p:0, la_c:0,
-                        ea_p:0, ea_c:0,
-                        ac_p:0, ac_c:0
-                    };
+                    groupedStats[label] = { otH:0, otC:0, tpH:0, tpC:0, jn:0, lv:0, pnd:0, aS_p:0, aS_c:0, otP_p:0, otP_c:0, ab_p:0, ab_c:0, le_p:0, le_c:0, la_p:0, la_c:0, ea_p:0, ea_c:0, ac_p:0, ac_c:0 };
                 }
 
-                groupedStats[label].otH += vOtHrs;
-                groupedStats[label].otC += vOtCost;
-                groupedStats[label].tpH += vTpHrs;
-                groupedStats[label].tpC += vTpCost;
-                groupedStats[label].jn += vJoin;
-                groupedStats[label].lv += vLeav;
-                groupedStats[label].pnd += vPend;
+                groupedStats[label].otH += vOtHrs; groupedStats[label].otC += vOtCost; groupedStats[label].tpH += vTpHrs; groupedStats[label].tpC += vTpCost;
+                groupedStats[label].jn += vJoin; groupedStats[label].lv += vLeav; groupedStats[label].pnd += vPend;
 
                 if (vActStd > 0) { groupedStats[label].aS_p += vActStd; groupedStats[label].aS_c++; }
                 if (vOtPct > 0) { groupedStats[label].otP_p += vOtPct; groupedStats[label].otP_c++; }
@@ -790,7 +652,6 @@
                 if (vAct > 0) { groupedStats[label].ac_p += vAct; groupedStats[label].ac_c++; }
             });
 
-            // Update Header Values
             document.getElementById('valActVsStd').innerText = cntActStd > 0 ? (sumActStd / cntActStd).toFixed(2) + "%" : "0%";
             document.getElementById('valOTHours').innerText = formatNum(gOtHours);
             document.getElementById('valOTCost').innerText = "Rs " + formatNum(gOtCost);
@@ -807,12 +668,10 @@
             document.getElementById('valPending').innerText = formatNum(gPending);
 
             let chartLabels = Object.keys(groupedStats);
-
-            // Tarteeb (Chronological sorting for months)
-            const monthsMap = { "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6, "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12 };
+            const monthOrder = { "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6, "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12 };
             chartLabels.sort((a, b) => {
-                let valA = monthsMap[a.toLowerCase().substring(0, 3)] || 99;
-                let valB = monthsMap[b.toLowerCase().substring(0, 3)] || 99;
+                let valA = monthOrder[a.toLowerCase().substring(0, 3)] || 99;
+                let valB = monthOrder[b.toLowerCase().substring(0, 3)] || 99;
                 return valA - valB;
             });
 
@@ -820,10 +679,7 @@
 
             chartLabels.forEach(lbl => {
                 let s = groupedStats[lbl];
-                dOtHrs.push(s.otH); dOtCost.push(s.otC);
-                dTpHrs.push(s.tpH); dTpCost.push(s.tpC);
-                dJoin.push(s.jn); dLeav.push(s.lv); dPend.push(s.pnd);
-
+                dOtHrs.push(s.otH); dOtCost.push(s.otC); dTpHrs.push(s.tpH); dTpCost.push(s.tpC); dJoin.push(s.jn); dLeav.push(s.lv); dPend.push(s.pnd);
                 dActStd.push(s.aS_c > 0 ? (s.aS_p / s.aS_c).toFixed(2) : 0);
                 dOtPct.push(s.otP_c > 0 ? (s.otP_p / s.otP_c).toFixed(2) : 0);
                 dAbs.push(s.ab_c > 0 ? (s.ab_p / s.ab_c).toFixed(2) : 0);
@@ -834,46 +690,28 @@
             });
 
             function updateC(chartInst, lbs, dta) {
-                chartInst.data.labels = lbs;
-                chartInst.data.datasets[0].data = dta;
-                chartInst.update();
+                if(chartInst) {
+                    chartInst.data.labels = lbs;
+                    chartInst.data.datasets[0].data = dta;
+                    chartInst.update();
+                }
             }
 
-            updateC(charts.actStd, chartLabels, dActStd);
-            updateC(charts.otHours, chartLabels, dOtHrs);
-            updateC(charts.otCost, chartLabels, dOtCost);
-            updateC(charts.otPct, chartLabels, dOtPct);
-            updateC(charts.tpOTHours, chartLabels, dTpHrs);
-            updateC(charts.tpOTCost, chartLabels, dTpCost);
-            updateC(charts.absent, chartLabels, dAbs);
-            updateC(charts.leave, chartLabels, dLev);
-            updateC(charts.late, chartLabels, dLat);
-            updateC(charts.early, chartLabels, dEar);
-            updateC(charts.active, chartLabels, dAct);
-            updateC(charts.joiners, chartLabels, dJoin);
-            updateC(charts.leavers, chartLabels, dLeav);
-            updateC(charts.pending, chartLabels, dPend);
+            updateC(charts.actStd, chartLabels, dActStd); updateC(charts.otHours, chartLabels, dOtHrs); updateC(charts.otCost, chartLabels, dOtCost); updateC(charts.otPct, chartLabels, dOtPct); updateC(charts.tpOTHours, chartLabels, dTpHrs); updateC(charts.tpOTCost, chartLabels, dTpCost); updateC(charts.absent, chartLabels, dAbs); updateC(charts.leave, chartLabels, dLev); updateC(charts.late, chartLabels, dLat); updateC(charts.early, chartLabels, dEar); updateC(charts.active, chartLabels, dAct); updateC(charts.joiners, chartLabels, dJoin); updateC(charts.leavers, chartLabels, dLeav); updateC(charts.pending, chartLabels, dPend);
         }
 
-        // Filters
-        document.getElementById('filterDept').addEventListener('change', () => {
-            updateSectionDropdown(); 
-            updateDashboard();       
-        });
+        document.getElementById('filterDept').addEventListener('change', () => { updateSectionDropdown(); updateDashboard(); });
         document.getElementById('filterYear').addEventListener('change', updateDashboard);
         document.getElementById('filterMonth').addEventListener('change', updateDashboard);
         document.getElementById('filterSection').addEventListener('change', updateDashboard);
 
         document.getElementById('clearFiltersBtn').addEventListener('click', () => {
             document.querySelectorAll('select').forEach(select => select.value = 'All');
-            updateSectionDropdown(); 
-            updateDashboard(); 
+            updateSectionDropdown(); updateDashboard(); 
         });
 
-        window.onload = () => {
-            initCharts();
-            fetchGoogleSheetData();
-        };
+        window.onload = () => { initCharts(); fetchGoogleSheetData(); };
     </script>
 </body>
 </html>
+this code needs to be fixed , when fetching live data , after fetched graph dont show there values like Act vs Std Hours % is shown but the graph dont have any value when hovered and Total Ot Hours also only showing heading but no hover value and graph
