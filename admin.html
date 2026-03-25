@@ -24,7 +24,7 @@
             --text-main: #202124;
             --text-muted: #5F6368;
             --border-color: #DADCE0;
-            --header-height: 85px; /* Adjusted for standard stats header */
+            --header-height: 80px; 
         }
 
         body {
@@ -62,85 +62,6 @@
         .top-header h1 { color: var(--google-green); margin: 0; font-size: 1.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
         /* ---------------------------------
-           HEADER RIGHT STATS (STANDARD MINIMAL)
-        --------------------------------- */
-        .header-right-stats {
-            display: flex;
-            gap: 15px; 
-            height: 60px;
-            align-items: center;
-        }
-
-        .h-stat-card {
-            background: #ffffff;
-            border-radius: 12px; 
-            display: flex;
-            height: 100%;
-            min-width: 160px;
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02); 
-            overflow: hidden;
-            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
-            position: relative;
-            cursor: pointer;
-            z-index: 1;
-        }
-        .h-stat-card:hover { transform: scale(1.08) translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.12); z-index: 10; }
-
-        .h-accent { height: 4px; width: 100%; position: absolute; top: 0; left: 0; }
-
-        .h-stat-content {
-            display: flex;
-            flex: 1;
-            align-items: center;
-            padding: 10px 12px; 
-            justify-content: space-between;
-            margin-top: 4px; 
-        }
-
-        .h-stat-left {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-width: 50px;
-        }
-
-        .h-stat-title-text { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        .h-stat-icon svg { width: 22px; height: 22px; fill: none; stroke: var(--text-muted); stroke-width: 1.5; }
-        .h-stat-main { font-size: 1.3rem; font-weight: 700; color: #111; margin-top: 4px; line-height: 1; }
-
-        .h-stat-divider { width: 1px; height: 80%; background-color: #eee; margin: 0 10px; }
-
-        .h-stat-right {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            flex: 1;
-        }
-
-        .h-stat-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.7rem;
-            margin-bottom: 3px;
-            gap: 8px;
-        }
-        .h-stat-row:last-child { margin-bottom: 0; }
-
-        .h-stat-label { color: var(--text-muted); font-weight: 400; }
-        .h-stat-val { font-weight: 600; color: #333; }
-
-        .h-stat-huge {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #111;
-            line-height: 1;
-            text-align: center;
-        }
-
-        /* ---------------------------------
            LAYOUT WRAPPER
         --------------------------------- */
         .layout-container { display: flex; margin-top: var(--header-height); height: calc(100vh - var(--header-height)); }
@@ -176,7 +97,7 @@
         /* ---------------------------------
            SMOOTH TRANSITION CLASSES 
         --------------------------------- */
-        .chart-wrapper, .kpi-value, .surveyor-rounds-container {
+        .chart-wrapper, .surveyor-rounds-container {
             transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 1;
             transform: scale(1);
@@ -200,7 +121,6 @@
         .kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .kpi-title { width: 100%; }
         .kpi-title h3 { margin: 0 0 2px 0; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .kpi-value { font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin: 0; }
         .chart-wrapper { position: relative; height: 140px; width: 100%; }
 
         /* ---------------------------------
@@ -223,88 +143,6 @@
         <div class="header-left">
             <img src="Logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
             <h1>Corporate Dashboard</h1>
-        </div>
-
-        <div class="header-right-stats">
-            <div class="h-stat-card">
-                <div class="h-accent" style="background-color: var(--google-yellow);"></div>
-                <div class="h-stat-content">
-                    <div class="h-stat-left">
-                        <span class="h-stat-title-text">Total</span>
-                        <span class="h-stat-main">1021</span>
-                    </div>
-                    <div class="h-stat-divider"></div>
-                    <div class="h-stat-right">
-                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">661</span></div>
-                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">360</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="h-stat-card">
-                <div class="h-accent" style="background-color: #A4C639;"></div>
-                <div class="h-stat-content">
-                    <div class="h-stat-left">
-                        <span class="h-stat-title-text">KHI</span>
-                        <span class="h-stat-main">82</span>
-                    </div>
-                    <div class="h-stat-divider"></div>
-                    <div class="h-stat-right">
-                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">70</span></div>
-                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">12</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="h-stat-card">
-                <div class="h-accent" style="background-color: var(--google-green);"></div>
-                <div class="h-stat-content">
-                    <div class="h-stat-left">
-                        <span class="h-stat-title-text">LHR</span>
-                        <span class="h-stat-main">408</span>
-                    </div>
-                    <div class="h-stat-divider"></div>
-                    <div class="h-stat-right">
-                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">283</span></div>
-                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">125</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="h-stat-card">
-                <div class="h-accent" style="background-color: #FF5722;"></div>
-                <div class="h-stat-content">
-                    <div class="h-stat-left">
-                        <span class="h-stat-title-text">SKP</span>
-                        <span class="h-stat-main">531</span>
-                    </div>
-                    <div class="h-stat-divider"></div>
-                    <div class="h-stat-right">
-                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">308</span></div>
-                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">223</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="h-stat-card" style="min-width: 110px;">
-                <div class="h-accent" style="background-color: var(--google-green);"></div>
-                <div class="h-stat-content" style="justify-content: center; gap: 8px;">
-                    <div class="h-stat-icon">
-                        <svg viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
-                    </div>
-                    <span class="h-stat-huge">96%</span>
-                </div>
-            </div>
-
-            <div class="h-stat-card" style="min-width: 110px;">
-                <div class="h-accent" style="background-color: #FF5722;"></div>
-                <div class="h-stat-content" style="justify-content: center; gap: 8px;">
-                    <div class="h-stat-icon">
-                        <svg viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13.608 8.908a3.188 3.188 0 10-1.608-4.908" /></svg>
-                    </div>
-                    <span class="h-stat-huge">4%</span>
-                </div>
-            </div>
         </div>
     </header>
 
@@ -354,16 +192,16 @@
             <div id="loadingMsg">Calculating Service Level Averages...</div>
 
             <div class="dashboard-grid" id="dashboardContent" style="display: none;">
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Admin Building</h3></div><div class="kpi-value" id="valLoc1">...</div></div><div class="chart-wrapper"><canvas id="chartLoc1"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Executive Mess</h3></div><div class="kpi-value" id="valLoc2">...</div></div><div class="chart-wrapper"><canvas id="chartLoc2"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Guesthouse Building</h3></div><div class="kpi-value" id="valLoc3">...</div></div><div class="chart-wrapper"><canvas id="chartLoc3"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Guest Rooms</h3></div><div class="kpi-value" id="valLoc4">...</div></div><div class="chart-wrapper"><canvas id="chartLoc4"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Lockers</h3></div><div class="kpi-value" id="valLoc5">...</div></div><div class="chart-wrapper"><canvas id="chartLoc5"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Plant Outside</h3></div><div class="kpi-value" id="valLoc6">...</div></div><div class="chart-wrapper"><canvas id="chartLoc6"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Staff Mess Social Block</h3></div><div class="kpi-value" id="valLoc7">...</div></div><div class="chart-wrapper"><canvas id="chartLoc7"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Staff Transport</h3></div><div class="kpi-value" id="valLoc8">...</div></div><div class="chart-wrapper"><canvas id="chartLoc8"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Technical Office</h3></div><div class="kpi-value" id="valLoc9">...</div></div><div class="chart-wrapper"><canvas id="chartLoc9"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Washrooms</h3></div><div class="kpi-value" id="valLoc10">...</div></div><div class="chart-wrapper"><canvas id="chartLoc10"></canvas></div></div>
+                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Admin Building</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc1"></canvas></div></div>
+                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Executive Mess</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc2"></canvas></div></div>
+                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Guesthouse Building</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc3"></canvas></div></div>
+                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Guest Rooms</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc4"></canvas></div></div>
+                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Lockers</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc5"></canvas></div></div>
+                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Plant Outside</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc6"></canvas></div></div>
+                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Staff Mess Social Block</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc7"></canvas></div></div>
+                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Staff Transport</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc8"></canvas></div></div>
+                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Technical Office</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc9"></canvas></div></div>
+                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Washrooms</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc10"></canvas></div></div>
             </div>
 
             <div class="surveyor-rounds-container" id="surveyorRoundsContainer">
@@ -421,6 +259,7 @@
             return num.toFixed(1) + "%"; 
         }
 
+        // Standard Graph styling (Bold Tooltips, Bold X-Axis, Hidden Y-Axis Ticks)
         function createEmptyLineChart(canvasId, colorLine, colorBg) {
             const ctx = document.getElementById(canvasId).getContext('2d');
             return new Chart(ctx, {
@@ -536,7 +375,7 @@
         }
 
         function triggerUpdate() {
-            const elementsToFade = document.querySelectorAll('.chart-wrapper, .kpi-value, .surveyor-rounds-container');
+            const elementsToFade = document.querySelectorAll('.chart-wrapper, .surveyor-rounds-container');
             elementsToFade.forEach(el => el.classList.add('fade-out'));
             
             setTimeout(() => {
@@ -637,7 +476,6 @@
             for(let i=0; i<10; i++) {
                 let canvasId = 'chartLoc' + (i+1);
                 let colorIdx = i % locColorsLine.length;
-                let topValueEl = document.getElementById('valLoc' + (i+1));
                 
                 if(charts['loc'+(i+1)]) {
                     charts['loc'+(i+1)].destroy();
@@ -647,8 +485,6 @@
 
                 if(isMonthSelected) {
                     // DOUGHNUT CHART MODE
-                    if (topValueEl) topValueEl.style.display = 'none';
-
                     let avgVal = gCnt[i] > 0 ? parseFloat((gSum[i] / gCnt[i]).toFixed(1)) : 0;
                     let targetColor = avgVal >= 95 ? G_GREEN : G_RED; 
                     
@@ -690,12 +526,7 @@
                     });
 
                 } else {
-                    // LINE CHART MODE (TREND)
-                    if (topValueEl) {
-                        topValueEl.style.display = 'block';
-                        topValueEl.innerText = formatAvg(gCnt[i] > 0 ? (gSum[i] / gCnt[i]) : 0);
-                    }
-
+                    // LINE CHART MODE (Standardized)
                     charts['loc'+(i+1)] = new Chart(ctx, {
                         type: 'line',
                         data: { 
