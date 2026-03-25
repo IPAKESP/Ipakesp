@@ -122,7 +122,10 @@
         .kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .kpi-title { width: 100%; }
         .kpi-title h3 { margin: 0 0 2px 0; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .kpi-value { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin: 0; }
+        
+        /* HIDDEN KPI VALUES FOR STANDARD LOOK */
+        .kpi-value { display: none; } 
+
         .chart-wrapper { position: relative; height: 140px; width: 100%; }
 
         /* ---------------------------------
@@ -247,10 +250,6 @@
             return num;
         }
 
-        function formatAvg(num) {
-            return num.toFixed(1) + "%"; 
-        }
-
         let h_month, h_surv, h_driver, h_loc, h_area, h_svc;
         let isLongFormat = false;
 
@@ -298,8 +297,7 @@
                         <div class="kpi-header">
                             <div class="kpi-title">
                                 <h3 title="${car}">${car}</h3>
-                                <div class="kpi-value" id="valCar${index}">...</div>
-                            </div>
+                                </div>
                         </div>
                         <div class="chart-wrapper"><canvas id="chartCar${index}"></canvas></div>
                     </div>
@@ -385,7 +383,7 @@
         }
 
         function triggerUpdate() {
-            const elementsToFade = document.querySelectorAll('.chart-wrapper, .kpi-value, .surveyor-rounds-container');
+            const elementsToFade = document.querySelectorAll('.chart-wrapper, .surveyor-rounds-container');
             elementsToFade.forEach(el => el.classList.add('fade-out'));
             
             setTimeout(() => {
@@ -488,9 +486,6 @@
                 let carName = uniqueCars[i]; 
                 let colorIdx = i % locColorsLine.length;
                 
-                let topValueEl = document.getElementById(`valCar${i}`);
-                let titleEl = topValueEl.previousElementSibling; // BUG FIXED HERE: Getting the <h3> properly
-                
                 if(charts[`car${i}`]) {
                     charts[`car${i}`].destroy();
                 }
@@ -501,9 +496,6 @@
                     // DOUGHNUT CHART MODE
                     let avgVal = gCnt[i] > 0 ? parseFloat((gSum[i] / gCnt[i]).toFixed(1)) : 0;
                     let targetColor = avgVal >= 95 ? G_GREEN : G_RED; 
-                    
-                    topValueEl.style.display = 'none'; // Hide right-side text
-                    titleEl.innerText = carName; // Ensure car name is retained
 
                     charts[`car${i}`] = new Chart(ctx, {
                         type: 'doughnut',
@@ -544,11 +536,7 @@
                     });
 
                 } else {
-                    // LINE CHART MODE (TREND)
-                    topValueEl.style.display = 'block'; 
-                    topValueEl.innerText = formatAvg(gCnt[i] > 0 ? (gSum[i] / gCnt[i]) : 0);
-                    titleEl.innerText = carName; 
-
+                    // LINE CHART MODE (Standardized)
                     charts[`car${i}`] = new Chart(ctx, {
                         type: 'line',
                         data: { 
@@ -562,8 +550,19 @@
                         },
                         options: {
                             responsive: true, maintainAspectRatio: false, animation: { duration: 800, easing: 'easeOutQuart' },
-                            plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { return context.parsed.y + "%"; } } } },
-                            scales: { y: { display: true, beginAtZero: true, grid: { drawBorder: false, color: '#f1f3f4' } }, x: { display: true, grid: { display: false } } }
+                            plugins: { 
+                                legend: { display: false }, 
+                                tooltip: { 
+                                    titleFont: { size: 12, weight: 'bold' }, 
+                                    bodyFont: { size: 13, weight: 'bold' },
+                                    padding: 10,
+                                    callbacks: { label: function(context) { return context.parsed.y + "%"; } } 
+                                } 
+                            },
+                            scales: { 
+                                y: { display: true, beginAtZero: true, grid: { drawBorder: false, color: '#f1f3f4' }, ticks: { display: false } }, 
+                                x: { display: true, grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' }, color: '#5F6368', maxRotation: 45, minRotation: 0 } } 
+                            }
                         }
                     });
                 }
