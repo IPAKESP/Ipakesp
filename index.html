@@ -354,7 +354,7 @@
                 <a href="#" class="active">HR Dashboard</a>
                 <a href="admin.html">Admin Dashboard</a>
                 <a href="cost.html">Cost Dashboard</a>
-                <a href="transport.html">Pool & Transport</a>
+                <a href="transport.html">Pool & Transport</a> 
                 
                 <a href="index.html" class="home-icon" title="Home">
                     <svg viewBox="0 0 24 24">
@@ -575,23 +575,19 @@
                     animation: { duration: 800, easing: 'easeOutQuart' },
                     plugins: { 
                         legend: { display: false },
-                        tooltip: { 
-                            titleFont: { size: 12, weight: 'bold' }, 
-                            bodyFont: { size: 13, weight: 'bold' },
-                            padding: 10
-                        }
+                        tooltip: { titleFont: { size: 11 }, bodyFont: { size: 11 } }
                     },
                     scales: { 
                         y: { 
                             display: true, 
                             beginAtZero: true, 
                             grid: { drawBorder: false, color: '#f1f3f4' },
-                            ticks: { font: { size: 10 }, color: '#9aa0a6' }
+                            ticks: { display: false } /* <--- YAHAN CHANGE KIYA HAI - NUMBERS HATA DIYE */
                         },
                         x: { 
                             display: true, 
                             grid: { display: false },
-                            ticks: { font: { size: 11, weight: 'bold' }, color: '#5F6368', maxRotation: 45, minRotation: 0 }
+                            ticks: { font: { size: 10 }, color: '#9aa0a6', maxRotation: 45, minRotation: 0 }
                         }
                     }
                 }
@@ -825,7 +821,6 @@
                 if (vEar > 0) { groupedStats[label].ea_p += vEar; groupedStats[label].ea_c++; }
                 if (vAct > 0) { groupedStats[label].ac_p += vAct; groupedStats[label].ac_c++; }
             });
-
 
             let chartLabels = Object.keys(groupedStats);
 
