@@ -24,7 +24,7 @@
             --text-main: #202124;
             --text-muted: #5F6368;
             --border-color: #DADCE0;
-            --header-height: 85px; /* Thora sa barhaya stats header fit karne k liye */
+            --header-height: 80px;
         }
 
         body {
@@ -46,7 +46,6 @@
             background-color: var(--surface);
             border-bottom: 1px solid var(--border-color);
             display: flex;
-            justify-content: space-between; /* Space between logo and stats */
             align-items: center;
             padding: 0 30px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.05);
@@ -70,6 +69,7 @@
             margin-right: 20px;
         }
 
+        /* Changed from Blue to Green */
         .top-header h1 {
             color: var(--google-green);
             margin: 0;
@@ -78,75 +78,6 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
-        /* ---------------------------------
-           HEADER RIGHT STATS (MINIMAL NO-ICONS)
-        --------------------------------- */
-        .header-right-stats {
-            display: flex;
-            gap: 10px; 
-            height: 55px;
-            align-items: center;
-        }
-
-        .h-stat-card {
-            background: #ffffff;
-            border-radius: 8px;
-            display: flex;
-            height: 100%;
-            min-width: 150px;
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .h-accent { height: 4px; width: 100%; position: absolute; top: 0; left: 0; }
-
-        .h-stat-content {
-            display: flex;
-            flex: 1;
-            align-items: center;
-            padding: 8px 10px; 
-            justify-content: space-between;
-            margin-top: 4px; 
-        }
-
-        .h-stat-left {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-width: 45px;
-        }
-
-        .h-stat-title-text { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        .h-stat-main { font-size: 1.25rem; font-weight: 700; color: #111; margin-top: 3px; line-height: 1; }
-
-        .h-stat-divider { width: 1px; height: 80%; background-color: #eee; margin: 0 10px; }
-
-        .h-stat-right {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            flex: 1;
-        }
-
-        .h-stat-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.65rem;
-            margin-bottom: 3px;
-            gap: 6px;
-        }
-        .h-stat-row:last-child { margin-bottom: 0; }
-
-        .h-stat-label { color: var(--text-muted); font-weight: 400; }
-        .h-stat-val { font-weight: 600; color: #333; }
-
-        .h-stat-icon svg { width: 20px; height: 20px; fill: none; stroke: var(--text-muted); stroke-width: 1.5; }
-        .h-stat-huge { font-size: 1.4rem; font-weight: 700; color: #111; line-height: 1; text-align: center; }
 
         /* ---------------------------------
            LAYOUT WRAPPER (Below Header)
@@ -205,12 +136,14 @@
             outline: none;
         }
 
+        /* Changed Focus ring to Green */
         .filter-group select:focus {
             background: var(--surface);
             border-color: var(--google-green);
             box-shadow: 0 0 0 2px rgba(52, 168, 83, 0.2);
         }
 
+        /* Changed Button to Green */
         .clear-btn {
             width: 100%;
             padding: 10px;
@@ -240,14 +173,14 @@
         }
 
         /* ---------------------------------
-           NAVIGATION TABS 
+           NAVIGATION TABS (UPDATED)
         --------------------------------- */
         .nav-tabs {
             display: flex;
             align-items: center;
             gap: 15px;
             margin-bottom: 30px;
-            flex-wrap: wrap; 
+            flex-wrap: wrap; /* Helps on smaller screens */
         }
 
         .nav-tabs a {
@@ -353,6 +286,7 @@
             width: 100%;
         }
 
+        /* Changed loading text color to Green */
         #loadingMsg {
             position: absolute;
             color: var(--google-green);
@@ -389,88 +323,6 @@
             <img src="Logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
             <h1>Corporate Dashboard</h1>
         </div>
-
-        <div class="header-right-stats">
-            <div class="h-stat-card">
-                <div class="h-accent" style="background-color: var(--google-yellow);"></div>
-                <div class="h-stat-content">
-                    <div class="h-stat-left">
-                        <span class="h-stat-title-text">Total</span>
-                        <span class="h-stat-main">1021</span>
-                    </div>
-                    <div class="h-stat-divider"></div>
-                    <div class="h-stat-right">
-                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">661</span></div>
-                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">360</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="h-stat-card">
-                <div class="h-accent" style="background-color: #A4C639;"></div>
-                <div class="h-stat-content">
-                    <div class="h-stat-left">
-                        <span class="h-stat-title-text">KHI</span>
-                        <span class="h-stat-main">82</span>
-                    </div>
-                    <div class="h-stat-divider"></div>
-                    <div class="h-stat-right">
-                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">70</span></div>
-                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">12</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="h-stat-card">
-                <div class="h-accent" style="background-color: var(--google-green);"></div>
-                <div class="h-stat-content">
-                    <div class="h-stat-left">
-                        <span class="h-stat-title-text">LHR</span>
-                        <span class="h-stat-main">408</span>
-                    </div>
-                    <div class="h-stat-divider"></div>
-                    <div class="h-stat-right">
-                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">283</span></div>
-                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">125</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="h-stat-card">
-                <div class="h-accent" style="background-color: var(--google-red);"></div>
-                <div class="h-stat-content">
-                    <div class="h-stat-left">
-                        <span class="h-stat-title-text">SKP</span>
-                        <span class="h-stat-main">531</span>
-                    </div>
-                    <div class="h-stat-divider"></div>
-                    <div class="h-stat-right">
-                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">308</span></div>
-                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">223</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="h-stat-card" style="min-width: 100px;">
-                <div class="h-accent" style="background-color: var(--google-green);"></div>
-                <div class="h-stat-content" style="justify-content: center; gap: 8px;">
-                    <div class="h-stat-icon">
-                        <svg viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
-                    </div>
-                    <span class="h-stat-huge">96%</span>
-                </div>
-            </div>
-
-            <div class="h-stat-card" style="min-width: 100px;">
-                <div class="h-accent" style="background-color: var(--google-red);"></div>
-                <div class="h-stat-content" style="justify-content: center; gap: 8px;">
-                    <div class="h-stat-icon">
-                        <svg viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13.608 8.908a3.188 3.188 0 10-1.608-4.908" /></svg>
-                    </div>
-                    <span class="h-stat-huge">4%</span>
-                </div>
-            </div>
-        </div>
     </header>
 
     <div class="layout-container">
@@ -502,7 +354,9 @@
                 <a href="#" class="active">HR Dashboard</a>
                 <a href="admin.html">Admin Dashboard</a>
                 <a href="cost.html">Cost Dashboard</a>
-                <a href="transport.html">Pool & Transport</a> <a href="index.html" class="home-icon" title="Home">
+                <a href="transport.html">Pool & Transport</a>
+                
+                <a href="index.html" class="home-icon" title="Home">
                     <svg viewBox="0 0 24 24">
                         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                         <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -518,7 +372,6 @@
                     <div class="kpi-header">
                         <div class="kpi-title">
                             <h3>Act vs Std Hours %</h3>
-                            <div class="kpi-value" id="valActVsStd">...</div>
                         </div>
                     </div>
                     <div class="chart-wrapper"><canvas id="chartActVsStd"></canvas></div>
@@ -528,7 +381,6 @@
                     <div class="kpi-header">
                         <div class="kpi-title">
                             <h3>Total OT Hours</h3>
-                            <div class="kpi-value" id="valOTHours">...</div>
                         </div>
                     </div>
                     <div class="chart-wrapper"><canvas id="chartOTHours"></canvas></div>
@@ -538,7 +390,6 @@
                     <div class="kpi-header">
                         <div class="kpi-title">
                             <h3>OT Cost</h3>
-                            <div class="kpi-value" id="valOTCost">...</div>
                         </div>
                     </div>
                     <div class="chart-wrapper"><canvas id="chartOTCost"></canvas></div>
@@ -548,7 +399,6 @@
                     <div class="kpi-header">
                         <div class="kpi-title">
                             <h3>OT %</h3>
-                            <div class="kpi-value" id="valOTPercent">...</div>
                         </div>
                     </div>
                     <div class="chart-wrapper"><canvas id="chartOTPercent"></canvas></div>
@@ -558,7 +408,6 @@
                     <div class="kpi-header">
                         <div class="kpi-title">
                             <h3>TP Total OT Hours</h3>
-                            <div class="kpi-value" id="valTPOTHours">...</div>
                         </div>
                     </div>
                     <div class="chart-wrapper"><canvas id="chartTPOTHours"></canvas></div>
@@ -568,7 +417,6 @@
                     <div class="kpi-header">
                         <div class="kpi-title">
                             <h3>TP OT Cost</h3>
-                            <div class="kpi-value" id="valTPOTCost">...</div>
                         </div>
                     </div>
                     <div class="chart-wrapper"><canvas id="chartTPOTCost"></canvas></div>
@@ -578,7 +426,6 @@
                     <div class="kpi-header">
                         <div class="kpi-title">
                             <h3>Absenteeism %</h3>
-                            <div class="kpi-value" id="valAbsent">...</div>
                         </div>
                     </div>
                     <div class="chart-wrapper"><canvas id="chartAbsent"></canvas></div>
@@ -588,7 +435,6 @@
                     <div class="kpi-header">
                         <div class="kpi-title">
                             <h3>Leaves %</h3>
-                            <div class="kpi-value" id="valLeave">...</div>
                         </div>
                     </div>
                     <div class="chart-wrapper"><canvas id="chartLeave"></canvas></div>
@@ -598,7 +444,6 @@
                     <div class="kpi-header">
                         <div class="kpi-title">
                             <h3>Late Arrival %</h3>
-                            <div class="kpi-value" id="valLate">...</div>
                         </div>
                     </div>
                     <div class="chart-wrapper"><canvas id="chartLate"></canvas></div>
@@ -608,7 +453,6 @@
                     <div class="kpi-header">
                         <div class="kpi-title">
                             <h3>Early Out %</h3>
-                            <div class="kpi-value" id="valEarly">...</div>
                         </div>
                     </div>
                     <div class="chart-wrapper"><canvas id="chartEarly"></canvas></div>
@@ -618,7 +462,6 @@
                     <div class="kpi-header">
                         <div class="kpi-title">
                             <h3>Active Employee %</h3>
-                            <div class="kpi-value" id="valActive">...</div>
                         </div>
                     </div>
                     <div class="chart-wrapper"><canvas id="chartActive"></canvas></div>
@@ -628,7 +471,6 @@
                     <div class="kpi-header">
                         <div class="kpi-title">
                             <h3>Joiners</h3>
-                            <div class="kpi-value" id="valJoiners">...</div>
                         </div>
                     </div>
                     <div class="chart-wrapper"><canvas id="chartJoiners"></canvas></div>
@@ -638,7 +480,6 @@
                     <div class="kpi-header">
                         <div class="kpi-title">
                             <h3>Leavers</h3>
-                            <div class="kpi-value" id="valLeavers">...</div>
                         </div>
                     </div>
                     <div class="chart-wrapper"><canvas id="chartLeavers"></canvas></div>
@@ -648,7 +489,6 @@
                     <div class="kpi-header">
                         <div class="kpi-title">
                             <h3>Pending Final Settlement</h3>
-                            <div class="kpi-value" id="valPending">...</div>
                         </div>
                     </div>
                     <div class="chart-wrapper"><canvas id="chartPending"></canvas></div>
@@ -982,21 +822,6 @@
                 if (vAct > 0) { groupedStats[label].ac_p += vAct; groupedStats[label].ac_c++; }
             });
 
-            // Update Header Values
-            document.getElementById('valActVsStd').innerText = cntActStd > 0 ? (sumActStd / cntActStd).toFixed(2) + "%" : "0%";
-            document.getElementById('valOTHours').innerText = formatNum(gOtHours);
-            document.getElementById('valOTCost').innerText = "Rs " + formatNum(gOtCost);
-            document.getElementById('valOTPercent').innerText = cntOtPct > 0 ? (sumOtPct / cntOtPct).toFixed(2) + "%" : "0%";
-            document.getElementById('valTPOTHours').innerText = formatNum(gTpOTHours);
-            document.getElementById('valTPOTCost').innerText = "Rs " + formatNum(gTpOTCost);
-            document.getElementById('valAbsent').innerText = cntAbsent > 0 ? (sumAbsent / cntAbsent).toFixed(2) + "%" : "0%";
-            document.getElementById('valLeave').innerText = cntLeave > 0 ? (sumLeave / cntLeave).toFixed(2) + "%" : "0%";
-            document.getElementById('valLate').innerText = cntLate > 0 ? (sumLate / cntLate).toFixed(2) + "%" : "0%";
-            document.getElementById('valEarly').innerText = cntEarly > 0 ? (sumEarly / cntEarly).toFixed(2) + "%" : "0%";
-            document.getElementById('valActive').innerText = cntActive > 0 ? (sumActive / cntActive).toFixed(2) + "%" : "0%";
-            document.getElementById('valJoiners').innerText = formatNum(gJoiners);
-            document.getElementById('valLeavers').innerText = formatNum(gLeavers);
-            document.getElementById('valPending').innerText = formatNum(gPending);
 
             let chartLabels = Object.keys(groupedStats);
 
