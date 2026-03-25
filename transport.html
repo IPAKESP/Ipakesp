@@ -122,10 +122,6 @@
         .kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .kpi-title { width: 100%; }
         .kpi-title h3 { margin: 0 0 2px 0; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
-        /* HIDDEN KPI VALUES FOR STANDARD LOOK */
-        .kpi-value { display: none; } 
-
         .chart-wrapper { position: relative; height: 140px; width: 100%; }
 
         /* ---------------------------------
@@ -184,7 +180,7 @@
                 <a href="index.html">HR Dashboard</a>
                 <a href="admin.html">Admin Dashboard</a>
                 <a href="cost.html">Cost Dashboard</a>
-                <a href="#" class="active">Pool & Transport</a>
+                <a href="#" class="active">Pool & Transport</a> 
                 
                 <a href="index.html" class="home-icon" title="Home">
                     <svg viewBox="0 0 24 24">
@@ -297,7 +293,7 @@
                         <div class="kpi-header">
                             <div class="kpi-title">
                                 <h3 title="${car}">${car}</h3>
-                                </div>
+                            </div>
                         </div>
                         <div class="chart-wrapper"><canvas id="chartCar${index}"></canvas></div>
                     </div>
@@ -483,7 +479,6 @@
 
             for(let i=0; i<carCount; i++) {
                 let canvasId = `chartCar${i}`;
-                let carName = uniqueCars[i]; 
                 let colorIdx = i % locColorsLine.length;
                 
                 if(charts[`car${i}`]) {
