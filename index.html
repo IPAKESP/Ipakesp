@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Corporate Dashboard</title>
+    <title>Corporate Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -24,7 +24,7 @@
             --text-main: #202124;
             --text-muted: #5F6368;
             --border-color: #DADCE0;
-            --header-height: 85px; /* Stats boxes fit karne k liye 85px kiya */
+            --header-height: 80px;
         }
 
         body {
@@ -46,10 +46,9 @@
             background-color: var(--surface);
             border-bottom: 1px solid var(--border-color);
             display: flex;
-            justify-content: space-between; /* Add kiya ta k logo left aur stats right par rahain */
             align-items: center;
-            padding: 0 40px; /* Thori padding barhai */
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            padding: 0 30px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
             z-index: 200;
             position: fixed;
             top: 0;
@@ -70,6 +69,7 @@
             margin-right: 20px;
         }
 
+        /* Changed from Blue to Green */
         .top-header h1 {
             color: var(--google-green);
             margin: 0;
@@ -77,83 +77,6 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
-
-        /* ---------------------------------
-           HEADER RIGHT STATS (ADDED MINIMAL STATS CSS)
-        --------------------------------- */
-        .header-right-stats {
-            display: flex;
-            gap: 15px; 
-            height: 60px;
-            align-items: center;
-        }
-
-        .h-stat-card {
-            background: #ffffff;
-            border-radius: 8px; 
-            display: flex;
-            height: 100%;
-            min-width: 160px;
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02); 
-            overflow: hidden;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            position: relative;
-        }
-        .h-stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-
-        .h-accent { height: 4px; width: 100%; position: absolute; top: 0; left: 0; }
-
-        .h-stat-content {
-            display: flex;
-            flex: 1;
-            align-items: center;
-            padding: 10px 12px; 
-            justify-content: space-between;
-            margin-top: 4px; 
-        }
-
-        .h-stat-left {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-width: 50px;
-        }
-
-        .h-stat-title-text { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        .h-stat-icon svg { width: 22px; height: 22px; fill: none; stroke: var(--text-muted); stroke-width: 1.5; }
-        .h-stat-main { font-size: 1.3rem; font-weight: 700; color: #111; margin-top: 4px; line-height: 1; }
-
-        .h-stat-divider { width: 1px; height: 80%; background-color: #eee; margin: 0 10px; }
-
-        .h-stat-right {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            flex: 1;
-        }
-
-        .h-stat-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.7rem;
-            margin-bottom: 3px;
-            gap: 8px;
-        }
-        .h-stat-row:last-child { margin-bottom: 0; }
-
-        .h-stat-label { color: var(--text-muted); font-weight: 400; }
-        .h-stat-val { font-weight: 600; color: #333; }
-
-        .h-stat-huge {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #111;
-            line-height: 1;
-            text-align: center;
         }
 
         /* ---------------------------------
@@ -382,7 +305,7 @@
         @media print {
             @page { size: A4 landscape; margin: 10mm; }
             body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .sidebar, .nav-tabs, #loadingMsg, .header-right-stats { display: none !important; }
+            .sidebar, .nav-tabs, #loadingMsg { display: none !important; }
             .layout-container { margin-top: 0 !important; height: auto !important; }
             .main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; overflow: visible !important; }
             .top-header { position: relative !important; margin-bottom: 15px !important; padding: 0 0 10px 0 !important; border-bottom: 2px solid #000; box-shadow: none !important; }
@@ -398,89 +321,7 @@
     <header class="top-header">
         <div class="header-left">
             <img src="Logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
-            <h1>HR Corporate Dashboard</h1>
-        </div>
-
-        <div class="header-right-stats">
-            <div class="h-stat-card">
-                <div class="h-accent" style="background-color: var(--google-yellow);"></div>
-                <div class="h-stat-content">
-                    <div class="h-stat-left">
-                        <span class="h-stat-title-text">Total</span>
-                        <span class="h-stat-main">1021</span>
-                    </div>
-                    <div class="h-stat-divider"></div>
-                    <div class="h-stat-right">
-                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">661</span></div>
-                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">360</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="h-stat-card">
-                <div class="h-accent" style="background-color: #A4C639;"></div>
-                <div class="h-stat-content">
-                    <div class="h-stat-left">
-                        <span class="h-stat-title-text">KHI</span>
-                        <span class="h-stat-main">82</span>
-                    </div>
-                    <div class="h-stat-divider"></div>
-                    <div class="h-stat-right">
-                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">70</span></div>
-                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">12</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="h-stat-card">
-                <div class="h-accent" style="background-color: var(--google-green);"></div>
-                <div class="h-stat-content">
-                    <div class="h-stat-left">
-                        <span class="h-stat-title-text">LHR</span>
-                        <span class="h-stat-main">408</span>
-                    </div>
-                    <div class="h-stat-divider"></div>
-                    <div class="h-stat-right">
-                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">283</span></div>
-                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">125</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="h-stat-card">
-                <div class="h-accent" style="background-color: #FF5722;"></div>
-                <div class="h-stat-content">
-                    <div class="h-stat-left">
-                        <span class="h-stat-title-text">SKP</span>
-                        <span class="h-stat-main">531</span>
-                    </div>
-                    <div class="h-stat-divider"></div>
-                    <div class="h-stat-right">
-                        <div class="h-stat-row"><span class="h-stat-label">Perm.</span><span class="h-stat-val">308</span></div>
-                        <div class="h-stat-row"><span class="h-stat-label">T. Party</span><span class="h-stat-val">223</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="h-stat-card" style="min-width: 110px;">
-                <div class="h-accent" style="background-color: var(--google-green);"></div>
-                <div class="h-stat-content" style="justify-content: center; gap: 8px;">
-                    <div class="h-stat-icon">
-                        <svg viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
-                    </div>
-                    <span class="h-stat-huge">96%</span>
-                </div>
-            </div>
-
-            <div class="h-stat-card" style="min-width: 110px;">
-                <div class="h-accent" style="background-color: #FF5722;"></div>
-                <div class="h-stat-content" style="justify-content: center; gap: 8px;">
-                    <div class="h-stat-icon">
-                        <svg viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13.608 8.908a3.188 3.188 0 10-1.608-4.908" /></svg>
-                    </div>
-                    <span class="h-stat-huge">4%</span>
-                </div>
-            </div>
+            <h1>Corporate Dashboard</h1>
         </div>
     </header>
 
@@ -488,6 +329,10 @@
         
         <div class="sidebar">
             <h2>Filters</h2>
+            <div class="filter-group">
+                <label>Company</label>
+                <select id="filterCompany"><option value="All">All Companies</option></select>
+            </div>
             <div class="filter-group">
                 <label>Year</label>
                 <select id="filterYear"><option value="All">All Years</option></select>
@@ -513,7 +358,7 @@
                 <a href="#" class="active">HR Dashboard</a>
                 <a href="admin.html">Admin Dashboard</a>
                 <a href="cost.html">Cost Dashboard</a>
-                <a href="transport.html">Pool & Transport</a>
+                <a href="transport.html">Pool & Transport</a> 
                 
                 <a href="index.html" class="home-icon" title="Home">
                     <svg viewBox="0 0 24 24">
@@ -758,7 +603,7 @@
                         x: { 
                             display: true, 
                             grid: { display: false },
-                            ticks: { font: { size: 11, weight: 'bold' }, color: '#5F6368', maxRotation: 45, minRotation: 0 }
+                            ticks: { font: { size: 10, weight: 'bold' }, color: '#5F6368', maxRotation: 45, minRotation: 0 }
                         }
                     }
                 }
@@ -819,23 +664,29 @@
         }
 
         function populateDropdowns() {
+            const compCol = findColumn(sheetData[0], ['company', 'comp']);
             const yearCol = findColumn(sheetData[0], ['year', 'saal']);
             const monthCol = findColumn(sheetData[0], ['month', 'mahina']);
             const deptCol = findColumn(sheetData[0], ['department', 'dept']);
 
+            const companies = new Set();
             const years = new Set();
             const months = new Set();
             const depts = new Set();
 
             sheetData.forEach(row => {
+                let cRaw = compCol ? row[compCol] : null;
+                if (cRaw && cRaw.toLowerCase() !== 'group') companies.add(cRaw.trim());
+
                 if (yearCol && row[yearCol]) years.add(row[yearCol]);
                 if (monthCol && row[monthCol]) months.add(row[monthCol]);
                 if (deptCol && row[deptCol]) depts.add(row[deptCol]);
             });
 
-            const addOptions = (setId, dataSet) => {
+            const addOptions = (setId, dataSet, label) => {
                 const select = document.getElementById(setId);
-                select.innerHTML = `<option value="All">All ${setId.replace('filter', '')}s</option>`;
+                if(!select) return;
+                select.innerHTML = `<option value="All">All ${label}</option>`;
                 dataSet.forEach(val => {
                     let opt = document.createElement('option');
                     opt.value = val;
@@ -844,9 +695,10 @@
                 });
             };
 
-            addOptions('filterYear', years);
-            addOptions('filterMonth', months);
-            addOptions('filterDept', depts);
+            addOptions('filterCompany', companies, 'Companies');
+            addOptions('filterYear', years, 'Years');
+            addOptions('filterMonth', months, 'Months');
+            addOptions('filterDept', depts, 'Departments');
             
             updateSectionDropdown();
         }
@@ -883,12 +735,14 @@
         function updateDashboard() {
             if(sheetData.length === 0) return;
 
+            const selectedComp = document.getElementById('filterCompany') ? document.getElementById('filterCompany').value : 'All';
             const selectedYear = document.getElementById('filterYear').value;
             const selectedMonth = document.getElementById('filterMonth').value;
             const selectedDept = document.getElementById('filterDept').value;
             const selectedSection = document.getElementById('filterSection').value;
 
             // Dimensions
+            const compCol = findColumn(sheetData[0], ['company', 'comp']);
             const yearCol = findColumn(sheetData[0], ['year']);
             const monthCol = findColumn(sheetData[0], ['month']);
             const deptCol = findColumn(sheetData[0], ['department', 'dept']);
@@ -896,6 +750,9 @@
 
             let filteredData = sheetData.filter(item => {
                 let match = true;
+                if(selectedComp === "All" && compCol && item[compCol] && item[compCol].toLowerCase() === 'group') return false;
+                if(selectedComp !== "All" && compCol && item[compCol] !== selectedComp) match = false;
+
                 if(selectedYear !== "All" && yearCol && item[yearCol] !== selectedYear) match = false;
                 if(selectedMonth !== "All" && monthCol && item[monthCol] !== selectedMonth) match = false;
                 if(selectedDept !== "All" && deptCol && item[deptCol] !== selectedDept) match = false;
@@ -1043,13 +900,12 @@
         }
 
         // Filters
-        document.getElementById('filterDept').addEventListener('change', () => {
-            updateSectionDropdown(); 
-            updateDashboard();       
+        document.querySelectorAll('select').forEach(select => {
+            if(select) select.addEventListener('change', () => {
+                if(select.id === 'filterDept') updateSectionDropdown();
+                updateDashboard();       
+            });
         });
-        document.getElementById('filterYear').addEventListener('change', updateDashboard);
-        document.getElementById('filterMonth').addEventListener('change', updateDashboard);
-        document.getElementById('filterSection').addEventListener('change', updateDashboard);
 
         document.getElementById('clearFiltersBtn').addEventListener('click', () => {
             document.querySelectorAll('select').forEach(select => select.value = 'All');
