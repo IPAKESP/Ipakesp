@@ -406,8 +406,7 @@
                             display: true, beginAtZero: true, 
                             grid: { drawBorder: false, color: '#F1F5F9' }, // Light default
                             ticks: { 
-                                font: {size: 9, weight: '500'}, maxTicksLimit: 4, 
-                                callback: function(val) { return isPercent ? formatNum(val) + '%' : formatNum(val); } 
+                                display: false // HIDDEN RANGE NUMBERS HERE
                             } 
                         },
                         x: { display: true, grid: { display: false }, ticks: { font: { size: 9, weight: '600' }, maxRotation: 0 } }
