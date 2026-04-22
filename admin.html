@@ -1,229 +1,320 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Admin Dashboard - Unique Bento Box</title>
+    <link rel="icon" href="Logo.png" type="image/png">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Google Material Design Variables */
+        /* ---------------------------------
+           PREMIUM THEME VARIABLES
+        --------------------------------- */
         :root {
-            --google-blue: #4285F4;
-            --google-red: #EA4335;
-            --google-yellow: #FBBC05;
-            --google-green: #34A853;
+            --color-blue: #3B82F6;
+            --color-red: #EF4444;
+            --color-yellow: #F59E0B;
+            --color-green: #10B981;
             
-            --bg-blue-light: rgba(66, 133, 244, 0.1);
-            --bg-red-light: rgba(234, 67, 53, 0.1);
-            --bg-yellow-light: rgba(251, 188, 5, 0.1);
-            --bg-green-light: rgba(52, 168, 83, 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius-lg: 24px; 
+            --radius-md: 16px;
+            --radius-sm: 8px;
+        }
 
-            --bg-light: #F8F9FA;
-            --surface: #FFFFFF;
-            --text-main: #202124;
-            --text-muted: #5F6368;
-            --border-color: #DADCE0;
-            --header-height: 80px; 
+        /* LIGHT MODE */
+        [data-theme="light"] {
+            --bg-main: #F4F4F5; 
+            --bg-surface: #FFFFFF;
+            --text-primary: #0F172A;
+            --text-secondary: #64748B;
+            --border-color: #E4E4E7;
+            --border-hover: #D4D4D8;
+            --grid-line: #F1F5F9;
+            --shadow-card: 0 4px 24px -6px rgba(15, 23, 42, 0.08);
+            --bg-input: #F4F4F5;
+            --bg-icon: rgba(16, 185, 129, 0.1);
+        }
+
+        /* TRUE DARK MODE */
+        [data-theme="dark"] {
+            --bg-main: #09090B; 
+            --bg-surface: #121212; 
+            --text-primary: #FAFAFA;
+            --text-secondary: #A1A1AA;
+            --border-color: #27272A; 
+            --border-hover: #3F3F46;
+            --grid-line: #18181B;
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.6);
+            --bg-input: #18181B;
+            --bg-icon: rgba(16, 185, 129, 0.15);
         }
 
         body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column; 
-            background-color: var(--bg-light);
-            color: var(--text-main);
-            height: 100vh;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0; background-color: var(--bg-main); color: var(--text-primary);
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+            transition: var(--transition);
         }
 
         /* ---------------------------------
-           FULL-WIDTH TOP HEADER
+           HEADER & NAVIGATION
         --------------------------------- */
         .top-header {
-            width: 100%;
-            height: var(--header-height);
-            background-color: var(--surface);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 40px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-            z-index: 200;
-            position: fixed;
-            top: 0;
-            left: 0;
-            box-sizing: border-box;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 30px; background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color); height: 60px;
+            box-sizing: border-box; transition: var(--transition);
         }
 
-        .header-left { display: flex; align-items: center; gap: 15px; }
-        .logo { height: 50px; width: auto; object-fit: contain; margin-right: 20px; }
-        .top-header h1 { color: var(--google-green); margin: 0; font-size: 1.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        /* ---------------------------------
-           LAYOUT WRAPPER
-        --------------------------------- */
-        .layout-container { display: flex; margin-top: var(--header-height); height: calc(100vh - var(--header-height)); }
-
-        /* Clean Sidebar */
-        .sidebar {
-            width: 260px; background-color: var(--surface); border-right: 1px solid var(--border-color); padding: 25px 20px; overflow-y: auto; box-sizing: border-box; flex-shrink: 0;
+        .header-brand h1 {
+            margin: 0; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.3px;
         }
 
-        .sidebar h2 { color: var(--text-main); font-size: 1.1rem; font-weight: 500; margin-top: 0; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .filter-group { margin-bottom: 20px; }
-        .filter-group label { display: block; margin-bottom: 8px; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 500; letter-spacing: 0.5px; }
-        .filter-group select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: #F1F3F4; color: var(--text-main); font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; outline: none; }
-        .filter-group select:focus { background: var(--surface); border-color: var(--google-green); box-shadow: 0 0 0 2px rgba(52, 168, 83, 0.2); }
+        .nav-tabs { display: flex; gap: 8px; align-items: center; }
+        .nav-tabs a {
+            text-decoration: none; padding: 8px 16px; font-size: 0.85rem; font-weight: 600;
+            color: var(--text-secondary); border-radius: 20px; transition: var(--transition);
+        }
+        .nav-tabs a.active { background-color: var(--text-primary); color: var(--bg-surface); }
+        .nav-tabs a:hover:not(.active) { color: var(--text-primary); background-color: var(--bg-input); }
+        
+        .nav-tabs a.home-icon { padding: 8px; display: flex; align-items: center; justify-content: center; }
+        .nav-tabs a.home-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5; }
 
-        .clear-btn { width: 100%; padding: 10px; margin-top: 10px; background-color: transparent; color: var(--google-green); border: 1px solid var(--google-green); border-radius: 8px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; font-family: 'Roboto', sans-serif; }
-        .clear-btn:hover { background-color: rgba(52, 168, 83, 0.08); }
-
-        /* Main Content Area */
-        .main-content { flex-grow: 1; padding: 30px 40px; overflow-y: auto; box-sizing: border-box; position: relative; }
-
-        /* ---------------------------------
-           NAVIGATION TABS
-        --------------------------------- */
-        .nav-tabs { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
-        .nav-tabs a { text-decoration: none; padding: 10px 24px; font-size: 1rem; font-weight: 500; color: var(--text-muted); background-color: white; border: 1px solid var(--border-color); border-radius: 8px; transition: all 0.3s ease; }
-        .nav-tabs a:hover { color: var(--text-main); background-color: var(--bg-light); border-color: #c0c4c9; }
-        .nav-tabs a.active { background-color: var(--google-green); color: white; border-color: var(--google-green); box-shadow: 0 2px 6px rgba(52, 168, 83, 0.3); }
-        .nav-tabs a.home-icon { margin-left: auto; display: flex; align-items: center; justify-content: center; padding: 10px; border-radius: 8px; background-color: white; }
-        .nav-tabs a.home-icon:hover { background-color: var(--bg-light); }
-        .nav-tabs a.home-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .theme-toggle {
+            background: transparent; border: 1px solid var(--border-color);
+            color: var(--text-primary); padding: 8px 16px; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: var(--transition);
+            display: flex; align-items: center; gap: 6px; margin-left: 15px;
+        }
+        .theme-toggle:hover { border-color: var(--text-secondary); }
 
         /* ---------------------------------
-           SMOOTH TRANSITION CLASSES 
+           SLEEK FILTER BAR
         --------------------------------- */
-        .chart-wrapper, .surveyor-rounds-container {
-            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 1;
-            transform: scale(1);
+        .filter-bar {
+            display: flex; align-items: center; gap: 15px; padding: 10px 30px;
+            background-color: var(--bg-main); height: 50px; box-sizing: border-box;
+            border-bottom: 1px solid var(--border-color); flex-wrap: nowrap; overflow-x: auto;
+        }
+
+        .filter-group { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+        .filter-group label { font-size: 0.7rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .filter-group select {
+            padding: 6px 28px 6px 12px; border-radius: 20px; border: 1px solid var(--border-color);
+            background-color: var(--bg-surface); color: var(--text-primary); font-size: 0.75rem; font-weight: 600;
+            font-family: inherit; cursor: pointer; outline: none; appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2371717A%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat; background-position: right 10px top 50%; background-size: 8px auto;
+            transition: var(--transition);
+        }
+        .filter-group select:hover { border-color: var(--border-hover); }
+
+        .clear-btn {
+            background-color: transparent; color: var(--text-secondary); border: 1px solid var(--border-color);
+            padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
+            cursor: pointer; margin-left: auto; transition: var(--transition); font-family: inherit;
+        }
+        .clear-btn:hover { color: var(--text-primary); border-color: var(--text-primary); }
+
+        /* ---------------------------------
+           UNIQUE BENTO GRID (MOSAIC LAYOUT)
+        --------------------------------- */
+        .workspace {
+            flex: 1; padding: 15px 30px; display: flex; flex-direction: column;
+            height: calc(100vh - 110px); box-sizing: border-box; overflow: hidden; position: relative;
+        }
+
+        /* 4x3 Asymmetric Mosaic Grid */
+        .dashboard-grid {
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            grid-template-rows: repeat(3, 1fr);
+            gap: 16px; flex-grow: 1; height: 100%; min-height: 0;
+        }
+
+        /* Magic Classes for Asymmetry */
+        .col-span-2 { grid-column: span 2; }
+        
+        .kpi-widget {
+            background: var(--bg-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
+            padding: 16px 20px; display: flex; flex-direction: column; 
+            border: 1px solid var(--border-color);
+            transition: var(--transition); position: relative; min-height: 0; overflow: hidden;
         }
         
-        .fade-out {
-            opacity: 0 !important;
-            transform: scale(0.92) !important;
+        .kpi-widget:hover { border-color: var(--text-secondary); }
+
+        .kpi-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-shrink: 0; }
+        
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+        .dot.blue { background-color: var(--color-blue); box-shadow: 0 0 8px var(--color-blue); }
+        .dot.red { background-color: var(--color-red); box-shadow: 0 0 8px var(--color-red); }
+        .dot.yellow { background-color: var(--color-yellow); box-shadow: 0 0 8px var(--color-yellow); }
+        .dot.green { background-color: var(--color-green); box-shadow: 0 0 8px var(--color-green); }
+
+        .kpi-title h3 { margin: 0; font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .chart-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; min-height: 0; }
+
+        /* Surveyor Rounds Bottom Summary */
+        .surveyor-rounds-container { 
+            display: flex; gap: 15px; flex-wrap: nowrap; margin-top: 15px; flex-shrink: 0; overflow-x: auto;
+            padding-bottom: 5px; /* Slight padding for smooth scroll if needed */
         }
-
-        /* Unified Card & Graph Widget Grid */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px; }
-
-        .kpi-widget { background: var(--surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(60,64,67,0.1), 0 1px 2px rgba(60,64,67,0.06); display: flex; flex-direction: column; overflow: hidden; border-top: 4px solid var(--border-color); padding: 18px 20px 10px 20px; }
-
-        .kpi-widget:nth-child(4n+1) { border-top-color: var(--google-blue); }
-        .kpi-widget:nth-child(4n+2) { border-top-color: var(--google-red); }
-        .kpi-widget:nth-child(4n+3) { border-top-color: var(--google-yellow); }
-        .kpi-widget:nth-child(4n+4) { border-top-color: var(--google-green); }
-
-        .kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-        .kpi-title { width: 100%; }
-        .kpi-title h3 { margin: 0 0 2px 0; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .chart-wrapper { position: relative; height: 140px; width: 100%; }
-
-        /* ---------------------------------
-           MINI SECTION: SURVEYOR ROUNDS 
-        --------------------------------- */
-        .surveyor-rounds-container { display: flex; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; }
-        .surveyor-card { background: var(--surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 1px 3px rgba(60,64,67,0.1); min-width: 180px; }
-        .surveyor-icon { width: 40px; height: 40px; background-color: var(--bg-green-light); color: var(--google-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .surveyor-icon svg { width: 22px; height: 22px; fill: currentColor; }
+        .surveyor-card { 
+            background: var(--bg-surface); border: 1px solid var(--border-color); 
+            border-radius: var(--radius-md); padding: 10px 15px; display: flex; align-items: center; 
+            gap: 12px; box-shadow: var(--shadow-card); min-width: 160px; transition: var(--transition);
+        }
+        .surveyor-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+        .surveyor-icon { width: 36px; height: 36px; background-color: var(--bg-icon); color: var(--color-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .surveyor-icon svg { width: 18px; height: 18px; fill: currentColor; }
         .surveyor-info { display: flex; flex-direction: column; }
-        .surveyor-name { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; }
-        .surveyor-count { font-size: 1.3rem; font-weight: 700; color: var(--text-main); }
+        .surveyor-name { font-size: 0.7rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
+        .surveyor-count { font-size: 1.1rem; font-weight: 800; color: var(--text-primary); }
 
-        #loadingMsg { position: absolute; color: var(--google-green); font-weight: 500; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; background: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        /* FADE TRANSITIONS */
+        .fade-out { opacity: 0 !important; transform: scale(0.96) !important; }
+        .dashboard-grid, .surveyor-rounds-container { transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); opacity: 1; transform: scale(1); }
+
+        #loadingMsg {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: var(--text-primary); font-weight: 700; background: var(--bg-surface);
+            padding: 15px 30px; border-radius: 30px; border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-card); z-index: 10; font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
 
     <header class="top-header">
-        <div class="header-left">
-            <img src="Logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
+        <div class="header-brand" style="display: flex; align-items: center; gap: 12px;">
+            <img src="Logo.png" alt="Logo" style="height: 35px; width: auto; object-fit: contain;">
             <h1>HR Corporate Dashboard</h1>
+        </div>
+        <div style="display:flex; align-items:center;">
+            <div class="nav-tabs">
+                <a href="index.html">HR OPS</a>
+                <a href="#" class="active">Admin</a>
+                <a href="cost.html">Cost Center</a>
+                <a href="transport.html">Transport</a> 
+                <a href="index.html" class="home-icon" title="Home">
+                    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                </a>
+            </div>
+            <button class="theme-toggle" id="themeToggle">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Dark
+            </button>
         </div>
     </header>
 
-    <div class="layout-container">
-        
-        <div class="sidebar">
-            <h2>Filters</h2>
-            <div class="filter-group">
-                <label>Year</label>
-                <select id="filterYear"><option value="All">All Years</option></select>
-            </div>
-            <div class="filter-group">
-                <label>Month</label>
-                <select id="filterMonth"><option value="All">All Months</option></select>
-            </div>
-            <div class="filter-group">
-                <label>Location</label>
-                <select id="filterLocation"><option value="All">All Locations</option></select>
-            </div>
-            <div class="filter-group">
-                <label>Surveyor Name</label>
-                <select id="filterSurveyor"><option value="All">All Surveyors</option></select>
-            </div>
-            <div class="filter-group">
-                <label>Driver Name</label>
-                <select id="filterDriver"><option value="All">All Drivers</option></select>
-            </div>
-            <button id="clearFiltersBtn" class="clear-btn">Clear Filters</button>
-        </div>
+    <div class="filter-bar">
+        <div class="filter-group"><label>Year</label><select id="filterYear"><option value="All">All Years</option></select></div>
+        <div class="filter-group"><label>Month</label><select id="filterMonth"><option value="All">All Months</option></select></div>
+        <div class="filter-group"><label>Location</label><select id="filterLocation"><option value="All">All Locations</option></select></div>
+        <div class="filter-group"><label>Surveyor</label><select id="filterSurveyor"><option value="All">All Surveyors</option></select></div>
+        <div class="filter-group"><label>Driver</label><select id="filterDriver"><option value="All">All Drivers</option></select></div>
+        <button id="clearFiltersBtn" class="clear-btn">Reset View</button>
+    </div>
 
-        <div class="main-content">
+    <div class="workspace">
+        <div id="loadingMsg">Calculating Service Level...</div>
+
+        <div class="dashboard-grid" id="dashboardContent" style="display: none;">
             
-            <div class="nav-tabs">
-                <a href="index.html">HR Dashboard</a>
-                <a href="#" class="active">Admin Dashboard</a>
-                <a href="cost.html">Cost Dashboard</a>
-                <a href="transport.html">Pool & Transport</a> 
-                
-                <a href="index.html" class="home-icon" title="Home">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                    </svg>
-                </a>
+            <div class="kpi-widget col-span-2">
+                <div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Admin Building</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartLoc1"></canvas></div>
+            </div>
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot red"></span><div class="kpi-title"><h3>Executive Mess</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartLoc2"></canvas></div>
+            </div>
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot yellow"></span><div class="kpi-title"><h3>Guesthouse</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartLoc3"></canvas></div>
             </div>
 
-            <div id="loadingMsg">Calculating Service Level Averages...</div>
-
-            <div class="dashboard-grid" id="dashboardContent" style="display: none;">
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Admin Building</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc1"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Executive Mess</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc2"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Guesthouse Building</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc3"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Guest Rooms</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc4"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Lockers</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc5"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Plant Outside</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc6"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Staff Mess Social Block</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc7"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Staff Transport</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc8"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Technical Office</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc9"></canvas></div></div>
-                <div class="kpi-widget"><div class="kpi-header"><div class="kpi-title"><h3>Washrooms</h3></div></div><div class="chart-wrapper"><canvas id="chartLoc10"></canvas></div></div>
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot green"></span><div class="kpi-title"><h3>Guest Rooms</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartLoc4"></canvas></div>
+            </div>
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Lockers</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartLoc5"></canvas></div>
+            </div>
+            <div class="kpi-widget col-span-2">
+                <div class="kpi-header"><span class="dot red"></span><div class="kpi-title"><h3>Plant Outside</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartLoc6"></canvas></div>
             </div>
 
-            <div class="surveyor-rounds-container" id="surveyorRoundsContainer">
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot yellow"></span><div class="kpi-title"><h3>Staff Mess</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartLoc7"></canvas></div>
             </div>
-
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot green"></span><div class="kpi-title"><h3>Staff Transport</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartLoc8"></canvas></div>
+            </div>
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Technical Office</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartLoc9"></canvas></div>
+            </div>
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot red"></span><div class="kpi-title"><h3>Washrooms</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartLoc10"></canvas></div>
+            </div>
+            
         </div>
+
+        <div class="surveyor-rounds-container" id="surveyorRoundsContainer" style="display: none;">
+            </div>
+
     </div>
 
     <script>
-        // ADMIN SHEET LINK 
+        // --- THEME & UTILS ---
+        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+        const themeBtn = document.getElementById('themeToggle');
+
+        function getThemeColors() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            return {
+                text: isDark ? '#A1A1AA' : '#64748B',
+                grid: isDark ? '#18181B' : '#F1F5F9',
+                tooltipBg: isDark ? 'rgba(24, 24, 27, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                tooltipText: isDark ? '#FAFAFA' : '#0F172A',
+                tooltipBorder: isDark ? '#3F3F46' : '#E2E8F0',
+                pointBg: isDark ? '#FAFAFA' : '#FFFFFF',
+                emptyDoughnut: isDark ? '#27272A' : '#F1F5F9',
+                positiveColor: isDark ? '#10B981' : '#10B981',
+                negativeColor: isDark ? '#EF4444' : '#EF4444'
+            };
+        }
+
+        themeBtn.addEventListener('click', () => {
+            const html = document.documentElement;
+            const isCurrentlyDark = html.getAttribute('data-theme') === 'dark';
+            const newTheme = isCurrentlyDark ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            
+            themeBtn.innerHTML = newTheme === 'dark' 
+                ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Light`
+                : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Dark`;
+            
+            triggerUpdate(); // Re-render charts to catch new theme variables
+        });
+
+        // --- CORE LOGIC ---
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=508898650&single=true&output=csv';
-
-        let sheetData = [];
-        let headers = [];
-        const charts = {};
-
-        const G_BLUE = '#4285F4'; const G_RED = '#EA4335'; const G_YELLOW = '#FBBC05'; const G_GREEN = '#34A853';
-        const BG_BLUE = 'rgba(66, 133, 244, 0.15)'; const BG_RED = 'rgba(234, 67, 53, 0.15)'; const BG_YELLOW = 'rgba(251, 188, 5, 0.15)'; const BG_GREEN = 'rgba(52, 168, 83, 0.15)';
-
-        const locColorsLine = [G_BLUE, G_RED, G_YELLOW, G_GREEN, G_BLUE, G_RED, G_YELLOW, G_GREEN, G_BLUE, G_RED];
-        const locColorsBg = [BG_BLUE, BG_RED, BG_YELLOW, BG_GREEN, BG_BLUE, BG_RED, BG_YELLOW, BG_GREEN, BG_BLUE, BG_RED];
-
+        let sheetData = []; let headers = []; const charts = {};
+        
+        // Premium Theme Accent Colors mapping for the 10 locations
+        const locColorsHex = ['#3B82F6', '#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#EF4444'];
         const userSvgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
 
         function parseCSV(str) {
@@ -246,47 +337,11 @@
             if (!val || val.toString().trim() === '') return null;
             let strVal = val.toString().toLowerCase();
             if (strVal.includes('#div/0!') || strVal.includes('#n/a') || strVal.includes('error')) return null;
-            
             let num = parseFloat(strVal.replace(/[^0-9.-]/g, ''));
             if (isNaN(num)) return null;
-
             if (strVal.includes('%')) return num;
             if (num > 0 && num <= 1.0) return num * 100;
             return num;
-        }
-
-        function formatAvg(num) {
-            return num.toFixed(1) + "%"; 
-        }
-
-        // Standard Graph styling (Bold Tooltips, Bold X-Axis, Hidden Y-Axis Ticks)
-        function createEmptyLineChart(canvasId, colorLine, colorBg) {
-            const ctx = document.getElementById(canvasId).getContext('2d');
-            return new Chart(ctx, {
-                type: 'line',
-                data: { labels: [], datasets: [{ backgroundColor: colorBg, borderColor: colorLine, borderWidth: 2, fill: true, tension: 0.4, pointRadius: 3, pointHoverRadius: 6, data: [] }] },
-                options: {
-                    responsive: true, maintainAspectRatio: false, animation: { duration: 800 },
-                    plugins: { 
-                        legend: { display: false },
-                        tooltip: { 
-                            titleFont: { size: 12, weight: 'bold' }, 
-                            bodyFont: { size: 13, weight: 'bold' },
-                            padding: 10
-                        }
-                    },
-                    scales: { 
-                        y: { display: true, beginAtZero: true, grid: { drawBorder: false, color: '#f1f3f4' }, ticks: { display: false } }, 
-                        x: { display: true, grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' }, color: '#5F6368', maxRotation: 45, minRotation: 0 } } 
-                    }
-                }
-            });
-        }
-
-        function initCharts() {
-            for(let i=0; i<10; i++) {
-                charts['loc'+(i+1)] = createEmptyLineChart('chartLoc'+(i+1), locColorsLine[i], locColorsBg[i]);
-            }
         }
 
         let h_month, h_surv, h_area, h_loc, h_svc;
@@ -304,7 +359,6 @@
 
         function populateDropdowns() {
             const years = new Set(), months = new Set(), surveyors = new Set(), locations = new Set();
-
             sheetData.forEach(row => {
                 let mRaw = row[h_month] || "";
                 if(mRaw.includes('-')) {
@@ -319,7 +373,6 @@
                     row['ExtractedMonth'] = mRaw.trim();
                     row['ExtractedYear'] = "All"; 
                 }
-
                 if(h_surv && row[h_surv]) surveyors.add(row[h_surv].trim());
                 if(h_loc && row[h_loc]) locations.add(row[h_loc].trim());
             });
@@ -327,61 +380,47 @@
             const addOptions = (setId, dataSet) => {
                 const select = document.getElementById(setId);
                 select.innerHTML = `<option value="All">All</option>`;
-                dataSet.forEach(val => {
-                    if(val) select.innerHTML += `<option value="${val}">${val}</option>`;
-                });
+                dataSet.forEach(val => { if(val) select.innerHTML += `<option value="${val}">${val}</option>`; });
             };
-
             addOptions('filterYear', years); addOptions('filterMonth', months);
             addOptions('filterSurveyor', surveyors); addOptions('filterLocation', locations);
         }
 
         async function fetchGoogleSheetData() {
             try {
-                const response = await fetch(csvUrl);
-                const csvText = await response.text();
+                const response = await fetch(csvUrl); const csvText = await response.text();
                 const rows = parseCSV(csvText);
-                
                 let headerIdx = 0;
                 for(let i=0; i<Math.min(15, rows.length); i++) {
                     let rowStr = rows[i].join("").toLowerCase().replace(/\s/g, '');
-                    if(rowStr.includes("month") && rowStr.includes("servicelevel")) {
-                        headerIdx = i; break;
-                    }
+                    if(rowStr.includes("month") && rowStr.includes("servicelevel")) { headerIdx = i; break; }
                 }
 
                 headers = rows[headerIdx].map(h => h ? h.trim() : `Col_${Math.random()}`);
                 identifyHeaders(headers); 
-                
                 sheetData = rows.slice(headerIdx + 1).map(row => {
                     let obj = {};
                     row.forEach((cell, i) => { if(headers[i]) obj[headers[i]] = cell ? cell.trim() : ""; });
                     return obj;
                 });
-
                 sheetData = sheetData.filter(row => Object.values(row).some(x => x !== ""));
-
                 if(sheetData.length === 0) throw new Error("No data found");
 
                 document.getElementById('loadingMsg').style.display = 'none';
                 document.getElementById('dashboardContent').style.display = 'grid'; 
+                document.getElementById('surveyorRoundsContainer').style.display = 'flex'; 
 
-                populateDropdowns();
-                updateDashboard(); 
-            } catch (error) {
-                console.error("Data error:", error);
-                document.getElementById('loadingMsg').innerHTML = `<span style='color:red'>Error reading sheet headers. Check columns.</span>`;
-            }
+                populateDropdowns(); updateDashboard(); 
+            } catch (error) { document.getElementById('loadingMsg').innerHTML = `Error loading data.`; }
         }
 
         function triggerUpdate() {
-            const elementsToFade = document.querySelectorAll('.chart-wrapper, .surveyor-rounds-container');
+            const elementsToFade = document.querySelectorAll('#dashboardContent, #surveyorRoundsContainer');
             elementsToFade.forEach(el => el.classList.add('fade-out'));
-            
             setTimeout(() => {
                 updateDashboard();
                 elementsToFade.forEach(el => el.classList.remove('fade-out'));
-            }, 350);
+            }, 300);
         }
 
         function updateDashboard() {
@@ -389,7 +428,6 @@
             const mVal = document.getElementById('filterMonth').value;
             const sVal = document.getElementById('filterSurveyor').value;
             const lVal = document.getElementById('filterLocation').value;
-
             const isMonthSelected = (mVal !== "All");
 
             let filteredData = sheetData.filter(item => {
@@ -400,48 +438,34 @@
                 return true;
             });
 
-            // ---------------------------------------------------------
-            // CALCULATE & RENDER SURVEYOR ROUNDS 
-            // ---------------------------------------------------------
+            // Surveyor Rounds Calculation
             let surveyorCounts = {};
-            
             filteredData.forEach(item => {
                 let sName = item[h_surv];
-                if (sName) {
-                    sName = sName.trim();
-                    if (!surveyorCounts[sName]) surveyorCounts[sName] = 0;
-                    surveyorCounts[sName]++; 
-                }
+                if (sName) { sName = sName.trim(); surveyorCounts[sName] = (surveyorCounts[sName] || 0) + 1; }
             });
 
             const roundsContainer = document.getElementById('surveyorRoundsContainer');
             roundsContainer.innerHTML = ''; 
-
             for (const [name, count] of Object.entries(surveyorCounts)) {
-                const cardHtml = `
+                roundsContainer.innerHTML += `
                     <div class="surveyor-card">
                         <div class="surveyor-icon">${userSvgIcon}</div>
                         <div class="surveyor-info">
                             <span class="surveyor-name">${name}</span>
-                            <span class="surveyor-count">${count} <span style="font-size:0.8rem; font-weight:500; color:var(--text-muted)">Rounds</span></span>
+                            <span class="surveyor-count">${count} <span style="font-size:0.7rem; font-weight:600; color:var(--text-secondary)">Rounds</span></span>
                         </div>
-                    </div>
-                `;
-                roundsContainer.innerHTML += cardHtml;
+                    </div>`;
             }
 
-            // ---------------------------------------------------------
-            // GRAPHS LOGIC (AVERAGE SERVICE LEVEL)
-            // ---------------------------------------------------------
+            // Graphs Calculation
             const targetAreas = [
                 ['admin building', 'admin'], ['executive mess'], ['guesthouse', 'guest house'], ['guest room'],
                 ['locker'], ['plant outside', 'plant'], ['social block', 'staff mess'], ['transport'],
                 ['technical', 'gpak', 'ipak', 'petpak'], ['washroom']
             ];
 
-            let gSum = Array(10).fill(0);
-            let gCnt = Array(10).fill(0);
-            let groupedStats = {};
+            let gSum = Array(10).fill(0), gCnt = Array(10).fill(0), groupedStats = {};
 
             filteredData.forEach(item => {
                 let label = item['ExtractedMonth'] || "Unknown";
@@ -468,90 +492,91 @@
             let datasets = Array.from({length: 10}, () => []);
             labels.forEach(lbl => {
                 let s = groupedStats[lbl];
-                for(let i=0; i<10; i++) {
-                    datasets[i].push(s.cnts[i] > 0 ? parseFloat((s.sums[i]/s.cnts[i]).toFixed(1)) : 0);
-                }
+                for(let i=0; i<10; i++) datasets[i].push(s.cnts[i] > 0 ? parseFloat((s.sums[i]/s.cnts[i]).toFixed(1)) : 0);
             });
 
+            const tColors = getThemeColors();
+
+            // Render Charts
             for(let i=0; i<10; i++) {
                 let canvasId = 'chartLoc' + (i+1);
-                let colorIdx = i % locColorsLine.length;
-                
-                if(charts['loc'+(i+1)]) {
-                    charts['loc'+(i+1)].destroy();
-                }
+                let colorHex = locColorsHex[i];
+                let overallAvg = gCnt[i] > 0 ? parseFloat((gSum[i] / gCnt[i]).toFixed(1)) : 0;
 
+                if(charts['loc'+(i+1)]) charts['loc'+(i+1)].destroy();
                 const ctx = document.getElementById(canvasId).getContext('2d');
 
                 if(isMonthSelected) {
                     // DOUGHNUT CHART MODE
-                    let avgVal = gCnt[i] > 0 ? parseFloat((gSum[i] / gCnt[i]).toFixed(1)) : 0;
-                    let targetColor = avgVal >= 95 ? G_GREEN : G_RED; 
+                    let targetColor = overallAvg >= 95 ? tColors.positiveColor : tColors.negativeColor; 
                     
                     charts['loc'+(i+1)] = new Chart(ctx, {
                         type: 'doughnut',
                         data: {
                             labels: ['Achieved', 'Remaining'],
                             datasets: [{
-                                data: [avgVal, Math.max(0, 100 - avgVal)],
-                                backgroundColor: [targetColor, '#E8EAED'],
-                                borderWidth: 0,
-                                cutout: '75%'
+                                data: [overallAvg, Math.max(0, 100 - overallAvg)],
+                                backgroundColor: [targetColor, tColors.emptyDoughnut],
+                                borderWidth: 0, cutout: '75%'
                             }]
                         },
                         options: {
                             responsive: true, maintainAspectRatio: false, 
-                            animation: { duration: 1000, easing: 'easeOutBounce', animateScale: true, animateRotate: true },
+                            animation: { duration: 800, easing: 'easeOutBounce' },
                             plugins: { legend: { display: false }, tooltip: { enabled: false } },
-                            scales: { x: { display: false }, y: { display: false } }
+                            layout: { padding: 10 }
                         },
                         plugins: [{
                             id: 'centerTextPlugin',
                             beforeDraw: function(chart) {
                                 var width = chart.width, height = chart.height, context = chart.ctx;
                                 context.restore();
-                                
-                                let fontSizePct = (height / 120).toFixed(2); 
-                                context.font = "bold " + fontSizePct + "em Roboto";
+                                let fontSizePct = (height / 110).toFixed(2); 
+                                context.font = "bold " + fontSizePct + "em 'Plus Jakarta Sans'";
                                 context.textBaseline = "middle";
-                                context.fillStyle = targetColor;
-                                let textPct = avgVal + "%";
+                                context.fillStyle = tColors.text; // Text adapts to theme
+                                let textPct = overallAvg > 0 ? overallAvg + "%" : "--";
                                 let textXPct = Math.round((width - context.measureText(textPct).width) / 2);
                                 let textYPct = height / 2; 
                                 context.fillText(textPct, textXPct, textYPct);
-                                
                                 context.save();
                             }
                         }]
                     });
-
                 } else {
-                    // LINE CHART MODE (Standardized)
+                    // LINE CHART MODE (Standardized with Bento Gradient)
+                    let bgGradient = ctx.createLinearGradient(0, 0, 0, 120);
+                    bgGradient.addColorStop(0, colorHex + '30'); 
+                    bgGradient.addColorStop(1, colorHex + '00'); 
+
                     charts['loc'+(i+1)] = new Chart(ctx, {
                         type: 'line',
                         data: { 
                             labels: labels, 
                             datasets: [{ 
-                                backgroundColor: locColorsBg[colorIdx], 
-                                borderColor: locColorsLine[colorIdx], 
+                                backgroundColor: bgGradient, borderColor: colorHex, 
                                 borderWidth: 2, fill: true, tension: 0.4, 
-                                pointRadius: 3, pointHoverRadius: 6, data: datasets[i] 
+                                pointRadius: 2, pointHoverRadius: 5,
+                                pointBackgroundColor: tColors.pointBg, pointBorderColor: colorHex,
+                                pointBorderWidth: 2, data: datasets[i] 
                             }] 
                         },
                         options: {
-                            responsive: true, maintainAspectRatio: false, animation: { duration: 800, easing: 'easeOutQuart' },
+                            responsive: true, maintainAspectRatio: false, layout: { padding: { top: 5 } },
+                            animation: { duration: 600, easing: 'easeOutQuart' },
                             plugins: { 
                                 legend: { display: false }, 
                                 tooltip: { 
-                                    titleFont: { size: 12, weight: 'bold' }, 
-                                    bodyFont: { size: 13, weight: 'bold' },
-                                    padding: 10,
+                                    backgroundColor: tColors.tooltipBg, titleColor: tColors.tooltipText, bodyColor: tColors.tooltipText,
+                                    borderColor: tColors.tooltipBorder, borderWidth: 1, padding: 10, cornerRadius: 8,
+                                    titleFont: { size: 10, family: "'Plus Jakarta Sans', sans-serif" }, 
+                                    bodyFont: { size: 13, weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" },
                                     callbacks: { label: function(context) { return context.parsed.y + "%"; } } 
                                 } 
                             },
                             scales: { 
-                                y: { display: true, beginAtZero: true, grid: { drawBorder: false, color: '#f1f3f4' }, ticks: { display: false } }, 
-                                x: { display: true, grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' }, color: '#5F6368', maxRotation: 45, minRotation: 0 } } 
+                                y: { display: true, beginAtZero: true, grid: { drawBorder: false, color: tColors.grid }, ticks: { display: false } }, 
+                                x: { display: true, grid: { display: false }, ticks: { font: { size: 9, weight: '600' }, color: tColors.text, maxRotation: 0 } } 
                             }
                         }
                     });
@@ -560,12 +585,8 @@
         }
 
         document.querySelectorAll('select').forEach(sel => sel.addEventListener('change', triggerUpdate));
-        document.getElementById('clearFiltersBtn').addEventListener('click', () => {
-            document.querySelectorAll('select').forEach(sel => sel.value = 'All');
-            triggerUpdate(); 
-        });
-
-        window.onload = () => { initCharts(); fetchGoogleSheetData(); };
+        document.getElementById('clearFiltersBtn').addEventListener('click', () => { document.querySelectorAll('select').forEach(sel => sel.value = 'All'); triggerUpdate(); });
+        window.onload = () => { fetchGoogleSheetData(); };
     </script>
 </body>
 </html>
