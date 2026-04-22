@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pool Vehicle Dashboard - Standard Bento Box</title>
+    <title>Pool Vehicle Dashboard - One View Bento</title>
     <link rel="icon" href="Logo.png" type="image/png">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -34,7 +34,7 @@
             --border-hover: #D4D4D8;
             --grid-line: #F1F5F9;
             --shadow-card: 0 4px 24px -6px rgba(15, 23, 42, 0.08);
-            --shadow-hover: 0 12px 32px -8px rgba(15, 23, 42, 0.15); /* Hover Glow */
+            --shadow-hover: 0 12px 32px -8px rgba(15, 23, 42, 0.15);
             --bg-input: #F4F4F5;
             --bg-icon: rgba(16, 185, 129, 0.1);
         }
@@ -49,7 +49,7 @@
             --border-hover: #3F3F46;
             --grid-line: #18181B;
             --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.6);
-            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.8); /* Hover Glow Dark */
+            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.8);
             --bg-input: #18181B;
             --bg-icon: rgba(16, 185, 129, 0.15);
         }
@@ -57,7 +57,7 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             margin: 0; background-color: var(--bg-main); color: var(--text-primary);
-            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden; /* ONE VIEW - NO BODY SCROLL */
             transition: var(--transition);
         }
 
@@ -68,7 +68,7 @@
             display: flex; align-items: center; justify-content: space-between;
             padding: 12px 30px; background-color: var(--bg-surface);
             border-bottom: 1px solid var(--border-color); height: 60px;
-            box-sizing: border-box; transition: var(--transition);
+            box-sizing: border-box; transition: var(--transition); flex-shrink: 0;
         }
 
         .header-brand { display: flex; align-items: center; gap: 12px; }
@@ -87,7 +87,6 @@
 
         .header-actions { display: flex; align-items: center; gap: 15px; margin-left: 15px; }
 
-        /* Share Menu */
         .share-container { position: relative; }
         .share-btn {
             display: flex; align-items: center; gap: 8px;
@@ -130,7 +129,7 @@
         .filter-bar {
             display: flex; align-items: center; gap: 15px; padding: 10px 30px;
             background-color: var(--bg-main); height: 50px; box-sizing: border-box;
-            border-bottom: 1px solid var(--border-color); flex-wrap: nowrap; overflow-x: auto;
+            border-bottom: 1px solid var(--border-color); flex-wrap: nowrap; overflow-x: auto; flex-shrink: 0;
         }
 
         .filter-group { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
@@ -153,39 +152,36 @@
         .clear-btn:hover { color: var(--text-primary); border-color: var(--text-primary); transform: translateY(-1px); }
 
         /* ---------------------------------
-           UNIQUE BENTO GRID
+           ONE VIEW BENTO GRID
         --------------------------------- */
         .workspace {
             flex: 1; padding: 15px 30px; display: flex; flex-direction: column;
             height: calc(100vh - 110px); box-sizing: border-box; overflow: hidden; position: relative;
         }
 
-        /* 4-column auto Grid */
         .dashboard-grid {
             display: grid; 
             grid-template-columns: repeat(4, 1fr); 
-            grid-auto-rows: 1fr;
-            gap: 16px; flex-grow: 1; height: 100%; min-height: 0; overflow-y: auto; padding-bottom: 10px;
+            /* rows will be calculated dynamically via JS for perfect fit */
+            gap: 16px; flex-grow: 1; height: 100%; min-height: 0; overflow: hidden; /* NO SCROLL */
         }
 
-        /* Magic Classes for Dynamic Asymmetry */
         .col-span-2 { grid-column: span 2; }
         
         .kpi-widget {
             background: var(--bg-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
-            padding: 16px 20px; display: flex; flex-direction: column; 
-            border: 1px solid var(--border-color); min-height: 200px;
+            padding: 12px 20px; display: flex; flex-direction: column; 
+            border: 1px solid var(--border-color); min-height: 0; /* Lets it squish to fit */
             transition: var(--transition); position: relative; overflow: hidden;
         }
         
-        /* THE HOVER EFFECT */
         .kpi-widget:hover { 
             border-color: var(--text-secondary); 
             transform: translateY(-4px); 
             box-shadow: var(--shadow-hover);
         }
 
-        .kpi-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-shrink: 0; }
+        .kpi-header { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; flex-shrink: 0; }
         
         .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
         .dot.blue { background-color: var(--color-blue); box-shadow: 0 0 8px var(--color-blue); }
@@ -197,22 +193,22 @@
 
         .chart-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; min-height: 0; }
 
-        /* Surveyor Rounds Bottom Summary */
+        /* Surveyor Rounds */
         .surveyor-rounds-container { 
             display: flex; gap: 15px; flex-wrap: nowrap; margin-top: 15px; flex-shrink: 0; overflow-x: auto;
-            padding-bottom: 5px; 
+            padding-bottom: 5px; height: 60px; /* Fixed height so it doesn't push grid */
         }
         .surveyor-card { 
             background: var(--bg-surface); border: 1px solid var(--border-color); 
-            border-radius: var(--radius-md); padding: 10px 15px; display: flex; align-items: center; 
-            gap: 12px; box-shadow: var(--shadow-card); min-width: 160px; transition: var(--transition);
+            border-radius: var(--radius-md); padding: 8px 15px; display: flex; align-items: center; 
+            gap: 12px; box-shadow: var(--shadow-card); min-width: 150px; transition: var(--transition); height: 100%; box-sizing: border-box;
         }
         .surveyor-card:hover { border-color: var(--text-secondary); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
-        .surveyor-icon { width: 36px; height: 36px; background-color: var(--bg-icon); color: var(--color-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .surveyor-icon svg { width: 18px; height: 18px; fill: currentColor; }
+        .surveyor-icon { width: 32px; height: 32px; background-color: var(--bg-icon); color: var(--color-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink:0;}
+        .surveyor-icon svg { width: 16px; height: 16px; fill: currentColor; }
         .surveyor-info { display: flex; flex-direction: column; }
-        .surveyor-name { font-size: 0.7rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
-        .surveyor-count { font-size: 1.1rem; font-weight: 800; color: var(--text-primary); }
+        .surveyor-name { font-size: 0.65rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px;}
+        .surveyor-count { font-size: 1rem; font-weight: 800; color: var(--text-primary); }
 
         /* FADE TRANSITIONS */
         .fade-out { opacity: 0 !important; transform: scale(0.96) !important; }
@@ -226,20 +222,20 @@
         }
 
         /* ---------------------------------
-           A4 PRINT LOGIC (Standardized)
+           A4 PRINT LOGIC 
         --------------------------------- */
         @media print {
             @page { size: A4 landscape; margin: 10mm; }
-            body { background-color: #FFFFFF !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            body { background-color: #FFFFFF !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; height: auto !important; }
             .top-header { border-bottom: 2px solid #E2E8F0; background: #FFFFFF !important; }
             .header-brand h1 { color: #0F172A !important; }
             .nav-tabs, .header-actions, .filter-bar, #loadingMsg, .theme-toggle { display: none !important; }
             .workspace { height: auto !important; overflow: visible !important; padding: 0 !important; }
-            .dashboard-grid { grid-template-columns: repeat(4, 1fr) !important; grid-template-rows: auto !important; gap: 10px !important; }
-            .kpi-widget { border: 1px solid #E2E8F0 !important; box-shadow: none !important; background: #FFFFFF !important; break-inside: avoid; border-radius: 12px !important; transform: none !important; min-height: 180px; }
+            .dashboard-grid { grid-template-rows: auto !important; gap: 10px !important; } /* Reset Grid rows for print */
+            .kpi-widget { border: 1px solid #E2E8F0 !important; box-shadow: none !important; background: #FFFFFF !important; break-inside: avoid; border-radius: 12px !important; transform: none !important; min-height: 150px; }
             .kpi-title h3 { color: #0F172A !important; }
-            .surveyor-rounds-container { display: flex !important; flex-wrap: wrap; margin-top: 10px; }
-            .surveyor-card { box-shadow: none !important; border-color: #E2E8F0 !important; }
+            .surveyor-rounds-container { display: flex !important; flex-wrap: wrap; margin-top: 10px; height: auto; }
+            .surveyor-card { box-shadow: none !important; border-color: #E2E8F0 !important; height: auto; }
         }
     </style>
 </head>
@@ -344,7 +340,7 @@
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=651598198&single=true&output=csv';
         let sheetData = []; let headers = []; let uniqueCars = []; const charts = {};
         
-        const locColorsHex = ['#3B82F6', '#EF4444', '#F59E0B', '#10B981']; // 4 Core Colors
+        const locColorsHex = ['#3B82F6', '#EF4444', '#F59E0B', '#10B981']; 
         const dotColors = ['blue', 'red', 'yellow', 'green'];
         const userSvgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
 
@@ -412,10 +408,23 @@
             const container = document.getElementById('dashboardContent');
             container.innerHTML = '';
             
+            // JAVASCRIPT LOGIC TO DYNAMICALLY CALCULATE ROWS FOR "ONE VIEW" FIT
+            let cols = 4;
+            let currentRowCols = 0;
+            let totalRows = 1;
+
             uniqueCars.forEach((car, index) => {
-                // Dynamic Asymmetric Mosaic Logic (repeating pattern for responsive bento feel)
                 let mod = index % 10;
-                let colSpanClass = (mod === 0 || mod === 5) ? 'col-span-2' : ''; 
+                let span = (mod === 0 || mod === 5) ? 2 : 1; // Asymmetric logic
+                
+                if (currentRowCols + span > cols) {
+                    totalRows++;
+                    currentRowCols = span;
+                } else {
+                    currentRowCols += span;
+                }
+
+                let colSpanClass = span === 2 ? 'col-span-2' : ''; 
                 let dColor = dotColors[index % dotColors.length];
 
                 const widgetHTML = `
@@ -426,6 +435,9 @@
                 `;
                 container.innerHTML += widgetHTML;
             });
+
+            // Force grid to divide available 100% height into the exact number of required rows
+            container.style.gridTemplateRows = `repeat(${totalRows}, minmax(0, 1fr))`;
         }
 
         function populateDropdowns() {
@@ -529,7 +541,7 @@
                     <div class="surveyor-card">
                         <div class="surveyor-icon">${userSvgIcon}</div>
                         <div class="surveyor-info">
-                            <span class="surveyor-name">${name}</span>
+                            <span class="surveyor-name" title="${name}">${name}</span>
                             <span class="surveyor-count">${count} <span style="font-size:0.7rem; font-weight:600; color:var(--text-secondary)">Rounds</span></span>
                         </div>
                     </div>`;
@@ -597,7 +609,7 @@
                             responsive: true, maintainAspectRatio: false, 
                             animation: { duration: 800, easing: 'easeOutBounce' },
                             plugins: { legend: { display: false }, tooltip: { enabled: false } },
-                            layout: { padding: 10 }
+                            layout: { padding: 5 }
                         },
                         plugins: [{
                             id: 'centerTextPlugin',
