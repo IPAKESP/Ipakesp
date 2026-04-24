@@ -163,7 +163,7 @@
             padding: 5px 10px; border-radius: 8px; font-size: 0.65rem; font-weight: 700; cursor: pointer; 
             transition: var(--transition); font-family: inherit; width: 100%; text-align: center;
         }
-        .city-btn.active { background: var(--text-primary); color: var(--bg-surface); border-color: var(--text-primary); }
+        .city-btn.active { background: var(--text-primary); color: var(--bg-surface); border-color: var(--text-primary); transform: scale(1.05); }
         .city-btn:hover:not(.active) { background: var(--btn-dim); color: var(--text-primary); border-color: var(--border-hover); }
 
         #loadingMsg {
@@ -223,23 +223,24 @@
                 <div style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center; min-width: 0; min-height: 0;">
                     <canvas id="chartHeadcountDoughnut" style="z-index: 2; transition: all 0.3s;"></canvas>
                     <div style="position: absolute; text-align: center; pointer-events: none; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                        <div id="hc-total" style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary); line-height: 1; transition: var(--transition);">1,021</div>
+                        <div id="hc-total" style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary); line-height: 1; transition: color 0.3s;">1,021</div>
                     </div>
                 </div>
 
                 <div style="flex: 1.2; display: flex; flex-direction: column; justify-content: center; gap: 8px; min-width: 0;">
-                    <div class="kpi-title" style="margin-bottom: 2px;">
-                        <h3><span class="dot blue" style="margin-right: 6px;"></span>Headcount</h3>
+                    <div class="kpi-header" style="margin-bottom: 2px;">
+                        <span class="dot blue"></span>
+                        <div class="kpi-title"><h3>Headcount</h3></div>
                     </div>
                     
                     <div style="display: flex; gap: 8px; min-width: 0;">
                         <div style="flex: 1 1 0; background: var(--bg-input); padding: 8px; border-radius: 8px; border-left: 3px solid var(--color-blue); min-width: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: center;">
                             <div style="font-size: 0.55rem; color: var(--text-secondary); font-weight: 800; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">PERMANENT</div>
-                            <div id="hc-perm" style="font-size: 1rem; font-weight: 800; color: var(--text-primary); margin-top: 2px; transition: var(--transition);">661</div>
+                            <div id="hc-perm" style="font-size: 1rem; font-weight: 800; color: var(--text-primary); margin-top: 2px; transition: color 0.3s;">661</div>
                         </div>
                         <div style="flex: 1 1 0; background: var(--bg-input); padding: 8px; border-radius: 8px; border-left: 3px solid var(--color-yellow); min-width: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: center;">
                             <div style="font-size: 0.55rem; color: var(--text-secondary); font-weight: 800; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">THIRD PARTY</div>
-                            <div id="hc-tp" style="font-size: 1rem; font-weight: 800; color: var(--text-primary); margin-top: 2px; transition: var(--transition);">360</div>
+                            <div id="hc-tp" style="font-size: 1rem; font-weight: 800; color: var(--text-primary); margin-top: 2px; transition: color 0.3s;">360</div>
                         </div>
                     </div>
 
@@ -489,17 +490,22 @@
                         {
                             data: [82, 408, 531],
                             backgroundColor: [b, y, g],
-                            borderWidth: 2, borderColor: surfaceColor, hoverOffset: 4, weight: 1.5 
+                            borderWidth: 2, borderColor: surfaceColor, hoverOffset: 4, weight: 1.5,
+                            offset: [0, 0, 0] // Added offset for Pop-out Animation
                         },
                         {
                             data: [70, 12, 283, 125, 308, 223],
                             backgroundColor: ['#60A5FA', '#DBEAFE', '#FBBF24', '#FEF3C7', '#34D399', '#D1FAE5'],
-                            borderWidth: 2, borderColor: surfaceColor, weight: 0.8
+                            borderWidth: 2, borderColor: surfaceColor, weight: 0.8,
+                            offset: [0, 0, 0, 0, 0, 0] // Added offset for Pop-out Animation
                         }
                     ]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false, cutout: '65%', layout: { padding: 10 },
+                    animation: {
+                        animateScale: true, animateRotate: true, duration: 800, easing: 'easeOutQuart'
+                    },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
@@ -536,12 +542,29 @@
             charts.pending = createChart('chartPending', 'bar', r, false);         
         }
 
-        // --- CITY SELECTION INTERACTION LOGIC ---
+        // --- NUMBER ROLL/COUNT ANIMATION LOGIC ---
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                // Ease out quart equation for smooth slow down
+                const easeProgress = 1 - Math.pow(1 - progress, 4);
+                let currentVal = Math.floor(easeProgress * (end - start) + start);
+                obj.innerHTML = currentVal.toLocaleString('en-US');
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // --- CITY SELECTION INTERACTION LOGIC (WITH POP-OUT & ROLL) ---
         const hcData = {
-            "All": { total: "1,021", perm: "661", tp: "360" },
-            "KHI": { total: "82", perm: "70", tp: "12" },
-            "LHR": { total: "408", perm: "283", tp: "125" },
-            "SKP": { total: "531", perm: "308", tp: "223" }
+            "All": { total: 1021, perm: 661, tp: 360 },
+            "KHI": { total: 82, perm: 70, tp: 12 },
+            "LHR": { total: 408, perm: 283, tp: 125 },
+            "SKP": { total: 531, perm: 308, tp: 223 }
         };
 
         document.querySelectorAll('.city-btn').forEach(btn => {
@@ -550,11 +573,21 @@
                 e.target.classList.add('active');
                 
                 const city = e.target.getAttribute('data-city');
-                document.getElementById('hc-total').innerText = hcData[city].total;
-                document.getElementById('hc-perm').innerText = hcData[city].perm;
-                document.getElementById('hc-tp').innerText = hcData[city].tp;
+                
+                // 1. Roll Animation for Numbers
+                const elTotal = document.getElementById('hc-total');
+                const elPerm = document.getElementById('hc-perm');
+                const elTp = document.getElementById('hc-tp');
+                
+                const oldTotal = parseInt(elTotal.innerText.replace(/,/g, '')) || 0;
+                const oldPerm = parseInt(elPerm.innerText.replace(/,/g, '')) || 0;
+                const oldTp = parseInt(elTp.innerText.replace(/,/g, '')) || 0;
 
-                // Update Chart Opacity for Highlight Effect
+                animateValue(elTotal, oldTotal, hcData[city].total, 800);
+                animateValue(elPerm, oldPerm, hcData[city].perm, 800);
+                animateValue(elTp, oldTp, hcData[city].tp, 800);
+
+                // 2. Chart Pop-out & Dimming Animation
                 if (charts.headcount) {
                     const dsOuter = charts.headcount.data.datasets[0];
                     const dsInner = charts.headcount.data.datasets[1];
@@ -563,15 +596,27 @@
                     if (city === "All") {
                         dsOuter.backgroundColor = [b, y, g];
                         dsInner.backgroundColor = ['#60A5FA', '#DBEAFE', '#FBBF24', '#FEF3C7', '#34D399', '#D1FAE5'];
+                        // Reset Offsets
+                        dsOuter.offset = [0, 0, 0];
+                        dsInner.offset = [0, 0, 0, 0, 0, 0];
                     } else if (city === "KHI") {
                         dsOuter.backgroundColor = [b, 'rgba(245, 158, 11, 0.15)', 'rgba(16, 185, 129, 0.15)'];
                         dsInner.backgroundColor = ['#60A5FA', '#DBEAFE', 'rgba(251, 191, 36, 0.1)', 'rgba(254, 243, 199, 0.1)', 'rgba(52, 211, 153, 0.1)', 'rgba(209, 250, 229, 0.1)'];
+                        // Pop-out KHI (Index 0)
+                        dsOuter.offset = [15, 0, 0];
+                        dsInner.offset = [10, 10, 0, 0, 0, 0];
                     } else if (city === "LHR") {
                         dsOuter.backgroundColor = ['rgba(59, 130, 246, 0.15)', y, 'rgba(16, 185, 129, 0.15)'];
                         dsInner.backgroundColor = ['rgba(96, 165, 250, 0.1)', 'rgba(219, 234, 254, 0.1)', '#FBBF24', '#FEF3C7', 'rgba(52, 211, 153, 0.1)', 'rgba(209, 250, 229, 0.1)'];
+                        // Pop-out LHR (Index 1)
+                        dsOuter.offset = [0, 15, 0];
+                        dsInner.offset = [0, 0, 10, 10, 0, 0];
                     } else if (city === "SKP") {
                         dsOuter.backgroundColor = ['rgba(59, 130, 246, 0.15)', 'rgba(245, 158, 11, 0.15)', g];
                         dsInner.backgroundColor = ['rgba(96, 165, 250, 0.1)', 'rgba(219, 234, 254, 0.1)', 'rgba(251, 191, 36, 0.1)', 'rgba(254, 243, 199, 0.1)', '#34D399', '#D1FAE5'];
+                        // Pop-out SKP (Index 2)
+                        dsOuter.offset = [0, 0, 15];
+                        dsInner.offset = [0, 0, 0, 0, 10, 10];
                     }
                     charts.headcount.update();
                 }
