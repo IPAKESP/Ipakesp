@@ -13,7 +13,6 @@
            PREMIUM THEME VARIABLES
         --------------------------------- */
         :root {
-            /* Brand Accents (Vibrant & Clean) */
             --color-blue: #3B82F6;
             --color-red: #EF4444;
             --color-yellow: #F59E0B;
@@ -25,7 +24,7 @@
             --radius-sm: 8px;
         }
 
-        /* LIGHT MODE (Clean & Airy) */
+        /* LIGHT MODE */
         [data-theme="light"] {
             --bg-main: #F8FAFC;
             --bg-surface: #FFFFFF;
@@ -36,19 +35,21 @@
             --grid-line: #F1F5F9;
             --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
             --bg-input: #F1F5F9;
+            --btn-dim: rgba(15, 23, 42, 0.05);
         }
 
-        /* TRUE DARK MODE (OLED/Zinc Style - Not Shady) */
+        /* DARK MODE */
         [data-theme="dark"] {
-            --bg-main: #09090B; /* Deep almost-black */
-            --bg-surface: #121212; /* Subtle elevation */
+            --bg-main: #09090B;
+            --bg-surface: #121212;
             --text-primary: #FAFAFA;
             --text-secondary: #A1A1AA;
-            --border-color: #27272A; /* Crisp thin border */
+            --border-color: #27272A;
             --border-hover: #3F3F46;
             --grid-line: #18181B;
             --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.5);
             --bg-input: #18181B;
+            --btn-dim: rgba(250, 250, 250, 0.1);
         }
 
         body {
@@ -68,9 +69,7 @@
             box-sizing: border-box; transition: var(--transition);
         }
 
-        .header-brand h1 {
-            margin: 0; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.3px;
-        }
+        .header-brand h1 { margin: 0; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.3px; }
 
         .nav-tabs { display: flex; gap: 8px; align-items: center; }
         .nav-tabs a {
@@ -110,7 +109,6 @@
             background-repeat: no-repeat; background-position: right 10px top 50%; background-size: 8px auto;
             transition: var(--transition);
         }
-        .filter-group select:hover { border-color: var(--border-hover); }
 
         .clear-btn {
             background-color: transparent; color: var(--text-secondary); border: 1px solid var(--border-color);
@@ -120,7 +118,7 @@
         .clear-btn:hover { color: var(--text-primary); border-color: var(--text-primary); }
 
         /* ---------------------------------
-           PREMIUM BENTO GRID (One View)
+           PREMIUM BENTO GRID
         --------------------------------- */
         .workspace {
             flex: 1; padding: 15px 30px; display: flex; flex-direction: column;
@@ -143,10 +141,8 @@
         }
         
         .kpi-widget:hover { border-color: var(--border-hover); transform: translateY(-2px); }
-
         .kpi-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
         
-        /* Colored dot indicator instead of clunky borders */
         .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         .dot.blue { background-color: var(--color-blue); box-shadow: 0 0 8px var(--color-blue); }
         .dot.red { background-color: var(--color-red); box-shadow: 0 0 8px var(--color-red); }
@@ -154,8 +150,20 @@
         .dot.green { background-color: var(--color-green); box-shadow: 0 0 8px var(--color-green); }
 
         .kpi-title h3 { margin: 0; font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        
         .chart-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; min-height: 0; }
+
+        /* CITY VERTICAL INTERACTIVE PILLS */
+        .city-menu {
+            display: flex; flex-direction: column; gap: 8px; justify-content: center;
+            border-right: 1px solid var(--border-color); padding-right: 15px;
+        }
+        .city-btn {
+            background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary);
+            padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; cursor: pointer; 
+            transition: var(--transition); font-family: inherit; width: 100%; text-align: center;
+        }
+        .city-btn.active { background: var(--text-primary); color: var(--bg-surface); border-color: var(--text-primary); }
+        .city-btn:hover:not(.active) { background: var(--btn-dim); color: var(--text-primary); border-color: var(--border-hover); }
 
         #loadingMsg {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -202,7 +210,52 @@
 
         <div class="dashboard-grid" id="dashboardContent" style="display: none;">
             
-            <div class="kpi-widget col-span-2">
+            <div class="kpi-widget col-span-2" style="display: flex; flex-direction: row; padding: 16px; gap: 15px;">
+                
+                <div class="city-menu">
+                    <button class="city-btn active" data-city="All">ALL</button>
+                    <button class="city-btn" data-city="KHI">KHI</button>
+                    <button class="city-btn" data-city="LHR">LHR</button>
+                    <button class="city-btn" data-city="SKP">SKP</button>
+                </div>
+
+                <div style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center;">
+                    <canvas id="chartHeadcountDoughnut" style="z-index: 2; transition: all 0.3s;"></canvas>
+                    <div style="position: absolute; text-align: center; pointer-events: none; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <div id="hc-total" style="font-size: 1.8rem; font-weight: 800; color: var(--text-primary); line-height: 1; transition: var(--transition);">1,021</div>
+                    </div>
+                </div>
+
+                <div style="flex: 1.1; display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+                    <div class="kpi-title" style="margin-bottom: 0;">
+                        <h3><span class="dot blue" style="margin-right: 6px;"></span>Demographics</h3>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1; background: var(--bg-input); padding: 10px 12px; border-radius: 10px; border-left: 3px solid var(--color-blue); position: relative; overflow: hidden;">
+                            <div style="font-size: 0.6rem; color: var(--text-secondary); font-weight: 800; letter-spacing: 0.5px;">PERMANENT</div>
+                            <div id="hc-perm" style="font-size: 1.2rem; font-weight: 800; color: var(--text-primary); margin-top: 2px; transition: var(--transition);">661</div>
+                        </div>
+                        <div style="flex: 1; background: var(--bg-input); padding: 10px 12px; border-radius: 10px; border-left: 3px solid var(--color-yellow); position: relative; overflow: hidden;">
+                            <div style="font-size: 0.6rem; color: var(--text-secondary); font-weight: 800; letter-spacing: 0.5px;">THIRD PARTY</div>
+                            <div id="hc-tp" style="font-size: 1.2rem; font-weight: 800; color: var(--text-primary); margin-top: 2px; transition: var(--transition);">360</div>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--bg-input); padding: 10px 12px; border-radius: 10px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.65rem; font-weight: 800; margin-bottom: 6px;">
+                            <span style="color: var(--color-blue); text-transform: uppercase;">Male 96%</span>
+                            <span style="color: var(--color-red); text-transform: uppercase;">Female 4%</span>
+                        </div>
+                        <div style="height: 6px; width: 100%; display: flex; border-radius: 10px;">
+                            <div style="width: 96%; background: var(--color-blue); border-radius: 10px; box-shadow: 0 0 8px rgba(59,130,246,0.4);"></div>
+                            <div style="width: 4%; background: var(--color-red); border-radius: 10px; margin-left: 4px; box-shadow: 0 0 8px rgba(239,68,68,0.4);"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="kpi-widget">
                 <div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Act vs Std Hours %</h3></div></div>
                 <div class="chart-wrapper"><canvas id="chartActVsStd"></canvas></div>
             </div>
@@ -210,11 +263,11 @@
                 <div class="kpi-header"><span class="dot red"></span><div class="kpi-title"><h3>Total OT Hours</h3></div></div>
                 <div class="chart-wrapper"><canvas id="chartOTHours"></canvas></div>
             </div>
+
             <div class="kpi-widget">
                 <div class="kpi-header"><span class="dot yellow"></span><div class="kpi-title"><h3>OT Cost</h3></div></div>
                 <div class="chart-wrapper"><canvas id="chartOTCost"></canvas></div>
             </div>
-
             <div class="kpi-widget">
                 <div class="kpi-header"><span class="dot green"></span><div class="kpi-title"><h3>OT %</h3></div></div>
                 <div class="chart-wrapper"><canvas id="chartOTPercent"></canvas></div>
@@ -227,11 +280,11 @@
                 <div class="kpi-header"><span class="dot red"></span><div class="kpi-title"><h3>TP OT Cost</h3></div></div>
                 <div class="chart-wrapper"><canvas id="chartTPOTCost"></canvas></div>
             </div>
+
             <div class="kpi-widget">
                 <div class="kpi-header"><span class="dot yellow"></span><div class="kpi-title"><h3>Absenteeism %</h3></div></div>
                 <div class="chart-wrapper"><canvas id="chartAbsent"></canvas></div>
             </div>
-
             <div class="kpi-widget">
                 <div class="kpi-header"><span class="dot green"></span><div class="kpi-title"><h3>Leaves %</h3></div></div>
                 <div class="chart-wrapper"><canvas id="chartLeave"></canvas></div>
@@ -244,11 +297,11 @@
                 <div class="kpi-header"><span class="dot red"></span><div class="kpi-title"><h3>Early Out %</h3></div></div>
                 <div class="chart-wrapper"><canvas id="chartEarly"></canvas></div>
             </div>
+
             <div class="kpi-widget">
                 <div class="kpi-header"><span class="dot yellow"></span><div class="kpi-title"><h3>Active Employee %</h3></div></div>
                 <div class="chart-wrapper"><canvas id="chartActive"></canvas></div>
             </div>
-
             <div class="kpi-widget">
                 <div class="kpi-header"><span class="dot green"></span><div class="kpi-title"><h3>Joiners</h3></div></div>
                 <div class="chart-wrapper"><canvas id="chartJoiners"></canvas></div>
@@ -257,7 +310,7 @@
                 <div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Leavers</h3></div></div>
                 <div class="chart-wrapper"><canvas id="chartLeavers"></canvas></div>
             </div>
-            <div class="kpi-widget col-span-2">
+            <div class="kpi-widget">
                 <div class="kpi-header"><span class="dot red"></span><div class="kpi-title"><h3>Pending Final Settlement</h3></div></div>
                 <div class="chart-wrapper"><canvas id="chartPending"></canvas></div>
             </div>
@@ -266,21 +319,23 @@
     </div>
 
     <script>
-        // --- THEME TOGGLE LOGIC (Enhanced) ---
+        // --- THEME TOGGLE LOGIC ---
         const themeBtn = document.getElementById('themeToggle');
         
         function updateChartThemeColors(isDark) {
             Chart.defaults.color = isDark ? '#A1A1AA' : '#64748B';
             const gridColor = isDark ? '#18181B' : '#F1F5F9';
+            const surfaceColor = isDark ? '#121212' : '#FFFFFF';
             const tooltipBg = isDark ? 'rgba(24, 24, 27, 0.9)' : 'rgba(255, 255, 255, 0.9)';
             const tooltipText = isDark ? '#FAFAFA' : '#0F172A';
             const tooltipBorder = isDark ? '#3F3F46' : '#E2E8F0';
 
             Object.values(charts).forEach(chart => {
-                chart.options.scales.x.grid.color = gridColor;
-                chart.options.scales.y.grid.color = gridColor;
+                if(chart.options.scales && chart.options.scales.x) {
+                    chart.options.scales.x.grid.color = gridColor;
+                    chart.options.scales.y.grid.color = gridColor;
+                }
                 
-                // Tooltip Glassmorphism styling
                 chart.options.plugins.tooltip.backgroundColor = tooltipBg;
                 chart.options.plugins.tooltip.titleColor = tooltipText;
                 chart.options.plugins.tooltip.bodyColor = tooltipText;
@@ -288,9 +343,13 @@
                 chart.options.plugins.tooltip.borderWidth = 1;
 
                 if(chart.config.type === 'line') {
-                    // Update glowing dot background based on theme
                     chart.data.datasets[0].pointBackgroundColor = isDark ? '#FAFAFA' : '#FFFFFF';
                 }
+                
+                if(chart.config.type === 'doughnut') {
+                    chart.data.datasets.forEach(ds => ds.borderColor = surfaceColor);
+                }
+                
                 chart.update();
             });
         }
@@ -348,7 +407,7 @@
         }
 
         Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
-        Chart.defaults.color = '#64748B'; // Default init to light mode text
+        Chart.defaults.color = '#64748B'; 
 
         // --- PREMIUM CHART FACTORY ---
         function createChart(canvasId, type, colorHex, isPercent = false) {
@@ -357,7 +416,7 @@
             let bgGradient = 'transparent';
             if (type === 'line') {
                 bgGradient = ctx.createLinearGradient(0, 0, 0, 150);
-                bgGradient.addColorStop(0, colorHex + '35'); // Subtle top glow
+                bgGradient.addColorStop(0, colorHex + '35'); 
                 bgGradient.addColorStop(1, colorHex + '00'); 
             }
 
@@ -372,7 +431,7 @@
                         fill: type === 'line', 
                         tension: 0.4, 
                         pointRadius: type === 'line' ? 2 : 0, 
-                        pointBackgroundColor: '#FFFFFF', // Light mode default glowing dot
+                        pointBackgroundColor: '#FFFFFF', 
                         pointBorderColor: colorHex,
                         pointBorderWidth: 2,
                         pointHoverRadius: 5,
@@ -387,7 +446,7 @@
                     plugins: { 
                         legend: { display: false }, 
                         tooltip: { 
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)', // Light default
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)', 
                             titleColor: '#0F172A', bodyColor: '#0F172A',
                             borderColor: '#E2E8F0', borderWidth: 1,
                             titleFont: { size: 10, family: "'Plus Jakarta Sans', sans-serif" }, 
@@ -404,10 +463,8 @@
                     scales: { 
                         y: { 
                             display: true, beginAtZero: true, 
-                            grid: { drawBorder: false, color: '#F1F5F9' }, // Light default
-                            ticks: { 
-                                display: false // HIDDEN RANGE NUMBERS HERE
-                            } 
+                            grid: { drawBorder: false, color: '#F1F5F9' }, 
+                            ticks: { display: false } 
                         },
                         x: { display: true, grid: { display: false }, ticks: { font: { size: 9, weight: '600' }, maxRotation: 0 } }
                     }
@@ -418,24 +475,107 @@
         function initCharts() {
             const b = '#3B82F6', r = '#EF4444', y = '#F59E0B', g = '#10B981';
             
+            // --- ADVANCED NESTED DOUGHNUT ---
+            const ctxHc = document.getElementById('chartHeadcountDoughnut').getContext('2d');
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const surfaceColor = isDark ? '#121212' : '#FFFFFF';
+
+            charts.headcount = new Chart(ctxHc, {
+                type: 'doughnut',
+                data: {
+                    labels: ['KHI - Perm', 'KHI - TP', 'LHR - Perm', 'LHR - TP', 'SKP - Perm', 'SKP - TP'],
+                    datasets: [
+                        {
+                            data: [82, 408, 531],
+                            backgroundColor: [b, y, g],
+                            borderWidth: 2, borderColor: surfaceColor, hoverOffset: 4, weight: 1.5 
+                        },
+                        {
+                            data: [70, 12, 283, 125, 308, 223],
+                            backgroundColor: ['#60A5FA', '#DBEAFE', '#FBBF24', '#FEF3C7', '#34D399', '#D1FAE5'],
+                            borderWidth: 2, borderColor: surfaceColor, weight: 0.8
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '65%', layout: { padding: 10 },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)', titleColor: '#0F172A', bodyColor: '#0F172A',
+                            borderColor: '#E2E8F0', borderWidth: 1, titleFont: { size: 10 }, bodyFont: { weight: 'bold', size: 13 },
+                            padding: 10, cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.datasetIndex === 0 
+                                                ? ['Karachi', 'Lahore', 'Sheikhupura'][context.dataIndex] 
+                                                : context.chart.data.labels[context.dataIndex];
+                                    return ` ${label}: ${context.raw}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // --- STANDARD DYNAMIC CHARTS ---
             charts.actStd = createChart('chartActVsStd', 'line', b, true);       
             charts.otHours = createChart('chartOTHours', 'bar', r, false);          
             charts.otCost = createChart('chartOTCost', 'bar', y, false);       
-            
             charts.otPct = createChart('chartOTPercent', 'line', g, true);     
             charts.tpOTHours = createChart('chartTPOTHours', 'bar', b, false);    
             charts.tpOTCost = createChart('chartTPOTCost', 'bar', r, false);        
             charts.absent = createChart('chartAbsent', 'line', y, true);     
-            
             charts.leave = createChart('chartLeave', 'line', g, true);         
             charts.late = createChart('chartLate', 'line', b, true);             
             charts.early = createChart('chartEarly', 'line', r, true);             
             charts.active = createChart('chartActive', 'line', y, true);     
-            
             charts.joiners = createChart('chartJoiners', 'bar', g, false);      
             charts.leavers = createChart('chartLeavers', 'bar', b, false);        
             charts.pending = createChart('chartPending', 'bar', r, false);         
         }
+
+        // --- CITY SELECTION INTERACTION LOGIC ---
+        const hcData = {
+            "All": { total: "1,021", perm: "661", tp: "360" },
+            "KHI": { total: "82", perm: "70", tp: "12" },
+            "LHR": { total: "408", perm: "283", tp: "125" },
+            "SKP": { total: "531", perm: "308", tp: "223" }
+        };
+
+        document.querySelectorAll('.city-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.city-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                const city = e.target.getAttribute('data-city');
+                document.getElementById('hc-total').innerText = hcData[city].total;
+                document.getElementById('hc-perm').innerText = hcData[city].perm;
+                document.getElementById('hc-tp').innerText = hcData[city].tp;
+
+                // Update Chart Opacity for Highlight Effect
+                if (charts.headcount) {
+                    const dsOuter = charts.headcount.data.datasets[0];
+                    const dsInner = charts.headcount.data.datasets[1];
+                    const b = '#3B82F6', y = '#F59E0B', g = '#10B981';
+
+                    if (city === "All") {
+                        dsOuter.backgroundColor = [b, y, g];
+                        dsInner.backgroundColor = ['#60A5FA', '#DBEAFE', '#FBBF24', '#FEF3C7', '#34D399', '#D1FAE5'];
+                    } else if (city === "KHI") {
+                        dsOuter.backgroundColor = [b, 'rgba(245, 158, 11, 0.15)', 'rgba(16, 185, 129, 0.15)'];
+                        dsInner.backgroundColor = ['#60A5FA', '#DBEAFE', 'rgba(251, 191, 36, 0.1)', 'rgba(254, 243, 199, 0.1)', 'rgba(52, 211, 153, 0.1)', 'rgba(209, 250, 229, 0.1)'];
+                    } else if (city === "LHR") {
+                        dsOuter.backgroundColor = ['rgba(59, 130, 246, 0.15)', y, 'rgba(16, 185, 129, 0.15)'];
+                        dsInner.backgroundColor = ['rgba(96, 165, 250, 0.1)', 'rgba(219, 234, 254, 0.1)', '#FBBF24', '#FEF3C7', 'rgba(52, 211, 153, 0.1)', 'rgba(209, 250, 229, 0.1)'];
+                    } else if (city === "SKP") {
+                        dsOuter.backgroundColor = ['rgba(59, 130, 246, 0.15)', 'rgba(245, 158, 11, 0.15)', g];
+                        dsInner.backgroundColor = ['rgba(96, 165, 250, 0.1)', 'rgba(219, 234, 254, 0.1)', 'rgba(251, 191, 36, 0.1)', 'rgba(254, 243, 199, 0.1)', '#34D399', '#D1FAE5'];
+                    }
+                    charts.headcount.update();
+                }
+            });
+        });
 
         function updateSectionDropdown() {
             const selectedDept = document.getElementById('filterDept').value;
