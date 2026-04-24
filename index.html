@@ -156,6 +156,7 @@
         .city-menu {
             display: flex; flex-direction: column; gap: 8px; justify-content: center;
             border-right: 1px solid var(--border-color); padding-right: 15px;
+            min-width: 45px; /* Prevent shrinking too much */
         }
         .city-btn {
             background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary);
@@ -210,7 +211,7 @@
 
         <div class="dashboard-grid" id="dashboardContent" style="display: none;">
             
-            <div class="kpi-widget col-span-2" style="display: flex; flex-direction: row; padding: 16px; gap: 15px;">
+            <div class="kpi-widget col-span-2" style="display: flex; flex-direction: row; padding: 16px; gap: 15px; overflow: hidden;">
                 
                 <div class="city-menu">
                     <button class="city-btn active" data-city="All">ALL</button>
@@ -219,31 +220,31 @@
                     <button class="city-btn" data-city="SKP">SKP</button>
                 </div>
 
-                <div style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center;">
+                <div style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center; min-width: 0; min-height: 0;">
                     <canvas id="chartHeadcountDoughnut" style="z-index: 2; transition: all 0.3s;"></canvas>
                     <div style="position: absolute; text-align: center; pointer-events: none; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                        <div id="hc-total" style="font-size: 1.8rem; font-weight: 800; color: var(--text-primary); line-height: 1; transition: var(--transition);">1,021</div>
+                        <div id="hc-total" style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary); line-height: 1; transition: var(--transition);">1,021</div>
                     </div>
                 </div>
 
-                <div style="flex: 1.1; display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+                <div style="flex: 1.2; display: flex; flex-direction: column; justify-content: center; gap: 10px; min-width: 0;">
                     <div class="kpi-title" style="margin-bottom: 0;">
                         <h3><span class="dot blue" style="margin-right: 6px;"></span>Demographics</h3>
                     </div>
                     
-                    <div style="display: flex; gap: 10px;">
-                        <div style="flex: 1; background: var(--bg-input); padding: 10px 12px; border-radius: 10px; border-left: 3px solid var(--color-blue); position: relative; overflow: hidden;">
-                            <div style="font-size: 0.6rem; color: var(--text-secondary); font-weight: 800; letter-spacing: 0.5px;">PERMANENT</div>
-                            <div id="hc-perm" style="font-size: 1.2rem; font-weight: 800; color: var(--text-primary); margin-top: 2px; transition: var(--transition);">661</div>
+                    <div style="display: flex; gap: 8px;">
+                        <div style="flex: 1; background: var(--bg-input); padding: 10px; border-radius: 10px; border-left: 3px solid var(--color-blue); position: relative; overflow: hidden;">
+                            <div style="font-size: 0.55rem; color: var(--text-secondary); font-weight: 800; letter-spacing: 0.5px;">PERMANENT</div>
+                            <div id="hc-perm" style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary); margin-top: 2px; transition: var(--transition);">661</div>
                         </div>
-                        <div style="flex: 1; background: var(--bg-input); padding: 10px 12px; border-radius: 10px; border-left: 3px solid var(--color-yellow); position: relative; overflow: hidden;">
-                            <div style="font-size: 0.6rem; color: var(--text-secondary); font-weight: 800; letter-spacing: 0.5px;">THIRD PARTY</div>
-                            <div id="hc-tp" style="font-size: 1.2rem; font-weight: 800; color: var(--text-primary); margin-top: 2px; transition: var(--transition);">360</div>
+                        <div style="flex: 1; background: var(--bg-input); padding: 10px; border-radius: 10px; border-left: 3px solid var(--color-yellow); position: relative; overflow: hidden;">
+                            <div style="font-size: 0.55rem; color: var(--text-secondary); font-weight: 800; letter-spacing: 0.5px;">THIRD PARTY</div>
+                            <div id="hc-tp" style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary); margin-top: 2px; transition: var(--transition);">360</div>
                         </div>
                     </div>
 
-                    <div style="background: var(--bg-input); padding: 10px 12px; border-radius: 10px;">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.65rem; font-weight: 800; margin-bottom: 6px;">
+                    <div style="background: var(--bg-input); padding: 10px; border-radius: 10px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.6rem; font-weight: 800; margin-bottom: 6px;">
                             <span style="color: var(--color-blue); text-transform: uppercase;">Male 96%</span>
                             <span style="color: var(--color-red); text-transform: uppercase;">Female 4%</span>
                         </div>
