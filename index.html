@@ -246,14 +246,15 @@
 
                     <div style="background: var(--bg-input); padding: 8px; border-radius: 8px; min-width: 0; display: flex; flex-direction: column; justify-content: center;">
                         <div style="display: flex; justify-content: space-between; font-size: 0.55rem; font-weight: 800; margin-bottom: 6px; white-space: nowrap;">
-                            <span style="color: var(--color-blue); text-transform: uppercase;">Male-96%</span>
-                            <span style="color: var(--color-red); text-transform: uppercase;">Female-4%</span>
+                            <span id="male-text" style="color: var(--color-blue); text-transform: uppercase;">Male-96%</span>
+                            <span id="female-text" style="color: var(--color-red); text-transform: uppercase;">Female-4%</span>
                         </div>
                         <div style="height: 5px; width: 100%; display: flex; border-radius: 10px;">
-                            <div style="width: 96%; background: var(--color-blue); border-radius: 10px; box-shadow: 0 0 8px rgba(59,130,246,0.4);"></div>
-                            <div style="width: 4%; background: var(--color-red); border-radius: 10px; margin-left: 4px; box-shadow: 0 0 8px rgba(239,68,68,0.4);"></div>
+                            <div id="male-bar" style="width: 96%; background: var(--color-blue); border-radius: 10px; box-shadow: 0 0 8px rgba(59,130,246,0.4); transition: width 0.8s ease-out;"></div>
+                            <div id="female-bar" style="width: 4%; background: var(--color-red); border-radius: 10px; margin-left: 4px; box-shadow: 0 0 8px rgba(239,68,68,0.4); transition: width 0.8s ease-out;"></div>
                         </div>
                     </div>
+
                 </div>
             </div>
             
@@ -488,18 +489,16 @@
                     labels: ['KHI - Perm', 'KHI - TP', 'LHR - Perm', 'LHR - TP', 'SKP - Perm', 'SKP - TP'],
                     datasets: [
                         {
-                            // UPDATED DATA: Totals for KHI, LHR, SKP
                             data: [83, 403, 530],
                             backgroundColor: [b, y, g],
                             borderWidth: 2, borderColor: surfaceColor, hoverOffset: 4, weight: 1.5,
-                            offset: [0, 0, 0] // offset for Pop-out Animation
+                            offset: [0, 0, 0]
                         },
                         {
-                            // UPDATED DATA: Breakdown for KHI-Perm, KHI-TP, LHR-Perm, LHR-TP, SKP-Perm, SKP-TP
                             data: [73, 10, 275, 128, 303, 227],
                             backgroundColor: ['#60A5FA', '#DBEAFE', '#FBBF24', '#FEF3C7', '#34D399', '#D1FAE5'],
                             borderWidth: 2, borderColor: surfaceColor, weight: 0.8,
-                            offset: [0, 0, 0, 0, 0, 0] // offset for Pop-out Animation
+                            offset: [0, 0, 0, 0, 0, 0]
                         }
                     ]
                 },
@@ -550,7 +549,6 @@
             const step = (timestamp) => {
                 if (!startTimestamp) startTimestamp = timestamp;
                 const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                // Ease out quart equation for smooth slow down
                 const easeProgress = 1 - Math.pow(1 - progress, 4);
                 let currentVal = Math.floor(easeProgress * (end - start) + start);
                 obj.innerHTML = currentVal.toLocaleString('en-US');
@@ -561,12 +559,26 @@
             window.requestAnimationFrame(step);
         }
 
+        // --- GENDER TEXT PERCENTAGE ANIMATION ---
+        function animatePercent(obj, start, end, duration, prefix) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const easeProgress = 1 - Math.pow(1 - progress, 4);
+                let currentVal = Math.floor(easeProgress * (end - start) + start);
+                obj.innerHTML = `${prefix}${currentVal}%`;
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+
         // --- CITY SELECTION INTERACTION LOGIC (WITH POP-OUT & ROLL) ---
         const hcData = {
-            "All": { total: 1016, perm: 651, tp: 365 },
-            "KHI": { total: 83, perm: 73, tp: 10 },
-            "LHR": { total: 403, perm: 275, tp: 128 },
-            "SKP": { total: 530, perm: 303, tp: 227 }
+            "All": { total: 1016, perm: 651, tp: 365, male: 96, female: 4 },
+            "KHI": { total: 83, perm: 73, tp: 10, male: 88, female: 12 },
+            "LHR": { total: 403, perm: 275, tp: 128, male: 97, female: 3 },
+            "SKP": { total: 530, perm: 303, tp: 227, male: 99, female: 1 }
         };
 
         document.querySelectorAll('.city-btn').forEach(btn => {
@@ -575,6 +587,7 @@
                 e.target.classList.add('active');
                 
                 const city = e.target.getAttribute('data-city');
+                const data = hcData[city];
                 
                 // 1. Roll Animation for Numbers
                 const elTotal = document.getElementById('hc-total');
@@ -585,9 +598,24 @@
                 const oldPerm = parseInt(elPerm.innerText.replace(/,/g, '')) || 0;
                 const oldTp = parseInt(elTp.innerText.replace(/,/g, '')) || 0;
 
-                animateValue(elTotal, oldTotal, hcData[city].total, 800);
-                animateValue(elPerm, oldPerm, hcData[city].perm, 800);
-                animateValue(elTp, oldTp, hcData[city].tp, 800);
+                animateValue(elTotal, oldTotal, data.total, 800);
+                animateValue(elPerm, oldPerm, data.perm, 800);
+                animateValue(elTp, oldTp, data.tp, 800);
+
+                // --- GENDER BAR UPDATE & ANIMATION ---
+                const maleText = document.getElementById('male-text');
+                const femaleText = document.getElementById('female-text');
+                const maleBar = document.getElementById('male-bar');
+                const femaleBar = document.getElementById('female-bar');
+
+                const oldMale = parseInt(maleText.innerText.replace(/[^\d]/g, '')) || 0;
+                const oldFemale = parseInt(femaleText.innerText.replace(/[^\d]/g, '')) || 0;
+
+                animatePercent(maleText, oldMale, data.male, 800, 'Male-');
+                animatePercent(femaleText, oldFemale, data.female, 800, 'Female-');
+
+                maleBar.style.width = data.male + '%';
+                femaleBar.style.width = data.female + '%';
 
                 // 2. Chart Pop-out & Dimming Animation
                 if (charts.headcount) {
@@ -598,25 +626,21 @@
                     if (city === "All") {
                         dsOuter.backgroundColor = [b, y, g];
                         dsInner.backgroundColor = ['#60A5FA', '#DBEAFE', '#FBBF24', '#FEF3C7', '#34D399', '#D1FAE5'];
-                        // Reset Offsets
                         dsOuter.offset = [0, 0, 0];
                         dsInner.offset = [0, 0, 0, 0, 0, 0];
                     } else if (city === "KHI") {
                         dsOuter.backgroundColor = [b, 'rgba(245, 158, 11, 0.15)', 'rgba(16, 185, 129, 0.15)'];
                         dsInner.backgroundColor = ['#60A5FA', '#DBEAFE', 'rgba(251, 191, 36, 0.1)', 'rgba(254, 243, 199, 0.1)', 'rgba(52, 211, 153, 0.1)', 'rgba(209, 250, 229, 0.1)'];
-                        // Pop-out KHI (Index 0)
                         dsOuter.offset = [15, 0, 0];
                         dsInner.offset = [10, 10, 0, 0, 0, 0];
                     } else if (city === "LHR") {
                         dsOuter.backgroundColor = ['rgba(59, 130, 246, 0.15)', y, 'rgba(16, 185, 129, 0.15)'];
                         dsInner.backgroundColor = ['rgba(96, 165, 250, 0.1)', 'rgba(219, 234, 254, 0.1)', '#FBBF24', '#FEF3C7', 'rgba(52, 211, 153, 0.1)', 'rgba(209, 250, 229, 0.1)'];
-                        // Pop-out LHR (Index 1)
                         dsOuter.offset = [0, 15, 0];
                         dsInner.offset = [0, 0, 10, 10, 0, 0];
                     } else if (city === "SKP") {
                         dsOuter.backgroundColor = ['rgba(59, 130, 246, 0.15)', 'rgba(245, 158, 11, 0.15)', g];
                         dsInner.backgroundColor = ['rgba(96, 165, 250, 0.1)', 'rgba(219, 234, 254, 0.1)', 'rgba(251, 191, 36, 0.1)', 'rgba(254, 243, 199, 0.1)', '#34D399', '#D1FAE5'];
-                        // Pop-out SKP (Index 2)
                         dsOuter.offset = [0, 0, 15];
                         dsInner.offset = [0, 0, 0, 0, 10, 10];
                     }
@@ -674,7 +698,6 @@
                 document.getElementById('loadingMsg').style.display = 'none';
                 document.getElementById('dashboardContent').style.display = 'grid'; 
                 
-                // RENDERING FIX APPLIED HERE: Initialize charts after setting grid display
                 initCharts(); 
                 populateDropdowns(); updateDashboard(); 
                 
@@ -776,7 +799,6 @@
         document.querySelectorAll('select').forEach(sel => { if(sel) sel.addEventListener('change', () => { if(sel.id === 'filterDept') updateSectionDropdown(); updateDashboard(); }); });
         document.getElementById('clearFiltersBtn').addEventListener('click', () => { document.querySelectorAll('select').forEach(s => s.value = 'All'); updateSectionDropdown(); updateDashboard(); });
         
-        // RENDERING FIX APPLIED HERE: Removed initCharts() from onload
         window.onload = () => { fetchGoogleSheetData(); };
     </script>
 </body>
