@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SLA Corporate Dashboard</title>
+    <title>SLA Corporate Dashboard - Admin</title>
     <link rel="icon" href="Logo.png" type="image/png">
     
     <!-- Libraries for Chart & Image Generation -->
@@ -13,62 +13,59 @@
 
     <style>
         /* ---------------------------------
-           PREMIUM THEME VARIABLES
+           PREMIUM THEME VARIABLES (STANDARD)
         --------------------------------- */
         :root {
             --color-blue: #3B82F6;
             --color-red: #EF4444;
+            --color-yellow: #F59E0B;
             --color-green: #10B981;
             
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --radius-lg: 24px; 
-            --radius-md: 16px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
             --radius-sm: 8px;
         }
 
         /* LIGHT MODE */
         [data-theme="light"] {
-            --bg-main: #F4F4F5; 
+            --bg-main: #F8FAFC;
             --bg-surface: #FFFFFF;
             --text-primary: #0F172A;
             --text-secondary: #64748B;
-            --border-color: #E4E4E7;
-            --border-hover: #D4D4D8;
+            --border-color: #E2E8F0;
+            --border-hover: #CBD5E1;
             --grid-line: #F1F5F9;
-            --shadow-card: 0 4px 24px -6px rgba(15, 23, 42, 0.08);
-            --shadow-hover: 0 12px 32px -8px rgba(15, 23, 42, 0.15); 
-            --bg-input: #F4F4F5;
-            --bg-icon: rgba(16, 185, 129, 0.1);
-            --chart-grid: rgba(0,0,0,0.05);
+            --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+            --bg-input: #F1F5F9;
+            --btn-dim: rgba(15, 23, 42, 0.05);
             --doughnut-bg: #F1F5F9;
         }
 
-        /* TRUE DARK MODE */
+        /* DARK MODE */
         [data-theme="dark"] {
-            --bg-main: #09090B; 
-            --bg-surface: #121212; 
+            --bg-main: #09090B;
+            --bg-surface: #121212;
             --text-primary: #FAFAFA;
             --text-secondary: #A1A1AA;
-            --border-color: #27272A; 
+            --border-color: #27272A;
             --border-hover: #3F3F46;
             --grid-line: #18181B;
-            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.6);
-            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.8); 
+            --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.5);
             --bg-input: #18181B;
-            --bg-icon: rgba(16, 185, 129, 0.15);
-            --chart-grid: rgba(255,255,255,0.05);
+            --btn-dim: rgba(250, 250, 250, 0.1);
             --doughnut-bg: #27272A;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             margin: 0; background-color: var(--bg-main); color: var(--text-primary);
-            display: flex; flex-direction: column; height: 100vh; overflow: hidden; /* STRICTLY NO SCROLL */
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
             transition: var(--transition);
         }
 
         /* ---------------------------------
-           HEADER & NAVIGATION (Standard)
+           HEADER & NAVIGATION
         --------------------------------- */
         .top-header {
             display: flex; align-items: center; justify-content: space-between;
@@ -78,10 +75,8 @@
         }
 
         .header-brand { display: flex; align-items: center; gap: 12px; }
-        .header-brand h1 { margin: 0; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.3px; text-transform: uppercase; }
-        
-        /* Logo Link styling to match standard without extra underlines */
         .header-brand a { display: flex; align-items: center; text-decoration: none; color: inherit; gap: 12px; }
+        .header-brand h1 { margin: 0; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.3px; }
 
         .nav-tabs { display: flex; gap: 8px; align-items: center; }
         .nav-tabs a {
@@ -94,30 +89,28 @@
         .nav-tabs a.home-icon { padding: 8px; display: flex; align-items: center; justify-content: center; }
         .nav-tabs a.home-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5; }
 
-        .header-actions { display: flex; align-items: center; gap: 15px; margin-left: 15px; }
-
         .theme-toggle {
             background: transparent; border: 1px solid var(--border-color);
             color: var(--text-primary); padding: 8px 16px; border-radius: 20px;
             font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: var(--transition);
-            display: flex; align-items: center; gap: 6px; 
+            display: flex; align-items: center; gap: 6px; margin-left: 15px;
         }
-        .theme-toggle:hover { border-color: var(--text-secondary); transform: translateY(-1px); }
+        .theme-toggle:hover { border-color: var(--text-secondary); }
 
         /* ---------------------------------
            SLEEK FILTER BAR
         --------------------------------- */
         .filter-bar {
             display: flex; align-items: center; gap: 15px; padding: 10px 30px;
-            background-color: var(--bg-main); height: 60px; box-sizing: border-box;
+            background-color: var(--bg-main); height: 50px; box-sizing: border-box;
             border-bottom: 1px solid var(--border-color); flex-wrap: nowrap; overflow-x: auto;
         }
 
         .filter-group { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
-        .filter-group label { font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .filter-group label { font-size: 0.7rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .filter-group select, .filter-group input {
-            padding: 8px 28px 8px 12px; border-radius: 20px; border: 1px solid var(--border-color);
-            background-color: var(--bg-surface); color: var(--text-primary); font-size: 0.8rem; font-weight: 600;
+            padding: 6px 28px 6px 12px; border-radius: 20px; border: 1px solid var(--border-color);
+            background-color: var(--bg-surface); color: var(--text-primary); font-size: 0.75rem; font-weight: 600;
             font-family: inherit; cursor: pointer; outline: none; appearance: none; transition: var(--transition);
         }
         .filter-group select {
@@ -128,68 +121,49 @@
 
         .clear-btn {
             background-color: transparent; color: var(--text-secondary); border: 1px solid var(--border-color);
-            padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;
+            padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
             cursor: pointer; margin-left: auto; transition: var(--transition); font-family: inherit;
         }
-        .clear-btn:hover { color: var(--text-primary); border-color: var(--text-primary); transform: translateY(-1px); }
+        .clear-btn:hover { color: var(--text-primary); border-color: var(--text-primary); }
 
         .report-btn-small {
             background: var(--color-blue); color: #fff; border: none;
-            padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;
+            padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
             cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 6px;
             white-space: nowrap; font-family: inherit;
         }
         .report-btn-small:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
 
         /* ---------------------------------
-           WORKSPACE & BENTO GRID (ONE-VIEW)
+           PREMIUM BENTO GRID
         --------------------------------- */
         .workspace {
             flex: 1; padding: 15px 30px; display: flex; flex-direction: column;
-            height: calc(100vh - 120px); box-sizing: border-box; 
-            overflow: hidden; 
-            position: relative;
+            height: calc(100vh - 110px); box-sizing: border-box; position: relative;
         }
 
         .dashboard-grid {
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            grid-template-rows: repeat(2, 1fr); 
-            gap: 15px; 
-            width: 100%; 
-            height: 100%; 
-            display: none;
+            display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr);
+            gap: 15px; flex-grow: 1; height: 100%; min-height: 0; display: none;
         }
 
         .kpi-widget {
             background: var(--bg-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
-            padding: 15px; display: flex; flex-direction: column; 
+            padding: 12px 16px; display: flex; flex-direction: column; 
             border: 1px solid var(--border-color);
-            transition: var(--transition); position: relative; 
-            min-height: 0; 
-            height: 100%; 
-            overflow: hidden;
-            justify-content: flex-start;
-            box-sizing: border-box;
+            transition: var(--transition); overflow: hidden; min-height: 0;
+            position: relative;
         }
         
-        .kpi-widget:hover { 
-            border-color: var(--text-secondary); 
-            transform: translateY(-2px); 
-            box-shadow: var(--shadow-hover);
-        }
-
-        .kpi-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-shrink: 0; }
+        .kpi-widget:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+        .kpi-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-shrink: 0; }
         
-        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
         .dot.blue { background-color: var(--color-blue); box-shadow: 0 0 8px var(--color-blue); }
 
-        .kpi-title h3 { margin: 0; font-size: 0.85rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .kpi-title h3 { margin: 0; font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .chart-wrapper {
-            position: relative; flex-grow: 1; width: 100%; height: 100%; min-height: 0; 
-            display: flex; align-items: center; justify-content: center;
-        }
+        .chart-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; }
 
         /* ---------------------------------
            HIDDEN CONTAINER FOR IMAGE GEN
@@ -200,10 +174,10 @@
         .dashboard-grid { transition: opacity 0.3s ease, transform 0.3s ease; opacity: 1; transform: scale(1); }
 
         #loadingMsg {
-            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             color: var(--text-primary); font-weight: 700; background: var(--bg-surface);
             padding: 15px 30px; border-radius: 30px; border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-card); z-index: 10; font-size: 1rem;
+            box-shadow: var(--shadow-card); z-index: 10; font-size: 0.9rem;
         }
 
         @media print {
@@ -211,29 +185,15 @@
             body { background-color: #FFFFFF !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; overflow: visible; height: auto;}
             .top-header { border-bottom: 2px solid #E2E8F0; background: #FFFFFF !important; }
             .header-brand h1 { color: #0F172A !important; }
-            .nav-tabs, .header-actions, .filter-bar, #loadingMsg, .theme-toggle { display: none !important; }
+            .nav-tabs, .theme-toggle, .filter-bar, #loadingMsg { display: none !important; }
             .workspace { height: auto !important; overflow: visible !important; padding: 0 !important; }
             .dashboard-grid { grid-template-columns: repeat(4, 1fr) !important; grid-template-rows: auto !important; gap: 15px !important; display: grid !important; height: auto !important;}
             .kpi-widget { border: 1px solid #E2E8F0 !important; box-shadow: none !important; background: #FFFFFF !important; break-inside: avoid; border-radius: 16px !important; transform: none !important; }
-        }
-
-        /* Fallback for smaller screens */
-        @media (max-width: 1200px) { 
-            .dashboard-grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); } 
-            .workspace { overflow-y: auto; } 
-            .kpi-widget { min-height: 220px; }
-        }
-        @media (max-width: 900px) { .dashboard-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: auto; } }
-        @media (max-width: 600px) { 
-            .dashboard-grid { grid-template-columns: 1fr; }
-            .filter-bar { flex-direction: column; height: auto; align-items: stretch; }
-            .clear-btn, .report-btn-small { margin-left: 0; width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
 
-    <!-- STANDARD HEADER (Fixed Logo Link) -->
     <header class="top-header">
         <div class="header-brand">
             <a href="index.html">
@@ -252,15 +212,12 @@
                 </a>
             </div>
             
-            <div class="header-actions">
-                <button class="theme-toggle" id="themeToggle">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Dark
-                </button>
-            </div>
+            <button class="theme-toggle" id="themeToggle">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Dark
+            </button>
         </div>
     </header>
 
-    <!-- ADVANCED FILTERS -->
     <div class="filter-bar">
         <div class="filter-group">
             <label>Location</label>
@@ -298,14 +255,12 @@
 
         <button id="clearFiltersBtn" class="clear-btn">Reset View</button>
         
-        <!-- Generate Image Report Button -->
         <button class="report-btn-small" id="generateImageBtn" style="display: none;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
             Export
         </button>
     </div>
 
-    <!-- Workspace & Grid (No Scroll, 2 Rows 100% Height) -->
     <div class="workspace">
         <div id="loadingMsg">Syncing Live SLA Data...</div>
 
@@ -321,12 +276,36 @@
         </div>
     </div>
 
-    <!-- Hidden Container for Image Generation Template -->
     <div id="imageReportContainer"></div>
 
     <script>
         // --- HEADER THEME LOGIC ---
         const themeBtn = document.getElementById('themeToggle');
+        
+        function updateChartThemeColors() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const gridColor = isDark ? '#18181B' : '#F1F5F9';
+            const textColor = isDark ? '#FAFAFA' : '#0F172A';
+            const doughnutBg = isDark ? '#27272A' : '#F1F5F9';
+
+            Chart.defaults.color = isDark ? '#A1A1AA' : '#64748B';
+
+            Object.values(myCharts).forEach(chart => {
+                if(chart.options.scales && chart.options.scales.x) {
+                    chart.options.scales.x.grid.color = gridColor;
+                    chart.options.scales.y.grid.color = gridColor;
+                    chart.options.scales.y.ticks.color = textColor;
+                    chart.options.scales.x.ticks.color = textColor;
+                }
+                
+                if(chart.config.type === 'doughnut') {
+                    chart.data.datasets[0].backgroundColor[1] = doughnutBg;
+                }
+                
+                chart.update();
+            });
+        }
+
         themeBtn.addEventListener('click', () => {
             const html = document.documentElement;
             const isCurrentlyDark = html.getAttribute('data-theme') === 'dark';
@@ -337,7 +316,7 @@
                 ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Light`
                 : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Dark`;
             
-            triggerUpdate(); 
+            updateChartThemeColors();
         });
 
         // Set Default Font for Charts
@@ -368,7 +347,6 @@
         };
         Chart.register(centerTextPlugin);
 
-        // Filter Logic Helpers
         function clearDateAndTrigger() {
             document.getElementById('filterDate').value = ''; 
             triggerUpdate();
@@ -564,7 +542,7 @@
             const ctx = document.getElementById(canvasId).getContext('2d');
             if(myCharts[prefix]) myCharts[prefix].destroy();
 
-            const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-grid').trim();
+            const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--grid-line').trim();
             const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim();
             const doughnutBg = getComputedStyle(document.documentElement).getPropertyValue('--doughnut-bg').trim();
 
@@ -606,7 +584,7 @@
                         bgColors.push(pct >= 95 ? '#10B981' : '#EF4444');
                     } else {
                         dataPct.push(0);
-                        bgColors.push('#E4E4E7'); 
+                        bgColors.push(getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim()); 
                     }
                 }
 
@@ -636,7 +614,7 @@
                 let displayPct = overallTotal > 0 ? pct.toFixed(0) + '%' : '0%';
                 
                 let color = pct >= 95 ? '#10B981' : '#EF4444';
-                if(overallTotal === 0) color = '#64748B'; 
+                if(overallTotal === 0) color = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim(); 
 
                 myCharts[prefix] = new Chart(ctx, {
                     type: 'doughnut',
@@ -676,7 +654,7 @@
             
             let htmlContent = `
                 <div style="background: #ffffff; padding: 50px; width: 1400px; font-family: 'Plus Jakarta Sans', sans-serif;">
-                    <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #E4E4E7; padding-bottom: 25px;">
+                    <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #E2E8F0; padding-bottom: 25px;">
                         <h1 style="margin: 0; color: #0F172A; font-size: 38px; font-weight: 800; text-transform: uppercase;">Master SLA Performance Report</h1>
                         <p style="margin: 15px 0 0 0; color: #64748B; font-size: 20px; font-weight: 600;">Timeframe Selection: <span style="color: #3B82F6;">${timeframeStr}</span></p>
                     </div>
@@ -685,8 +663,8 @@
 
             allLocations.forEach(loc => {
                 htmlContent += `
-                    <div style="background: #F8FAFC; border: 1px solid #E4E4E7; border-radius: 20px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
-                        <h2 style="margin: 0 0 20px 0; color: #0F172A; font-size: 24px; text-align: center; border-bottom: 2px solid #D4D4D8; padding-bottom: 15px; text-transform: uppercase;">${loc}</h2>
+                    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 20px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                        <h2 style="margin: 0 0 20px 0; color: #0F172A; font-size: 24px; text-align: center; border-bottom: 2px solid #CBD5E1; padding-bottom: 15px; text-transform: uppercase;">${loc}</h2>
                         <table style="width: 100%; border-collapse: collapse; font-size: 18px;">
                             <tbody>
                 `;
