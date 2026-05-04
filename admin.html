@@ -63,7 +63,7 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             margin: 0; background-color: var(--bg-main); color: var(--text-primary);
-            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden; /* STRICTLY NO SCROLL */
             transition: var(--transition);
         }
 
@@ -79,6 +79,9 @@
 
         .header-brand { display: flex; align-items: center; gap: 12px; }
         .header-brand h1 { margin: 0; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.3px; text-transform: uppercase; }
+        
+        /* Logo Link styling to match standard without extra underlines */
+        .header-brand a { display: flex; align-items: center; text-decoration: none; color: inherit; gap: 12px; }
 
         .nav-tabs { display: flex; gap: 8px; align-items: center; }
         .nav-tabs a {
@@ -130,60 +133,67 @@
         }
         .clear-btn:hover { color: var(--text-primary); border-color: var(--text-primary); transform: translateY(-1px); }
 
+        .report-btn-small {
+            background: var(--color-blue); color: #fff; border: none;
+            padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;
+            cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 6px;
+            white-space: nowrap; font-family: inherit;
+        }
+        .report-btn-small:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
+
         /* ---------------------------------
-           WORKSPACE & BENTO GRID
+           WORKSPACE & BENTO GRID (ONE-VIEW)
         --------------------------------- */
         .workspace {
-            flex: 1; padding: 20px 30px; display: flex; flex-direction: column;
-            height: calc(100vh - 120px); box-sizing: border-box; overflow-y: auto; position: relative; gap: 20px;
+            flex: 1; padding: 15px 30px; display: flex; flex-direction: column;
+            height: calc(100vh - 120px); box-sizing: border-box; 
+            overflow: hidden; 
+            position: relative;
         }
 
         .dashboard-grid {
             display: grid; 
             grid-template-columns: repeat(4, 1fr); 
-            gap: 20px; width: 100%; display: none;
+            grid-template-rows: repeat(2, 1fr); 
+            gap: 15px; 
+            width: 100%; 
+            height: 100%; 
+            display: none;
         }
 
         .kpi-widget {
             background: var(--bg-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
-            padding: 20px; display: flex; flex-direction: column; 
+            padding: 15px; display: flex; flex-direction: column; 
             border: 1px solid var(--border-color);
-            transition: var(--transition); position: relative; min-height: 240px; overflow: hidden;
+            transition: var(--transition); position: relative; 
+            min-height: 0; 
+            height: 100%; 
+            overflow: hidden;
             justify-content: flex-start;
+            box-sizing: border-box;
         }
         
         .kpi-widget:hover { 
             border-color: var(--text-secondary); 
-            transform: translateY(-4px); 
+            transform: translateY(-2px); 
             box-shadow: var(--shadow-hover);
         }
 
-        .kpi-header { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; flex-shrink: 0; }
+        .kpi-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-shrink: 0; }
         
         .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
         .dot.blue { background-color: var(--color-blue); box-shadow: 0 0 8px var(--color-blue); }
 
-        .kpi-title h3 { margin: 0; font-size: 0.9rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .kpi-title h3 { margin: 0; font-size: 0.85rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
         .chart-wrapper {
-            position: relative; flex-grow: 1; width: 100%; height: 100%; min-height: 0;
+            position: relative; flex-grow: 1; width: 100%; height: 100%; min-height: 0; 
             display: flex; align-items: center; justify-content: center;
         }
 
         /* ---------------------------------
-           REPORT BUTTON & HIDDEN CONTAINER
+           HIDDEN CONTAINER FOR IMAGE GEN
         --------------------------------- */
-        .report-btn {
-            background: var(--color-blue); color: #fff; border: none; 
-            padding: 15px 35px; border-radius: 30px; font-weight: 700; 
-            font-size: 1.05rem; cursor: pointer; transition: var(--transition); 
-            display: inline-flex; align-items: center; justify-content: center; gap: 10px; 
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); 
-            margin: 20px auto 40px auto; 
-            font-family: inherit;
-        }
-        .report-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6); }
-
         #imageReportContainer { position: fixed; top: -9999px; left: -9999px; z-index: -1000; }
 
         .fade-out { opacity: 0 !important; transform: scale(0.97) !important; }
@@ -201,28 +211,35 @@
             body { background-color: #FFFFFF !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; overflow: visible; height: auto;}
             .top-header { border-bottom: 2px solid #E2E8F0; background: #FFFFFF !important; }
             .header-brand h1 { color: #0F172A !important; }
-            .nav-tabs, .header-actions, .filter-bar, #loadingMsg, .theme-toggle, .report-btn { display: none !important; }
+            .nav-tabs, .header-actions, .filter-bar, #loadingMsg, .theme-toggle { display: none !important; }
             .workspace { height: auto !important; overflow: visible !important; padding: 0 !important; }
-            .dashboard-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 15px !important; display: grid !important; }
+            .dashboard-grid { grid-template-columns: repeat(4, 1fr) !important; grid-template-rows: auto !important; gap: 15px !important; display: grid !important; height: auto !important;}
             .kpi-widget { border: 1px solid #E2E8F0 !important; box-shadow: none !important; background: #FFFFFF !important; break-inside: avoid; border-radius: 16px !important; transform: none !important; }
         }
 
-        @media (max-width: 1200px) { .dashboard-grid { grid-template-columns: repeat(3, 1fr); } }
-        @media (max-width: 900px) { .dashboard-grid { grid-template-columns: repeat(2, 1fr); } }
+        /* Fallback for smaller screens */
+        @media (max-width: 1200px) { 
+            .dashboard-grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); } 
+            .workspace { overflow-y: auto; } 
+            .kpi-widget { min-height: 220px; }
+        }
+        @media (max-width: 900px) { .dashboard-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: auto; } }
         @media (max-width: 600px) { 
             .dashboard-grid { grid-template-columns: 1fr; }
             .filter-bar { flex-direction: column; height: auto; align-items: stretch; }
-            .clear-btn { margin-left: 0; }
+            .clear-btn, .report-btn-small { margin-left: 0; width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
 
-    <!-- STANDARD EXTRACTED HEADER (Expand Removed) -->
+    <!-- STANDARD HEADER (Fixed Logo Link) -->
     <header class="top-header">
         <div class="header-brand">
-            <img src="Logo.png" alt="Logo" style="height: 35px; width: auto; object-fit: contain;">
-            <h1>HR Corporate Dashboard</h1>
+            <a href="index.html">
+                <img src="Logo.png" alt="Logo" style="height: 35px; width: auto; object-fit: contain;">
+                <h1>HR Corporate Dashboard</h1>
+            </a>
         </div>
         <div style="display:flex; align-items:center;">
             <div class="nav-tabs">
@@ -280,9 +297,15 @@
         </div>
 
         <button id="clearFiltersBtn" class="clear-btn">Reset View</button>
+        
+        <!-- Generate Image Report Button -->
+        <button class="report-btn-small" id="generateImageBtn" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Export
+        </button>
     </div>
 
-    <!-- Workspace & Grid -->
+    <!-- Workspace & Grid (No Scroll, 2 Rows 100% Height) -->
     <div class="workspace">
         <div id="loadingMsg">Syncing Live SLA Data...</div>
 
@@ -296,12 +319,6 @@
             <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Staff Mess</h3></div></div><div class="chart-wrapper"><canvas id="chart-staffmess"></canvas></div></div>
             <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>GH Rooms</h3></div></div><div class="chart-wrapper"><canvas id="chart-ghrooms"></canvas></div></div>
         </div>
-
-        <!-- Generate Image Report Button -->
-        <button class="report-btn" id="generateImageBtn" style="display: none;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            Generate Image Report
-        </button>
     </div>
 
     <!-- Hidden Container for Image Generation Template -->
@@ -641,7 +658,7 @@
         // --- IMAGE REPORT LOGIC ---
         document.getElementById('generateImageBtn').addEventListener('click', async () => {
             const btn = document.getElementById('generateImageBtn');
-            btn.innerHTML = 'Generating Image... Please wait';
+            btn.innerHTML = 'Generating...';
 
             const allLocations = Array.from(document.getElementById('filterLocation').options).map(opt => opt.value).filter(val => val !== 'All');
             const year = document.getElementById('filterYear').value;
@@ -735,7 +752,7 @@
                     alert("Error generating the image report.");
                 } finally {
                     reportContainer.innerHTML = ''; 
-                    btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Generate Image Report`;
+                    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Export`;
                 }
             }, 500);
         });
