@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pool Vehicle Dashboard - One View Bento</title>
+    <title>Transport Dashboard - SLA</title>
     <link rel="icon" href="Logo.png" type="image/png">
     
+    <!-- Libraries for Chart & Image Generation -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
         /* ---------------------------------
-           PREMIUM THEME VARIABLES
+           PREMIUM THEME VARIABLES (STANDARD)
         --------------------------------- */
         :root {
             --color-blue: #3B82F6;
@@ -19,45 +22,47 @@
             --color-green: #10B981;
             
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --radius-lg: 24px; 
-            --radius-md: 16px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
             --radius-sm: 8px;
         }
 
         /* LIGHT MODE */
         [data-theme="light"] {
-            --bg-main: #F4F4F5; 
+            --bg-main: #F8FAFC;
             --bg-surface: #FFFFFF;
             --text-primary: #0F172A;
             --text-secondary: #64748B;
-            --border-color: #E4E4E7;
-            --border-hover: #D4D4D8;
+            --border-color: #E2E8F0;
+            --border-hover: #CBD5E1;
             --grid-line: #F1F5F9;
-            --shadow-card: 0 4px 24px -6px rgba(15, 23, 42, 0.08);
-            --shadow-hover: 0 12px 32px -8px rgba(15, 23, 42, 0.15);
-            --bg-input: #F4F4F5;
-            --bg-icon: rgba(16, 185, 129, 0.1);
+            --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+            --bg-input: #F1F5F9;
+            --btn-dim: rgba(15, 23, 42, 0.05);
+            --chart-grid: rgba(0,0,0,0.05);
+            --doughnut-bg: #F1F5F9;
         }
 
         /* TRUE DARK MODE */
         [data-theme="dark"] {
-            --bg-main: #09090B; 
-            --bg-surface: #121212; 
+            --bg-main: #09090B;
+            --bg-surface: #121212;
             --text-primary: #FAFAFA;
             --text-secondary: #A1A1AA;
-            --border-color: #27272A; 
+            --border-color: #27272A;
             --border-hover: #3F3F46;
             --grid-line: #18181B;
-            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.6);
-            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.8);
+            --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.5);
             --bg-input: #18181B;
-            --bg-icon: rgba(16, 185, 129, 0.15);
+            --btn-dim: rgba(250, 250, 250, 0.1);
+            --chart-grid: rgba(255,255,255,0.05);
+            --doughnut-bg: #27272A;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             margin: 0; background-color: var(--bg-main); color: var(--text-primary);
-            display: flex; flex-direction: column; height: 100vh; overflow: hidden; /* ONE VIEW - NO BODY SCROLL */
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden; /* STRICTLY NO SCROLL */
             transition: var(--transition);
         }
 
@@ -68,11 +73,12 @@
             display: flex; align-items: center; justify-content: space-between;
             padding: 12px 30px; background-color: var(--bg-surface);
             border-bottom: 1px solid var(--border-color); height: 60px;
-            box-sizing: border-box; transition: var(--transition); flex-shrink: 0;
+            box-sizing: border-box; transition: var(--transition);
         }
 
         .header-brand { display: flex; align-items: center; gap: 12px; }
-        .header-brand h1 { margin: 0; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.3px; text-transform: uppercase; }
+        .header-brand a { display: flex; align-items: center; text-decoration: none; color: inherit; gap: 12px; }
+        .header-brand h1 { margin: 0; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.3px; text-transform: uppercase;}
 
         .nav-tabs { display: flex; gap: 8px; align-items: center; }
         .nav-tabs a {
@@ -85,122 +91,127 @@
         .nav-tabs a.home-icon { padding: 8px; display: flex; align-items: center; justify-content: center; }
         .nav-tabs a.home-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5; }
 
-        .header-actions { display: flex; align-items: center; gap: 15px; margin-left: 15px; }
-
         .theme-toggle {
             background: transparent; border: 1px solid var(--border-color);
             color: var(--text-primary); padding: 8px 16px; border-radius: 20px;
             font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: var(--transition);
-            display: flex; align-items: center; gap: 6px; 
+            display: flex; align-items: center; gap: 6px; margin-left: 15px;
         }
-        .theme-toggle:hover { border-color: var(--text-secondary); transform: translateY(-1px); }
+        .theme-toggle:hover { border-color: var(--text-secondary); }
 
         /* ---------------------------------
            SLEEK FILTER BAR
         --------------------------------- */
         .filter-bar {
             display: flex; align-items: center; gap: 15px; padding: 10px 30px;
-            background-color: var(--bg-main); height: 50px; box-sizing: border-box;
-            border-bottom: 1px solid var(--border-color); flex-wrap: nowrap; overflow-x: auto; flex-shrink: 0;
+            background-color: var(--bg-main); height: 60px; box-sizing: border-box;
+            border-bottom: 1px solid var(--border-color); flex-wrap: nowrap; overflow-x: auto;
         }
 
         .filter-group { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
-        .filter-group label { font-size: 0.7rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .filter-group label { font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .filter-group select, .filter-group input {
+            padding: 8px 28px 8px 12px; border-radius: 20px; border: 1px solid var(--border-color);
+            background-color: var(--bg-surface); color: var(--text-primary); font-size: 0.8rem; font-weight: 600;
+            font-family: inherit; cursor: pointer; outline: none; appearance: none; transition: var(--transition);
+        }
         .filter-group select {
-            padding: 6px 28px 6px 12px; border-radius: 20px; border: 1px solid var(--border-color);
-            background-color: var(--bg-surface); color: var(--text-primary); font-size: 0.75rem; font-weight: 600;
-            font-family: inherit; cursor: pointer; outline: none; appearance: none;
             background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2371717A%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
             background-repeat: no-repeat; background-position: right 10px top 50%; background-size: 8px auto;
-            transition: var(--transition);
         }
-        .filter-group select:hover { border-color: var(--border-hover); }
+        .filter-group select:hover, .filter-group input:hover { border-color: var(--border-hover); }
 
         .clear-btn {
             background-color: transparent; color: var(--text-secondary); border: 1px solid var(--border-color);
-            padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
+            padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;
             cursor: pointer; margin-left: auto; transition: var(--transition); font-family: inherit;
         }
         .clear-btn:hover { color: var(--text-primary); border-color: var(--text-primary); transform: translateY(-1px); }
 
+        .report-btn-small {
+            background: var(--color-blue); color: #fff; border: none;
+            padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;
+            cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 6px;
+            white-space: nowrap; font-family: inherit;
+        }
+        .report-btn-small:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
+
         /* ---------------------------------
-           ONE VIEW BENTO GRID
+           WORKSPACE & BENTO GRID (ONE-VIEW)
         --------------------------------- */
         .workspace {
             flex: 1; padding: 15px 30px; display: flex; flex-direction: column;
-            height: calc(100vh - 110px); box-sizing: border-box; overflow: hidden; position: relative;
+            height: calc(100vh - 120px); box-sizing: border-box; 
+            overflow: hidden; position: relative;
         }
 
         .dashboard-grid {
             display: grid; 
             grid-template-columns: repeat(4, 1fr); 
-            /* rows will be calculated dynamically via JS for perfect fit */
-            gap: 16px; flex-grow: 1; height: 100%; min-height: 0; overflow: hidden; /* NO SCROLL */
+            grid-template-rows: repeat(2, 1fr); 
+            gap: 15px; width: 100%; height: 100%; display: none;
         }
 
+        /* Spanning grid to make cards look premium */
         .col-span-2 { grid-column: span 2; }
-        
+        .row-span-2 { grid-row: span 2; }
+
         .kpi-widget {
             background: var(--bg-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
-            padding: 12px 20px; display: flex; flex-direction: column; 
-            border: 1px solid var(--border-color); min-height: 0; /* Lets it squish to fit */
-            transition: var(--transition); position: relative; overflow: hidden;
+            padding: 15px; display: flex; flex-direction: column; 
+            border: 1px solid var(--border-color);
+            transition: var(--transition); position: relative; 
+            min-height: 0; height: 100%; overflow: hidden;
+            justify-content: flex-start; box-sizing: border-box;
         }
         
-        .kpi-widget:hover { 
-            border-color: var(--text-secondary); 
-            transform: translateY(-4px); 
-            box-shadow: var(--shadow-hover);
-        }
-
-        .kpi-header { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; flex-shrink: 0; }
+        .kpi-widget:hover { border-color: var(--text-secondary); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+        .kpi-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-shrink: 0; }
         
-        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
         .dot.blue { background-color: var(--color-blue); box-shadow: 0 0 8px var(--color-blue); }
         .dot.red { background-color: var(--color-red); box-shadow: 0 0 8px var(--color-red); }
         .dot.yellow { background-color: var(--color-yellow); box-shadow: 0 0 8px var(--color-yellow); }
-        .dot.green { background-color: var(--color-green); box-shadow: 0 0 8px var(--color-green); }
 
-        .kpi-title h3 { margin: 0; font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .kpi-title h3 { margin: 0; font-size: 0.85rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .chart-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; min-height: 0; }
+        .chart-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; }
 
-        /* Surveyor Rounds */
-        .surveyor-rounds-container { 
-            display: flex; gap: 15px; flex-wrap: nowrap; margin-top: 15px; flex-shrink: 0; overflow-x: auto;
-            padding-bottom: 5px; height: 60px; /* Fixed height so it doesn't push grid */
-        }
-        .surveyor-card { 
-            background: var(--bg-surface); border: 1px solid var(--border-color); 
-            border-radius: var(--radius-md); padding: 8px 15px; display: flex; align-items: center; 
-            gap: 12px; box-shadow: var(--shadow-card); min-width: 150px; transition: var(--transition); height: 100%; box-sizing: border-box;
-        }
-        .surveyor-card:hover { border-color: var(--text-secondary); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
-        .surveyor-icon { width: 32px; height: 32px; background-color: var(--bg-icon); color: var(--color-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink:0;}
-        .surveyor-icon svg { width: 16px; height: 16px; fill: currentColor; }
-        .surveyor-info { display: flex; flex-direction: column; }
-        .surveyor-name { font-size: 0.65rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px;}
-        .surveyor-count { font-size: 1rem; font-weight: 800; color: var(--text-primary); }
+        /* ---------------------------------
+           HIDDEN CONTAINER FOR IMAGE GEN
+        --------------------------------- */
+        #imageReportContainer { position: fixed; top: -9999px; left: -9999px; z-index: -1000; }
 
-        /* FADE TRANSITIONS */
-        .fade-out { opacity: 0 !important; transform: scale(0.96) !important; }
-        .dashboard-grid, .surveyor-rounds-container { transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); opacity: 1; transform: scale(1); }
+        .fade-out { opacity: 0 !important; transform: scale(0.97) !important; }
+        .dashboard-grid { transition: opacity 0.3s ease, transform 0.3s ease; opacity: 1; transform: scale(1); }
 
         #loadingMsg {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
             color: var(--text-primary); font-weight: 700; background: var(--bg-surface);
             padding: 15px 30px; border-radius: 30px; border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-card); z-index: 10; font-size: 0.9rem;
+            box-shadow: var(--shadow-card); z-index: 10; font-size: 1rem;
         }
 
+        @media print {
+            @page { size: A4 landscape; margin: 10mm; }
+            body { background-color: #FFFFFF !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; overflow: visible; height: auto;}
+            .top-header { border-bottom: 2px solid #E2E8F0; background: #FFFFFF !important; }
+            .header-brand h1 { color: #0F172A !important; }
+            .nav-tabs, .header-actions, .filter-bar, #loadingMsg, .theme-toggle { display: none !important; }
+            .workspace { height: auto !important; overflow: visible !important; padding: 0 !important; }
+            .dashboard-grid { display: block !important; height: auto !important;}
+            .kpi-widget { border: 1px solid #E2E8F0 !important; box-shadow: none !important; background: #FFFFFF !important; break-inside: avoid; border-radius: 16px !important; transform: none !important; height: 400px; margin-bottom: 20px;}
+        }
     </style>
 </head>
 <body>
 
     <header class="top-header">
         <div class="header-brand">
-            <img src="Logo.png" alt="Logo" style="height: 35px; width: auto; object-fit: contain;">
-            <h1>HR Corporate Dashboard</h1>
+            <a href="index.html">
+                <img src="Logo.png" alt="Logo" style="height: 35px; width: auto; object-fit: contain;">
+                <h1>HR Corporate Dashboard</h1>
+            </a>
         </div>
         <div style="display:flex; align-items:center;">
             <div class="nav-tabs">
@@ -222,42 +233,100 @@
     </header>
 
     <div class="filter-bar">
-        <div class="filter-group"><label>Year</label><select id="filterYear"><option value="All">All Years</option></select></div>
-        <div class="filter-group"><label>Month</label><select id="filterMonth"><option value="All">All Months</option></select></div>
-        <div class="filter-group"><label>Location</label><select id="filterLocation"><option value="All">All Locations</option></select></div>
-        <div class="filter-group"><label>Surveyor</label><select id="filterSurveyor"><option value="All">All Surveyors</option></select></div>
-        <div class="filter-group"><label>Driver</label><select id="filterDriver"><option value="All">All Drivers</option></select></div>
+        <div class="filter-group">
+            <label>Location</label>
+            <select id="filterLocation" onchange="triggerUpdate()"><option value="All">Loading...</option></select>
+        </div>
+        
+        <div class="filter-group">
+            <label>Year</label>
+            <select id="filterYear" onchange="clearDateAndTrigger()"></select>
+        </div>
+
+        <div class="filter-group">
+            <label>Month</label>
+            <select id="filterMonth" onchange="clearDateAndTrigger()">
+                <option value="All">All Months (Trend)</option>
+                <option value="01">January</option>
+                <option value="02">February</option>
+                <option value="03">March</option>
+                <option value="04">April</option>
+                <option value="05">May</option>
+                <option value="06">June</option>
+                <option value="07">July</option>
+                <option value="08">August</option>
+                <option value="09">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Exact Date</label>
+            <input type="date" id="filterDate" onchange="dateChangedAndTrigger()" title="Selecting a date will override Month/Year">
+        </div>
+
         <button id="clearFiltersBtn" class="clear-btn">Reset View</button>
+        
+        <button class="report-btn-small" id="generateImageBtn" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Export
+        </button>
     </div>
 
     <div class="workspace">
-        <div id="loadingMsg">Analyzing Vehicles Data...</div>
+        <div id="loadingMsg">Syncing Live SLA Data...</div>
 
-        <div class="dashboard-grid" id="dashboardContent" style="display: none;">
+        <div class="dashboard-grid" id="dashboardContent">
+            <!-- Pool Vehicle main Card -->
+            <div class="kpi-widget col-span-2 row-span-2">
+                <div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Pool Vehicle</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chart-poolvehicle"></canvas></div>
             </div>
 
-        <div class="surveyor-rounds-container" id="surveyorRoundsContainer" style="display: none;">
+            <!-- Staff Transport Lahore Card -->
+            <div class="kpi-widget col-span-2">
+                <div class="kpi-header"><span class="dot red"></span><div class="kpi-title"><h3>Staff Transport Lahore</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chart-staffTransportLHR"></canvas></div>
             </div>
+
+            <!-- Staff Transport SKP Card -->
+            <div class="kpi-widget col-span-2">
+                <div class="kpi-header"><span class="dot yellow"></span><div class="kpi-title"><h3>Staff Transport SKP</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chart-staffTransportSKP"></canvas></div>
+            </div>
+        </div>
     </div>
 
-    <script>
-        // --- THEME & UTILS ---
-        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
-        const themeBtn = document.getElementById('themeToggle');
+    <div id="imageReportContainer"></div>
 
-        function getThemeColors() {
+    <script>
+        // --- HEADER THEME LOGIC ---
+        const themeBtn = document.getElementById('themeToggle');
+        
+        function updateChartThemeColors() {
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            return {
-                text: isDark ? '#A1A1AA' : '#64748B',
-                grid: isDark ? '#18181B' : '#F1F5F9',
-                tooltipBg: isDark ? 'rgba(24, 24, 27, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-                tooltipText: isDark ? '#FAFAFA' : '#0F172A',
-                tooltipBorder: isDark ? '#3F3F46' : '#E2E8F0',
-                pointBg: isDark ? '#FAFAFA' : '#FFFFFF',
-                emptyDoughnut: isDark ? '#27272A' : '#F1F5F9',
-                positiveColor: isDark ? '#10B981' : '#10B981',
-                negativeColor: isDark ? '#EF4444' : '#EF4444'
-            };
+            const gridColor = isDark ? '#18181B' : '#F1F5F9';
+            const textColor = isDark ? '#FAFAFA' : '#0F172A';
+            const doughnutBg = isDark ? '#27272A' : '#F1F5F9';
+
+            Chart.defaults.color = isDark ? '#A1A1AA' : '#64748B';
+
+            Object.values(myCharts).forEach(chart => {
+                if(chart.options.scales && chart.options.scales.x) {
+                    chart.options.scales.x.grid.color = gridColor;
+                    chart.options.scales.y.grid.color = gridColor;
+                    chart.options.scales.y.ticks.color = textColor;
+                    chart.options.scales.x.ticks.color = textColor;
+                }
+                
+                if(chart.config.type === 'doughnut') {
+                    chart.data.datasets[0].backgroundColor[1] = doughnutBg;
+                }
+                
+                chart.update();
+            });
         }
 
         themeBtn.addEventListener('click', () => {
@@ -270,343 +339,424 @@
                 ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Light`
                 : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Dark`;
             
-            triggerUpdate(); 
+            updateChartThemeColors();
         });
 
-        // --- CORE LOGIC ---
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=651598198&single=true&output=csv';
-        let sheetData = []; let headers = []; let uniqueCars = []; const charts = {};
-        
-        const locColorsHex = ['#3B82F6', '#EF4444', '#F59E0B', '#10B981']; 
-        const dotColors = ['blue', 'red', 'yellow', 'green'];
-        const userSvgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
+        // Set Default Font for Charts
+        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+        let myCharts = {}; 
 
-        function parseCSV(str) {
-            const arr = []; let quote = false; let row = 0, col = 0;
-            for (let c = 0; c < str.length; c++) {
-                let cc = str[c], nc = str[c+1];
-                arr[row] = arr[row] || []; arr[row][col] = arr[row][col] || '';
-                if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
-                if (cc == '"') { quote = !quote; continue; }
-                if (cc == ',' && !quote) { ++col; continue; }
-                if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
-                if (cc == '\n' && !quote) { ++row; col = 0; continue; }
-                if (cc == '\r' && !quote) { ++row; col = 0; continue; }
-                arr[row][col] += cc;
-            }
-            return arr;
-        }
-
-        function cleanPercent(val) {
-            if (!val || val.toString().trim() === '') return null;
-            let strVal = val.toString().toLowerCase();
-            if (strVal.includes('#div/0!') || strVal.includes('#n/a') || strVal.includes('error')) return null;
-            let num = parseFloat(strVal.replace(/[^0-9.-]/g, ''));
-            if (isNaN(num)) return null;
-            if (strVal.includes('%')) return num;
-            if (num > 0 && num <= 1.0) return num * 100;
-            return num;
-        }
-
-        let h_month, h_surv, h_driver, h_loc, h_area, h_svc;
-        let isLongFormat = false;
-
-        function identifyHeaders(headerRow) {
-            headerRow.forEach(h => {
-                let cleanH = h.toLowerCase().replace(/[^a-z0-9]/g, '');
-                if (cleanH.includes('month') || cleanH.includes('date')) h_month = h;
-                if (cleanH.includes('surveyour') || cleanH.includes('surveyor')) h_surv = h;
-                if (cleanH.includes('driver')) h_driver = h;
-                if (cleanH.includes('location') || cleanH.includes('site')) h_loc = h;
-                if (cleanH.includes('area') || cleanH.includes('vehicle') || cleanH.includes('car')) h_area = h;
-                if (cleanH.includes('servicelevel') || cleanH.includes('score')) h_svc = h;
-            });
-        }
-
-        function extractUniqueCars() {
-            uniqueCars = [];
-            if (h_area && h_svc) {
-                isLongFormat = true;
-                sheetData.forEach(row => {
-                    let car = row[h_area];
-                    if (car && car.trim() !== "" && !uniqueCars.includes(car.trim())) uniqueCars.push(car.trim());
-                });
-                uniqueCars.sort();
-            } else {
-                isLongFormat = false;
-                const ignore = [h_month, h_surv, h_driver, h_loc, 'ExtractedYear', 'ExtractedMonth'].map(x => x ? x.toLowerCase() : "");
-                headers.forEach(h => {
-                    if (h && !ignore.includes(h.toLowerCase()) && h.toLowerCase() !== 'timestamp') uniqueCars.push(h.trim());
-                });
-            }
-        }
-
-        function buildHTMLGrid() {
-            const container = document.getElementById('dashboardContent');
-            container.innerHTML = '';
-            
-            let cols = 4;
-            let currentRowCols = 0;
-            let totalRows = 1;
-
-            uniqueCars.forEach((car, index) => {
-                let mod = index % 10;
-                let span = (mod === 0 || mod === 5) ? 2 : 1; 
+        // Center Text Plugin for Doughnut Charts
+        const centerTextPlugin = {
+            id: 'centerTextPlugin',
+            beforeDraw: function(chart) {
+                if (chart.config.type !== 'doughnut') return;
+                var width = chart.width, height = chart.height, ctx = chart.ctx;
+                ctx.restore();
                 
-                if (currentRowCols + span > cols) {
-                    totalRows++;
-                    currentRowCols = span;
-                } else {
-                    currentRowCols += span;
+                let textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim();
+                let fontSize = (height / 100).toFixed(2);
+                ctx.font = "bold " + fontSize + "em 'Plus Jakarta Sans'";
+                ctx.textBaseline = "middle";
+                ctx.fillStyle = textColor;
+                
+                let text = chart.config.options.elements.center.text;
+                let textX = Math.round((width - ctx.measureText(text).width) / 2);
+                let textY = height / 2;
+                
+                ctx.fillText(text, textX, textY);
+                ctx.save();
+            }
+        };
+        Chart.register(centerTextPlugin);
+
+        function clearDateAndTrigger() {
+            document.getElementById('filterDate').value = ''; 
+            triggerUpdate();
+        }
+        
+        function dateChangedAndTrigger() {
+            if(document.getElementById('filterDate').value !== '') {
+                document.getElementById('filterMonth').value = 'All';
+            }
+            triggerUpdate();
+        }
+
+        // --- DATA LOGIC ---
+        const csvPoolVehicle = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRzT96Ec_exrDjox1CSyp_FAyP1sgbtqIDwswsqa-Kmwj9Bf-Orkt7eXVpQ4NLPVnqlTgO7mmu-aHJV/pub?gid=162985426&single=true&output=csv";
+        const csvStaffLHR = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRwxU6lDnqY-uzfrqmJvOUUg8Wrv77iK1M5Z_IbXdvy0Vb45tl-Y9gB_ZrCEl4NFD0cZVMXg7MSkZGb/pub?gid=1529142728&single=true&output=csv";
+        const csvStaffSKP = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSD6fL-gX0q_NiyLbcfvLYYEO1xal3B0CjtiRX9iAvEb_rC1Oxd1vbzhj5HIXMsxtrkcaUzcniQa_Kg/pub?gid=1075567590&single=true&output=csv";
+
+        const endpoints = [
+            { id: 'poolvehicle', name: "Pool Vehicle", urls: [csvPoolVehicle], data: [], dotColor: '#3B82F6' },
+            { id: 'staffTransportLHR', name: "Staff Transport Lahore", urls: [csvStaffLHR], data: [], dotColor: '#EF4444' },
+            { id: 'staffTransportSKP', name: "Staff Transport SKP", urls: [csvStaffSKP], data: [], dotColor: '#F59E0B' }
+        ];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchAllData(); 
+        });
+
+        document.getElementById('clearFiltersBtn').addEventListener('click', () => {
+            document.getElementById('filterLocation').value = 'All';
+            const today = new Date();
+            document.getElementById('filterYear').value = String(today.getFullYear());
+            document.getElementById('filterMonth').value = 'All';
+            document.getElementById('filterDate').value = '';
+            triggerUpdate();
+        });
+
+        async function fetchAllData() {
+            const syncStatus = document.getElementById('loadingMsg');
+            
+            try {
+                await Promise.all(endpoints.map(async (ep) => {
+                    await Promise.all(ep.urls.map(async (url) => {
+                        try {
+                            const res = await fetch(url);
+                            const csvText = await res.text();
+                            const parsed = parseCSVData(csvText);
+                            ep.data = ep.data.concat(parsed);
+                        } catch (e) {
+                            console.error(`Failed to fetch ${url}:`, e);
+                        }
+                    }));
+                }));
+                
+                populateDropdowns();
+                
+                const todayYear = String(new Date().getFullYear());
+                const yearSelect = document.getElementById('filterYear');
+                if (Array.from(yearSelect.options).some(opt => opt.value === todayYear)) {
+                    yearSelect.value = todayYear;
+                }
+                
+                updateDashboard();
+                
+                syncStatus.style.display = 'none';
+                document.getElementById('dashboardContent').style.display = 'grid';
+                document.getElementById('generateImageBtn').style.display = 'inline-flex'; 
+                
+            } catch (error) {
+                console.error("Master Fetch Error:", error);
+                syncStatus.innerText = "Error Loading Data.";
+            }
+        }
+
+        function parseCSVData(csvText) {
+            const rows = csvText.split('\n');
+            let parsedData = [];
+            if (rows.length < 2) return parsedData;
+
+            const headers = rows[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(h => h.replace(/"/g, '').trim().toLowerCase());
+            let locIndex = headers.findIndex(h => h === 'location' || h === 'company' || h === 'plant' || h === 'site');
+            if (locIndex === -1) locIndex = headers.findIndex(h => h.includes('location') || h.includes('company'));
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row.trim()) continue;
+
+                const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                let rowDateStr = cols[0] ? cols[0].replace(/"/g, '').trim() : ''; 
+                
+                let parsedDate = ""; let parsedMonth = ""; let parsedYear = "";
+
+                if (rowDateStr) {
+                    let d = new Date(rowDateStr);
+                    if (!isNaN(d.getTime())) {
+                        let y = d.getFullYear();
+                        let m = String(d.getMonth() + 1).padStart(2, '0');
+                        let day = String(d.getDate()).padStart(2, '0');
+                        parsedDate = `${y}-${m}-${day}`;
+                        parsedMonth = `${y}-${m}`; 
+                        parsedYear = String(y);
+                    }
                 }
 
-                let colSpanClass = span === 2 ? 'col-span-2' : ''; 
-                let dColor = dotColors[index % dotColors.length];
+                let rowLocation = "Unknown";
+                if (locIndex !== -1 && cols[locIndex]) rowLocation = cols[locIndex].replace(/"/g, '').trim();
 
-                const widgetHTML = `
-                    <div class="kpi-widget ${colSpanClass}">
-                        <div class="kpi-header"><span class="dot ${dColor}"></span><div class="kpi-title"><h3 title="${car}">${car}</h3></div></div>
-                        <div class="chart-wrapper"><canvas id="chartCar${index}"></canvas></div>
-                    </div>
-                `;
-                container.innerHTML += widgetHTML;
-            });
-
-            container.style.gridTemplateRows = `repeat(${totalRows}, minmax(0, 1fr))`;
+                let rowTotal = 0; let rowYes = 0;
+                for (let j = 1; j < cols.length; j++) {
+                    if (j === locIndex) continue; 
+                    let cellValue = cols[j] ? cols[j].replace(/"/g, '').trim().toLowerCase() : '';
+                    if (cellValue === "yes") { rowTotal++; rowYes++; } 
+                    else if (cellValue === "no" || cellValue === "n/a") { rowTotal++; }
+                }
+                
+                if (parsedYear) {
+                    parsedData.push({ fullDate: parsedDate, month: parsedMonth, year: parsedYear, location: rowLocation, totalQuestions: rowTotal, achievedYes: rowYes });
+                }
+            }
+            return parsedData;
         }
 
         function populateDropdowns() {
-            const years = new Set(), months = new Set(), surveyors = new Set(), drivers = new Set(), locations = new Set();
-            sheetData.forEach(row => {
-                let mRaw = row[h_month] || "";
-                if(mRaw.includes('-')) {
-                    let parts = mRaw.split('-');
-                    months.add(parts[0].trim());
-                    let yr = (parts[1].length === 2 ? "20" : "") + parts[1].trim();
-                    years.add(yr); 
-                    row['ExtractedYear'] = yr;
-                    row['ExtractedMonth'] = parts[0].trim();
-                } else {
-                    if(mRaw) months.add(mRaw.trim());
-                    row['ExtractedMonth'] = mRaw.trim();
-                    row['ExtractedYear'] = "All"; 
-                }
-                if(h_surv && row[h_surv]) surveyors.add(row[h_surv].trim());
-                if(h_driver && row[h_driver]) drivers.add(row[h_driver].trim());
-                if(h_loc && row[h_loc]) locations.add(row[h_loc].trim());
+            let allLocations = new Set();
+            let allYears = new Set();
+
+            endpoints.forEach(ep => {
+                ep.data.forEach(row => {
+                    let loc = row.location ? row.location.trim() : "";
+                    if (loc && loc.toLowerCase() !== 'unknown' && !loc.toLowerCase().includes("http") && loc.length < 30) {
+                        allLocations.add(loc);
+                    }
+                    if (row.year) allYears.add(row.year);
+                });
             });
 
-            const addOptions = (setId, dataSet) => {
-                const select = document.getElementById(setId);
-                select.innerHTML = `<option value="All">All</option>`;
-                dataSet.forEach(val => { if(val) select.innerHTML += `<option value="${val}">${val}</option>`; });
-            };
-            addOptions('filterYear', years); addOptions('filterMonth', months);
-            addOptions('filterSurveyor', surveyors); addOptions('filterDriver', drivers); addOptions('filterLocation', locations);
-        }
+            const locSelect = document.getElementById('filterLocation');
+            locSelect.innerHTML = '<option value="All">All Locations</option>'; 
+            Array.from(allLocations).sort().forEach((loc) => {
+                const opt = document.createElement('option');
+                opt.value = loc; opt.textContent = loc;
+                locSelect.appendChild(opt);
+            });
 
-        async function fetchGoogleSheetData() {
-            try {
-                const response = await fetch(csvUrl); const csvText = await response.text();
-                const rows = parseCSV(csvText);
-                let headerIdx = 0;
-                for(let i=0; i<Math.min(15, rows.length); i++) {
-                    let rowStr = rows[i].join("").toLowerCase().replace(/\s/g, '');
-                    if(rowStr.includes("month") || rowStr.includes("date")) { headerIdx = i; break; }
-                }
-
-                headers = rows[headerIdx].map(h => h ? h.trim() : `Col_${Math.random()}`);
-                identifyHeaders(headers); 
-                sheetData = rows.slice(headerIdx + 1).map(row => {
-                    let obj = {};
-                    row.forEach((cell, i) => { if(headers[i]) obj[headers[i]] = cell ? cell.trim() : ""; });
-                    return obj;
-                });
-                sheetData = sheetData.filter(row => Object.values(row).some(x => x !== ""));
-                if(sheetData.length === 0) throw new Error("No data found");
-
-                extractUniqueCars();
-                buildHTMLGrid();
-
-                document.getElementById('loadingMsg').style.display = 'none';
-                document.getElementById('dashboardContent').style.display = 'grid'; 
-                document.getElementById('surveyorRoundsContainer').style.display = 'flex'; 
-
-                populateDropdowns(); updateDashboard(); 
-            } catch (error) { document.getElementById('loadingMsg').innerHTML = `Error loading data.`; }
+            const yearSelect = document.getElementById('filterYear');
+            yearSelect.innerHTML = ''; 
+            Array.from(allYears).sort((a,b) => b-a).forEach((yr) => {
+                const opt = document.createElement('option');
+                opt.value = yr; opt.textContent = yr;
+                yearSelect.appendChild(opt);
+            });
+            
+            if(yearSelect.options.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = new Date().getFullYear();
+                opt.textContent = new Date().getFullYear();
+                yearSelect.appendChild(opt);
+            }
         }
 
         function triggerUpdate() {
-            const elementsToFade = document.querySelectorAll('#dashboardContent, #surveyorRoundsContainer');
-            elementsToFade.forEach(el => el.classList.add('fade-out'));
+            const grid = document.getElementById('dashboardContent');
+            grid.classList.add('fade-out');
             setTimeout(() => {
                 updateDashboard();
-                elementsToFade.forEach(el => el.classList.remove('fade-out'));
+                grid.classList.remove('fade-out');
             }, 300);
         }
 
+        // --- CORE RENDER LOGIC ---
         function updateDashboard() {
-            const yVal = document.getElementById('filterYear').value;
-            const mVal = document.getElementById('filterMonth').value;
-            const sVal = document.getElementById('filterSurveyor').value;
-            const dVal = document.getElementById('filterDriver').value;
-            const lVal = document.getElementById('filterLocation').value;
-            const isMonthSelected = (mVal !== "All");
-
-            let filteredData = sheetData.filter(item => {
-                if(yVal !== "All" && item['ExtractedYear'] !== yVal) return false;
-                if(mVal !== "All" && item['ExtractedMonth'] !== mVal) return false;
-                if(sVal !== "All" && h_surv && item[h_surv] !== sVal) return false;
-                if(dVal !== "All" && h_driver && item[h_driver] !== dVal) return false;
-                if(lVal !== "All" && h_loc && item[h_loc] !== lVal) return false;
-                return true;
+            endpoints.forEach(ep => {
+                renderCardLogic(ep.data, ep.id, ep.dotColor);
             });
+        }
 
-            // Surveyor Rounds Calculation
-            let surveyorCounts = {};
-            filteredData.forEach(item => {
-                let sName = item[h_surv];
-                if (sName) { sName = sName.trim(); surveyorCounts[sName] = (surveyorCounts[sName] || 0) + 1; }
-            });
+        function renderCardLogic(dataArray, prefix, customLineColor) {
+            const loc = document.getElementById('filterLocation').value;
+            const year = document.getElementById('filterYear').value;
+            const month = document.getElementById('filterMonth').value; 
+            const exactDate = document.getElementById('filterDate').value;
 
-            const roundsContainer = document.getElementById('surveyorRoundsContainer');
-            roundsContainer.innerHTML = ''; 
-            for (const [name, count] of Object.entries(surveyorCounts)) {
-                roundsContainer.innerHTML += `
-                    <div class="surveyor-card">
-                        <div class="surveyor-icon">${userSvgIcon}</div>
-                        <div class="surveyor-info">
-                            <span class="surveyor-name" title="${name}">${name}</span>
-                            <span class="surveyor-count">${count} <span style="font-size:0.7rem; font-weight:600; color:var(--text-secondary)">Rounds</span></span>
-                        </div>
-                    </div>`;
+            let filteredRecords = dataArray;
+
+            if (loc && loc !== 'All') {
+                filteredRecords = filteredRecords.filter(item => item.location === loc);
             }
 
-            // Graphs Calculation
-            let carCount = uniqueCars.length;
-            let gSum = Array(carCount).fill(0), gCnt = Array(carCount).fill(0), groupedStats = {};
+            const canvasId = `chart-${prefix}`;
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            if(myCharts[prefix]) myCharts[prefix].destroy();
 
-            filteredData.forEach(item => {
-                let label = item['ExtractedMonth'] || "Unknown";
-                if (!groupedStats[label]) groupedStats[label] = { sums: Array(carCount).fill(0), cnts: Array(carCount).fill(0) };
+            const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-grid').trim();
+            const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim();
+            const doughnutBg = getComputedStyle(document.documentElement).getPropertyValue('--doughnut-bg').trim();
 
-                if (isLongFormat) {
-                    let rArea = item[h_area] ? item[h_area].trim() : "";
-                    let val = cleanPercent(item[h_svc]);
-                    if(val !== null && rArea !== "") {
-                        let idx = uniqueCars.indexOf(rArea);
-                        if (idx !== -1) { gSum[idx] += val; gCnt[idx]++; groupedStats[label].sums[idx] += val; groupedStats[label].cnts[idx]++; }
+            let showDoughnut = false;
+
+            if (exactDate) {
+                showDoughnut = true;
+                filteredRecords = filteredRecords.filter(item => item.fullDate === exactDate);
+            } else if (month !== 'All') {
+                showDoughnut = true;
+                let targetMonthFormat = `${year}-${month}`;
+                filteredRecords = filteredRecords.filter(item => item.month === targetMonthFormat);
+            } else {
+                filteredRecords = filteredRecords.filter(item => item.year === year);
+            }
+
+            if (!showDoughnut) {
+                // --- YEARLY TREND (BAR CHART) ---
+                let monthlyStats = {};
+                filteredRecords.forEach(item => {
+                    if(!item.month) return;
+                    if(!monthlyStats[item.month]) monthlyStats[item.month] = { total: 0, yes: 0 };
+                    monthlyStats[item.month].total += item.totalQuestions;
+                    monthlyStats[item.month].yes += item.achievedYes;
+                });
+
+                let labels = []; let dataPct = []; let bgColors = [];
+                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+                for (let i = 1; i <= 12; i++) {
+                    let mStr = String(i).padStart(2, '0');
+                    let targetKey = `${year}-${mStr}`;
+                    labels.push(monthNames[i-1]);
+
+                    if (monthlyStats[targetKey]) {
+                        let stat = monthlyStats[targetKey];
+                        let pct = stat.total > 0 ? (stat.yes / stat.total) * 100 : 0;
+                        dataPct.push(pct);
+                        // Rule applied: >= 95% is Green, otherwise Red
+                        bgColors.push(pct >= 95 ? '#10B981' : '#EF4444');
+                    } else {
+                        dataPct.push(0);
+                        bgColors.push(getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim()); 
                     }
-                } else {
-                    uniqueCars.forEach((carName, idx) => {
-                        let val = cleanPercent(item[carName]);
-                        if(val !== null) { gSum[idx] += val; gCnt[idx]++; groupedStats[label].sums[idx] += val; groupedStats[label].cnts[idx]++; }
-                    });
                 }
-            });
 
-            let labels = Object.keys(groupedStats);
-            const mOrder = {"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12};
-            labels.sort((a,b) => (mOrder[a.substring(0,3).toLowerCase()]||99) - (mOrder[b.substring(0,3).toLowerCase()]||99));
-
-            let datasets = Array.from({length: carCount}, () => []);
-            labels.forEach(lbl => {
-                let s = groupedStats[lbl];
-                for(let i=0; i<carCount; i++) datasets[i].push(s.cnts[i] > 0 ? parseFloat((s.sums[i]/s.cnts[i]).toFixed(1)) : 0);
-            });
-
-            const tColors = getThemeColors();
-
-            // Render Charts
-            for(let i=0; i<carCount; i++) {
-                let canvasId = `chartCar${i}`;
-                let colorHex = locColorsHex[i % locColorsHex.length];
-                let avgVal = gCnt[i] > 0 ? parseFloat((gSum[i] / gCnt[i]).toFixed(1)) : 0;
-
-                if(charts[`car${i}`]) charts[`car${i}`].destroy();
-                const ctx = document.getElementById(canvasId).getContext('2d');
-
-                if(isMonthSelected) {
-                    // DOUGHNUT CHART MODE
-                    let targetColor = avgVal >= 95 ? tColors.positiveColor : tColors.negativeColor; 
-                    
-                    charts[`car${i}`] = new Chart(ctx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: ['Achieved', 'Remaining'],
-                            datasets: [{
-                                data: [avgVal, Math.max(0, 100 - avgVal)],
-                                backgroundColor: [targetColor, tColors.emptyDoughnut],
-                                borderWidth: 0, cutout: '75%'
-                            }]
+                myCharts[prefix] = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{ data: dataPct, backgroundColor: bgColors, borderRadius: 4, barPercentage: 0.8 }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        animation: { duration: 800, easing: 'easeOutBounce' },
+                        scales: {
+                            y: { max: 100, min: 0, grid: { color: gridColor, drawBorder: false }, ticks: { color: textColor, font: {size: 10} } },
+                            x: { grid: { display: false }, ticks: { color: textColor, font: {weight: 'bold', size: 9} } }
                         },
-                        options: {
-                            responsive: true, maintainAspectRatio: false, 
-                            animation: { duration: 800, easing: 'easeOutBounce' },
-                            plugins: { legend: { display: false }, tooltip: { enabled: false } },
-                            layout: { padding: 5 }
-                        },
-                        plugins: [{
-                            id: 'centerTextPlugin',
-                            beforeDraw: function(chart) {
-                                var width = chart.width, height = chart.height, context = chart.ctx;
-                                context.restore();
-                                let fontSizePct = (height / 110).toFixed(2); 
-                                context.font = "bold " + fontSizePct + "em 'Plus Jakarta Sans'";
-                                context.textBaseline = "middle";
-                                context.fillStyle = tColors.text; 
-                                let textPct = avgVal > 0 ? avgVal + "%" : "--";
-                                let textXPct = Math.round((width - context.measureText(textPct).width) / 2);
-                                let textYPct = height / 2; 
-                                context.fillText(textPct, textXPct, textYPct);
-                                context.save();
-                            }
-                        }]
-                    });
-                } else {
-                    // LINE CHART MODE
-                    let bgGradient = ctx.createLinearGradient(0, 0, 0, 120);
-                    bgGradient.addColorStop(0, colorHex + '30'); 
-                    bgGradient.addColorStop(1, colorHex + '00'); 
+                        plugins: { legend: { display: false }, tooltip: { enabled: true, callbacks: { label: (c) => c.parsed.y.toFixed(1) + "%" } } }
+                    }
+                });
 
-                    charts[`car${i}`] = new Chart(ctx, {
-                        type: 'line',
-                        data: { 
-                            labels: labels, 
-                            datasets: [{ 
-                                backgroundColor: bgGradient, borderColor: colorHex, 
-                                borderWidth: 2, fill: true, tension: 0.4, 
-                                pointRadius: 2, pointHoverRadius: 5,
-                                pointBackgroundColor: tColors.pointBg, pointBorderColor: colorHex,
-                                pointBorderWidth: 2, data: datasets[i] 
-                            }] 
-                        },
-                        options: {
-                            responsive: true, maintainAspectRatio: false, layout: { padding: { top: 5 } },
-                            animation: { duration: 600, easing: 'easeOutQuart' },
-                            plugins: { 
-                                legend: { display: false }, 
-                                tooltip: { 
-                                    backgroundColor: tColors.tooltipBg, titleColor: tColors.tooltipText, bodyColor: tColors.tooltipText,
-                                    borderColor: tColors.tooltipBorder, borderWidth: 1, padding: 10, cornerRadius: 8,
-                                    titleFont: { size: 10, family: "'Plus Jakarta Sans', sans-serif" }, 
-                                    bodyFont: { size: 13, weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" },
-                                    callbacks: { label: function(context) { return context.parsed.y + "%"; } } 
-                                } 
-                            },
-                            scales: { 
-                                y: { display: true, beginAtZero: true, grid: { drawBorder: false, color: tColors.grid }, ticks: { display: false } }, 
-                                x: { display: true, grid: { display: false }, ticks: { font: { size: 9, weight: '600' }, color: tColors.text, maxRotation: 0 } } 
-                            }
-                        }
-                    });
-                }
+            } else {
+                // --- SPECIFIC DATE/MONTH (DOUGHNUT CHART) ---
+                let overallTotal = 0; let overallYes = 0;
+                filteredRecords.forEach(item => { overallTotal += item.totalQuestions; overallYes += item.achievedYes; });
+
+                let pct = overallTotal > 0 ? (overallYes / overallTotal) * 100 : 0;
+                let displayPct = overallTotal > 0 ? pct.toFixed(0) + '%' : '0%';
+                
+                // Rule applied: >= 95% is Green, otherwise Red
+                let color = pct >= 95 ? '#10B981' : '#EF4444';
+                if(overallTotal === 0) color = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim(); 
+
+                myCharts[prefix] = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Achieved', 'Remaining'],
+                        datasets: [{ data: [pct, Math.max(0, 100 - pct)], backgroundColor: [color, doughnutBg], borderWidth: 0, cutout: '75%' }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        animation: { animateScale: true, animateRotate: true, duration: 800, easing: 'easeOutQuart' },
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        layout: { padding: 10 },
+                        elements: { center: { text: displayPct } } 
+                    }
+                });
             }
         }
 
-        document.querySelectorAll('select').forEach(sel => sel.addEventListener('change', triggerUpdate));
-        document.getElementById('clearFiltersBtn').addEventListener('click', () => { document.querySelectorAll('select').forEach(sel => sel.value = 'All'); triggerUpdate(); });
-        window.onload = () => { fetchGoogleSheetData(); };
+        // --- IMAGE REPORT LOGIC ---
+        document.getElementById('generateImageBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('generateImageBtn');
+            btn.innerHTML = 'Generating...';
+
+            const allLocations = Array.from(document.getElementById('filterLocation').options).map(opt => opt.value).filter(val => val !== 'All');
+            const year = document.getElementById('filterYear').value;
+            const month = document.getElementById('filterMonth').value;
+            const exactDate = document.getElementById('filterDate').value;
+            
+            let timeframeStr = `Year Trend: ${year}`;
+            if (exactDate) timeframeStr = `Exact Date: ${exactDate}`;
+            else if (month !== 'All') {
+                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                timeframeStr = `${monthNames[parseInt(month)-1]} ${year}`;
+            }
+
+            const reportContainer = document.getElementById('imageReportContainer');
+            
+            let htmlContent = `
+                <div style="background: #ffffff; padding: 50px; width: 1400px; font-family: 'Plus Jakarta Sans', sans-serif;">
+                    <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #E2E8F0; padding-bottom: 25px;">
+                        <h1 style="margin: 0; color: #0F172A; font-size: 38px; font-weight: 800; text-transform: uppercase;">Master SLA Performance Report</h1>
+                        <p style="margin: 15px 0 0 0; color: #64748B; font-size: 20px; font-weight: 600;">Timeframe Selection: <span style="color: #3B82F6;">${timeframeStr}</span></p>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;">
+            `;
+
+            allLocations.forEach(loc => {
+                htmlContent += `
+                    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 20px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                        <h2 style="margin: 0 0 20px 0; color: #0F172A; font-size: 24px; text-align: center; border-bottom: 2px solid #CBD5E1; padding-bottom: 15px; text-transform: uppercase;">${loc}</h2>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 18px;">
+                            <tbody>
+                `;
+                
+                endpoints.forEach(ep => {
+                    let fData = ep.data.filter(item => item.location === loc);
+                    
+                    if (exactDate) fData = fData.filter(i => i.fullDate === exactDate);
+                    else if (month !== 'All') {
+                        let targetMonthFormat = `${year}-${month}`;
+                        fData = fData.filter(i => i.month === targetMonthFormat);
+                    } else {
+                        fData = fData.filter(i => i.year === year);
+                    }
+
+                    let total = 0; let yes = 0;
+                    fData.forEach(item => { total += item.totalQuestions; yes += item.achievedYes; });
+
+                    if (total > 0) {
+                        let pct = (yes / total) * 100;
+                        // Rule applied: >= 95% is Green, otherwise Red
+                        let color = pct >= 95 ? '#10B981' : '#EF4444';
+                        
+                        htmlContent += `
+                            <tr>
+                                <td style="padding: 12px 0; color: #64748B; font-weight: 600; border-bottom: 1px solid #F1F5F9;">${ep.name}</td>
+                                <td style="padding: 12px 0; text-align: right; color: ${color}; font-weight: 800; font-size: 20px; border-bottom: 1px solid #F1F5F9;">${pct.toFixed(0)}%</td>
+                            </tr>
+                        `;
+                    } else {
+                        htmlContent += `
+                            <tr>
+                                <td style="padding: 12px 0; color: #64748B; font-weight: 600; border-bottom: 1px solid #F1F5F9;">${ep.name}</td>
+                                <td style="padding: 12px 0; text-align: right; color: #94A3B8; font-weight: 800; font-size: 20px; border-bottom: 1px solid #F1F5F9;">N/A</td>
+                            </tr>
+                        `;
+                    }
+                });
+
+                htmlContent += `</tbody></table></div>`;
+            });
+
+            htmlContent += `
+                    </div>
+                    <div style="margin-top: 40px; text-align: center; color: #94A3B8; font-size: 16px; font-weight: 500;">
+                        Generated automatically by HR Corporate Dashboard System on ${new Date().toLocaleString()}
+                    </div>
+                </div>
+            `;
+
+            reportContainer.innerHTML = htmlContent;
+
+            setTimeout(async () => {
+                try {
+                    const canvas = await html2canvas(reportContainer.firstElementChild, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
+                    const imgData = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.href = imgData;
+                    link.download = `SLA_Report_${timeframeStr.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } catch (error) {
+                    alert("Error generating the image report.");
+                } finally {
+                    reportContainer.innerHTML = ''; 
+                    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Export`;
+                }
+            }, 500);
+        });
+
     </script>
 </body>
 </html>
