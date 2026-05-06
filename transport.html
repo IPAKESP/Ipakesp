@@ -20,6 +20,7 @@
             --color-red: #EF4444;
             --color-yellow: #F59E0B;
             --color-green: #10B981;
+            --color-purple: #8B5CF6;
             
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --radius-lg: 16px;
@@ -147,14 +148,14 @@
 
         .dashboard-grid {
             display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
+            /* 3 Columns Grid for perfect top row fit */
+            grid-template-columns: repeat(3, 1fr); 
             grid-template-rows: repeat(2, 1fr); 
             gap: 15px; width: 100%; height: 100%; display: none;
         }
 
-        /* Spanning grid to make cards look premium */
-        .col-span-2 { grid-column: span 2; }
-        .row-span-2 { grid-row: span 2; }
+        /* Bottom Row spans all 3 columns */
+        .col-span-3 { grid-column: span 3; }
 
         .kpi-widget {
             background: var(--bg-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
@@ -172,6 +173,7 @@
         .dot.blue { background-color: var(--color-blue); box-shadow: 0 0 8px var(--color-blue); }
         .dot.red { background-color: var(--color-red); box-shadow: 0 0 8px var(--color-red); }
         .dot.yellow { background-color: var(--color-yellow); box-shadow: 0 0 8px var(--color-yellow); }
+        .dot.purple { background-color: var(--color-purple); box-shadow: 0 0 8px var(--color-purple); }
 
         .kpi-title h3 { margin: 0; font-size: 0.85rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
@@ -279,22 +281,26 @@
         <div id="loadingMsg">Syncing Live SLA Data...</div>
 
         <div class="dashboard-grid" id="dashboardContent">
-            <!-- Pool Vehicle main Card -->
-            <div class="kpi-widget col-span-2 row-span-2">
+            <!-- Top Row: Pool Vehicle, LHR, SKP (Each takes 1 column) -->
+            <div class="kpi-widget">
                 <div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Pool Vehicle</h3></div></div>
                 <div class="chart-wrapper"><canvas id="chart-poolvehicle"></canvas></div>
             </div>
 
-            <!-- Staff Transport Lahore Card -->
-            <div class="kpi-widget col-span-2">
+            <div class="kpi-widget">
                 <div class="kpi-header"><span class="dot red"></span><div class="kpi-title"><h3>Staff Transport Lahore</h3></div></div>
                 <div class="chart-wrapper"><canvas id="chart-staffTransportLHR"></canvas></div>
             </div>
 
-            <!-- Staff Transport SKP Card -->
-            <div class="kpi-widget col-span-2">
+            <div class="kpi-widget">
                 <div class="kpi-header"><span class="dot yellow"></span><div class="kpi-title"><h3>Staff Transport SKP</h3></div></div>
                 <div class="chart-wrapper"><canvas id="chart-staffTransportSKP"></canvas></div>
+            </div>
+
+            <!-- Bottom Row: Vehicle SLA (Takes full width / 3 columns) -->
+            <div class="kpi-widget col-span-3">
+                <div class="kpi-header"><span class="dot purple"></span><div class="kpi-title"><h3>Vehicle SLA</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chart-vehicleSLA"></canvas></div>
             </div>
         </div>
     </div>
@@ -389,6 +395,7 @@
 
         const endpoints = [
             { id: 'poolvehicle', name: "Pool Vehicle", urls: [csvPoolVehicle], data: [], dotColor: '#3B82F6' },
+            { id: 'vehicleSLA', name: "Vehicle SLA", urls: [csvPoolVehicle], data: [], dotColor: '#8B5CF6' },
             { id: 'staffTransportLHR', name: "Staff Transport Lahore", urls: [csvStaffLHR], data: [], dotColor: '#EF4444' },
             { id: 'staffTransportSKP', name: "Staff Transport SKP", urls: [csvStaffSKP], data: [], dotColor: '#F59E0B' }
         ];
@@ -449,8 +456,16 @@
             if (rows.length < 2) return parsedData;
 
             const headers = rows[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(h => h.replace(/"/g, '').trim().toLowerCase());
+            
             let locIndex = headers.findIndex(h => h === 'location' || h === 'company' || h === 'plant' || h === 'site');
             if (locIndex === -1) locIndex = headers.findIndex(h => h.includes('location') || h.includes('company'));
+            
+            // Extract vehicle column
+            let vehicleIndex = headers.findIndex(h => h.includes('vehicle') || h.includes('reg') || h.includes('number'));
+            if (vehicleIndex === locIndex) {
+                // In case location and vehicle column match the same keyword, find the next one
+                vehicleIndex = headers.findIndex((h, idx) => idx !== locIndex && (h.includes('vehicle') || h.includes('reg')));
+            }
 
             for (let i = 1; i < rows.length; i++) {
                 const row = rows[i];
@@ -476,16 +491,22 @@
                 let rowLocation = "Unknown";
                 if (locIndex !== -1 && cols[locIndex]) rowLocation = cols[locIndex].replace(/"/g, '').trim();
 
+                let rowVehicle = "Unknown";
+                if (vehicleIndex !== -1 && cols[vehicleIndex]) {
+                    rowVehicle = cols[vehicleIndex].replace(/"/g, '').trim();
+                    if (!rowVehicle) rowVehicle = "Unknown";
+                }
+
                 let rowTotal = 0; let rowYes = 0;
                 for (let j = 1; j < cols.length; j++) {
-                    if (j === locIndex) continue; 
+                    if (j === locIndex || j === vehicleIndex) continue; // skip location & vehicle column from Yes/No count
                     let cellValue = cols[j] ? cols[j].replace(/"/g, '').trim().toLowerCase() : '';
                     if (cellValue === "yes") { rowTotal++; rowYes++; } 
                     else if (cellValue === "no" || cellValue === "n/a") { rowTotal++; }
                 }
                 
                 if (parsedYear) {
-                    parsedData.push({ fullDate: parsedDate, month: parsedMonth, year: parsedYear, location: rowLocation, totalQuestions: rowTotal, achievedYes: rowYes });
+                    parsedData.push({ fullDate: parsedDate, month: parsedMonth, year: parsedYear, location: rowLocation, vehicle: rowVehicle, totalQuestions: rowTotal, achievedYes: rowYes });
                 }
             }
             return parsedData;
@@ -564,6 +585,62 @@
             const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-grid').trim();
             const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim();
             const doughnutBg = getComputedStyle(document.documentElement).getPropertyValue('--doughnut-bg').trim();
+
+            // --- SPECIAL LOGIC FOR VEHICLE SLA ---
+            if (prefix === 'vehicleSLA') {
+                if (exactDate) {
+                    filteredRecords = filteredRecords.filter(item => item.fullDate === exactDate);
+                } else if (month !== 'All') {
+                    let targetMonthFormat = `${year}-${month}`;
+                    filteredRecords = filteredRecords.filter(item => item.month === targetMonthFormat);
+                } else {
+                    filteredRecords = filteredRecords.filter(item => item.year === year);
+                }
+
+                let vehicleStats = {};
+                filteredRecords.forEach(item => {
+                    let vName = item.vehicle || "Unknown";
+                    // Skip if the parsed vehicle name is just a placeholder like "select vehicle"
+                    if (vName.toLowerCase().includes('select vehicle') || vName.toLowerCase() === 'vehicle') return; 
+                    
+                    if (!vehicleStats[vName]) vehicleStats[vName] = { total: 0, yes: 0 };
+                    vehicleStats[vName].total += item.totalQuestions;
+                    vehicleStats[vName].yes += item.achievedYes;
+                });
+
+                let labels = []; let dataPct = []; let bgColors = [];
+                
+                Object.keys(vehicleStats).sort().forEach(vName => {
+                    let stat = vehicleStats[vName];
+                    if (stat.total > 0) {
+                        labels.push(vName);
+                        let pct = (stat.yes / stat.total) * 100;
+                        dataPct.push(pct);
+                        // Rule applied: >= 95% is Green, otherwise Red
+                        bgColors.push(pct >= 95 ? '#10B981' : '#EF4444');
+                    }
+                });
+
+                myCharts[prefix] = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{ data: dataPct, backgroundColor: bgColors, borderRadius: 4, barPercentage: 0.5 }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        animation: { duration: 800, easing: 'easeOutBounce' },
+                        scales: {
+                            y: { max: 100, min: 0, grid: { color: gridColor, drawBorder: false }, ticks: { color: textColor, font: {size: 10} } },
+                            x: { grid: { display: false }, ticks: { color: textColor, font: {weight: 'bold', size: 9}, maxRotation: 45, minRotation: 0 } }
+                        },
+                        plugins: { legend: { display: false }, tooltip: { enabled: true, callbacks: { label: (c) => c.parsed.y.toFixed(1) + "%" } } }
+                    }
+                });
+                
+                return; // End execution for vehicleSLA here
+            }
+            // --- END SPECIAL LOGIC ---
 
             let showDoughnut = false;
 
@@ -676,7 +753,7 @@
             let htmlContent = `
                 <div style="background: #ffffff; padding: 50px; width: 1400px; font-family: 'Plus Jakarta Sans', sans-serif;">
                     <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #E2E8F0; padding-bottom: 25px;">
-                        <h1 style="margin: 0; color: #0F172A; font-size: 38px; font-weight: 800; text-transform: uppercase;">Master SLA Performance Report</h1>
+                        <h1 style="margin: 0; color: #0F172A; font-size: 38px; font-weight: 800; text-transform: uppercase;">IPAK SLA Report</h1>
                         <p style="margin: 15px 0 0 0; color: #64748B; font-size: 20px; font-weight: 600;">Timeframe Selection: <span style="color: #3B82F6;">${timeframeStr}</span></p>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;">
@@ -691,6 +768,8 @@
                 `;
                 
                 endpoints.forEach(ep => {
+                    if (ep.id === 'vehicleSLA') return; // Skip in export to avoid duplicate Pool Vehicle total
+                    
                     let fData = ep.data.filter(item => item.location === loc);
                     
                     if (exactDate) fData = fData.filter(i => i.fullDate === exactDate);
