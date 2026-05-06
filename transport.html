@@ -187,11 +187,38 @@
         .fade-out { opacity: 0 !important; transform: scale(0.97) !important; }
         .dashboard-grid { transition: opacity 0.3s ease, transform 0.3s ease; opacity: 1; transform: scale(1); }
 
+        /* ---------------------------------
+           SMOOTH LOADING ANIMATION
+        --------------------------------- */
         #loadingMsg {
-            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             color: var(--text-primary); font-weight: 700; background: var(--bg-surface);
             padding: 15px 30px; border-radius: 30px; border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-card); z-index: 10; font-size: 1rem;
+            box-shadow: var(--shadow-card); z-index: 10; font-size: 0.9rem;
+            display: flex; align-items: center; gap: 12px;
+            opacity: 1; transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        #loadingMsg.hidden {
+            opacity: 0;
+            transform: translate(-50%, -40%);
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 20px; height: 20px; animation: rotate 2s linear infinite;
+        }
+        
+        .spinner .path {
+            stroke: var(--color-blue); stroke-linecap: round;
+            animation: dash 1.5s ease-in-out infinite;
+        }
+
+        @keyframes rotate { 100% { transform: rotate(360deg); } }
+        @keyframes dash {
+            0% { stroke-dasharray: 1, 150; stroke-dashoffset: 0; }
+            50% { stroke-dasharray: 90, 150; stroke-dashoffset: -35; }
+            100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; }
         }
 
         @media print {
@@ -278,7 +305,13 @@
     </div>
 
     <div class="workspace">
-        <div id="loadingMsg">Syncing Live SLA Data...</div>
+        <!-- UPDATED SMOOTH SPINNER -->
+        <div id="loadingMsg">
+            <svg class="spinner" viewBox="0 0 50 50">
+                <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+            </svg>
+            Syncing Live SLA Data...
+        </div>
 
         <div class="dashboard-grid" id="dashboardContent">
             <!-- Top Row: Pool Vehicle, LHR, SKP (Each takes 1 column) -->
@@ -440,13 +473,17 @@
                 
                 updateDashboard();
                 
-                syncStatus.style.display = 'none';
-                document.getElementById('dashboardContent').style.display = 'grid';
-                document.getElementById('generateImageBtn').style.display = 'inline-flex'; 
+                // --- UPDATED SMOOTH FADE OUT FOR LOADER ---
+                syncStatus.classList.add('hidden');
+                setTimeout(() => {
+                    syncStatus.style.display = 'none';
+                    document.getElementById('dashboardContent').style.display = 'grid';
+                    document.getElementById('generateImageBtn').style.display = 'inline-flex'; 
+                }, 500);
                 
             } catch (error) {
                 console.error("Master Fetch Error:", error);
-                syncStatus.innerText = "Error Loading Data.";
+                syncStatus.innerHTML = "Error Loading Data.";
             }
         }
 
@@ -629,7 +666,11 @@
                     },
                     options: {
                         responsive: true, maintainAspectRatio: false,
-                        animation: { duration: 800, easing: 'easeOutBounce' },
+                        // --- NATIVE PROFESSIONAL ANIMATION FOR VEHICLE SLA BAR CHART ---
+                        animation: { 
+                            duration: 1200, 
+                            easing: 'easeOutQuart'
+                        },
                         scales: {
                             y: { max: 100, min: 0, grid: { color: gridColor, drawBorder: false }, ticks: { color: textColor, font: {size: 10} } },
                             x: { grid: { display: false }, ticks: { color: textColor, font: {weight: 'bold', size: 9}, maxRotation: 45, minRotation: 0 } }
@@ -693,7 +734,11 @@
                     },
                     options: {
                         responsive: true, maintainAspectRatio: false,
-                        animation: { duration: 800, easing: 'easeOutBounce' },
+                        // --- NATIVE PROFESSIONAL ANIMATION FOR YEARLY TREND BAR CHART ---
+                        animation: { 
+                            duration: 1200, 
+                            easing: 'easeOutQuart'
+                        },
                         scales: {
                             y: { max: 100, min: 0, grid: { color: gridColor, drawBorder: false }, ticks: { color: textColor, font: {size: 10} } },
                             x: { grid: { display: false }, ticks: { color: textColor, font: {weight: 'bold', size: 9} } }
@@ -722,7 +767,8 @@
                     },
                     options: {
                         responsive: true, maintainAspectRatio: false,
-                        animation: { animateScale: true, animateRotate: true, duration: 800, easing: 'easeOutQuart' },
+                        // --- NATIVE PROFESSIONAL ANIMATION FOR DOUGHNUT CHART ---
+                        animation: { animateScale: true, animateRotate: true, duration: 1200, easing: 'easeOutQuart' },
                         plugins: { legend: { display: false }, tooltip: { enabled: false } },
                         layout: { padding: 10 },
                         elements: { center: { text: displayPct } } 
