@@ -670,6 +670,20 @@
                 `;
                 
                 endpoints.forEach(ep => {
+                    // --- NEW FILTERING RULES FOR EXPORT ---
+                    let locUpper = loc.toUpperCase();
+                    
+                    // GPAK Card: ONLY show Plant Outside and Technical Office
+                    if (locUpper.includes('GPAK')) {
+                        if (ep.id !== 'plantOutside' && ep.id !== 'tech') return;
+                    }
+                    
+                    // IPAK Card: Remove GH Building, Executive Mess, Social Block
+                    if (locUpper.includes('IPAK')) {
+                        if (ep.id === 'gh' || ep.id === 'exec' || ep.id === 'social') return;
+                    }
+                    // --------------------------------------
+
                     let fData = ep.data.filter(item => item.location === loc);
                     
                     if (exactDate) fData = fData.filter(i => i.fullDate === exactDate);
