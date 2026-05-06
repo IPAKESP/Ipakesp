@@ -769,6 +769,12 @@
                 
                 endpoints.forEach(ep => {
                     if (ep.id === 'vehicleSLA') return; // Skip in export to avoid duplicate Pool Vehicle total
+
+                    // --- NEW FILTERING RULES FOR EXPORT ---
+                    let locUpper = loc.toUpperCase();
+                    if (locUpper.includes('IPAK') && ep.id === 'staffTransportSKP') return;
+                    if (locUpper.includes('PETPAK') && ep.id === 'staffTransportLHR') return;
+                    // --------------------------------------
                     
                     let fData = ep.data.filter(item => item.location === loc);
                     
