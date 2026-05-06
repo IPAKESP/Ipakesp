@@ -40,6 +40,7 @@
             --bg-input: #F1F5F9;
             --btn-dim: rgba(15, 23, 42, 0.05);
             --doughnut-bg: #F1F5F9;
+            --card-highlight: #F1F5F9;
         }
 
         /* DARK MODE */
@@ -55,6 +56,7 @@
             --bg-input: #18181B;
             --btn-dim: rgba(250, 250, 250, 0.1);
             --doughnut-bg: #27272A;
+            --card-highlight: #18181B;
         }
 
         body {
@@ -72,6 +74,7 @@
             padding: 12px 30px; background-color: var(--bg-surface);
             border-bottom: 1px solid var(--border-color); height: 60px;
             box-sizing: border-box; transition: var(--transition);
+            flex-shrink: 0;
         }
 
         .header-brand { display: flex; align-items: center; gap: 12px; }
@@ -104,6 +107,7 @@
             display: flex; align-items: center; gap: 15px; padding: 10px 30px;
             background-color: var(--bg-main); height: 50px; box-sizing: border-box;
             border-bottom: 1px solid var(--border-color); flex-wrap: nowrap; overflow-x: auto;
+            flex-shrink: 0;
         }
 
         .filter-group { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
@@ -135,16 +139,43 @@
         .report-btn-small:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
 
         /* ---------------------------------
-           PREMIUM BENTO GRID
+           PREMIUM BENTO GRID WORKSPACE
         --------------------------------- */
         .workspace {
             flex: 1; padding: 15px 30px; display: flex; flex-direction: column;
-            height: calc(100vh - 110px); box-sizing: border-box; position: relative;
+            overflow-y: auto; position: relative; box-sizing: border-box;
         }
 
+        .section-header {
+            font-size: 0.9rem; font-weight: 800; color: var(--text-primary);
+            margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 0.5px;
+            display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+        }
+
+        /* --- MINI MEAL CARDS --- */
+        .meal-cards-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
+            margin-bottom: 20px; flex-shrink: 0;
+        }
+
+        .mini-card {
+            background: var(--bg-surface); border-radius: var(--radius-md); box-shadow: var(--shadow-card);
+            padding: 12px 16px; border: 1px solid var(--border-color);
+            display: flex; flex-direction: column; justify-content: center;
+            transition: var(--transition); position: relative; overflow: hidden;
+        }
+        .mini-card:hover { border-color: var(--color-blue); transform: translateY(-2px); }
+        
+        .mini-card.total-card { background: var(--card-highlight); border-color: var(--color-blue); }
+        .mini-card.total-card .mini-value { color: var(--color-blue); }
+
+        .mini-title { font-size: 0.65rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .mini-value { font-size: 1.4rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
+
+        /* --- MAIN SLA GRID --- */
         .dashboard-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr);
-            gap: 15px; flex-grow: 1; height: 100%; min-height: 0; display: none;
+            display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, minmax(180px, 1fr));
+            gap: 15px; flex-grow: 1; height: 100%; min-height: 380px; display: none;
         }
 
         .kpi-widget {
@@ -160,6 +191,7 @@
         
         .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
         .dot.blue { background-color: var(--color-blue); box-shadow: 0 0 8px var(--color-blue); }
+        .dot.green { background-color: var(--color-green); box-shadow: 0 0 8px var(--color-green); }
 
         .kpi-title h3 { margin: 0; font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
@@ -170,8 +202,8 @@
         --------------------------------- */
         #imageReportContainer { position: fixed; top: -9999px; left: -9999px; z-index: -1000; }
 
-        .fade-out { opacity: 0 !important; transform: scale(0.97) !important; }
-        .dashboard-grid { transition: opacity 0.3s ease, transform 0.3s ease; opacity: 1; transform: scale(1); }
+        .fade-out { opacity: 0 !important; transform: scale(0.98) !important; }
+        .content-wrapper { transition: opacity 0.3s ease, transform 0.3s ease; opacity: 1; transform: scale(1); display: flex; flex-direction: column; height: 100%; }
 
         /* ---------------------------------
            SMOOTH LOADING ANIMATION
@@ -207,16 +239,6 @@
             100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; }
         }
 
-        @media print {
-            @page { size: A4 landscape; margin: 10mm; }
-            body { background-color: #FFFFFF !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; overflow: visible; height: auto;}
-            .top-header { border-bottom: 2px solid #E2E8F0; background: #FFFFFF !important; }
-            .header-brand h1 { color: #0F172A !important; }
-            .nav-tabs, .theme-toggle, .filter-bar, #loadingMsg { display: none !important; }
-            .workspace { height: auto !important; overflow: visible !important; padding: 0 !important; }
-            .dashboard-grid { grid-template-columns: repeat(4, 1fr) !important; grid-template-rows: auto !important; gap: 15px !important; display: grid !important; height: auto !important;}
-            .kpi-widget { border: 1px solid #E2E8F0 !important; box-shadow: none !important; background: #FFFFFF !important; break-inside: avoid; border-radius: 16px !important; transform: none !important; }
-        }
     </style>
 </head>
 <body>
@@ -280,6 +302,14 @@
             <input type="date" id="filterDate" onchange="dateChangedAndTrigger()" title="Selecting a date will override Month/Year">
         </div>
 
+        <!-- SHIFT FILTER LINKED TO MEAL TICKETS -->
+        <div class="filter-group">
+            <label>Shift (Meals)</label>
+            <select id="filterShift" onchange="triggerUpdate()">
+                <option value="All">All Shifts</option>
+            </select>
+        </div>
+
         <button id="clearFiltersBtn" class="clear-btn">Reset View</button>
         
         <button class="report-btn-small" id="generateImageBtn" style="display: none;">
@@ -293,18 +323,69 @@
             <svg class="spinner" viewBox="0 0 50 50">
                 <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
             </svg>
-            Syncing Live SLA Data...
+            Syncing Live Data...
         </div>
 
-        <div class="dashboard-grid" id="dashboardContent">
-            <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Plant Outside</h3></div></div><div class="chart-wrapper"><canvas id="chart-plantOutside"></canvas></div></div>
-            <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>GH Building</h3></div></div><div class="chart-wrapper"><canvas id="chart-gh"></canvas></div></div>
-            <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Executive Mess</h3></div></div><div class="chart-wrapper"><canvas id="chart-exec"></canvas></div></div>
-            <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Technical Office</h3></div></div><div class="chart-wrapper"><canvas id="chart-tech"></canvas></div></div>
-            <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Admin Building</h3></div></div><div class="chart-wrapper"><canvas id="chart-admin"></canvas></div></div>
-            <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Social Block</h3></div></div><div class="chart-wrapper"><canvas id="chart-social"></canvas></div></div>
-            <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Staff Mess</h3></div></div><div class="chart-wrapper"><canvas id="chart-staffmess"></canvas></div></div>
-            <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>GH Rooms</h3></div></div><div class="chart-wrapper"><canvas id="chart-ghrooms"></canvas></div></div>
+        <!-- MAIN WRAPPER FOR FADE ANIMATION -->
+        <div id="mainContentWrapper" class="content-wrapper" style="display: none;">
+            
+            <!-- MEAL TICKETS SECTION -->
+            <h2 class="section-header"><span class="dot green"></span> Meal Tickets</h2>
+            <div class="meal-cards-grid">
+                <div class="mini-card total-card">
+                    <span class="mini-title">Total Meals</span>
+                    <span class="mini-value" id="meal-total">0</span>
+                </div>
+                <div class="mini-card">
+                    <span class="mini-title">Permanent Employees</span>
+                    <span class="mini-value" id="meal-perm">0</span>
+                </div>
+                <div class="mini-card">
+                    <span class="mini-title">Third Party</span>
+                    <span class="mini-value" id="meal-third">0</span>
+                </div>
+                <div class="mini-card">
+                    <span class="mini-title">Meer Security</span>
+                    <span class="mini-value" id="meal-meer">0</span>
+                </div>
+                <div class="mini-card">
+                    <span class="mini-title">Orient Employees</span>
+                    <span class="mini-value" id="meal-orient">0</span>
+                </div>
+                <div class="mini-card">
+                    <span class="mini-title">Cash Meal</span>
+                    <span class="mini-value" id="meal-cash">0</span>
+                </div>
+                <div class="mini-card">
+                    <span class="mini-title">Shift Drivers</span>
+                    <span class="mini-value" id="meal-drivers">0</span>
+                </div>
+                <div class="mini-card">
+                    <span class="mini-title">Guest</span>
+                    <span class="mini-value" id="meal-guest">0</span>
+                </div>
+                <div class="mini-card">
+                    <span class="mini-title">Other</span>
+                    <span class="mini-value" id="meal-other">0</span>
+                </div>
+                <div class="mini-card">
+                    <span class="mini-title">Breakfast</span>
+                    <span class="mini-value" id="meal-breakfast">0</span>
+                </div>
+            </div>
+
+            <!-- BUILDING SLA PERFORMANCE SECTION -->
+            <h2 class="section-header"><span class="dot blue"></span> Building SLA Performance</h2>
+            <div class="dashboard-grid" id="dashboardContent">
+                <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Plant Outside</h3></div></div><div class="chart-wrapper"><canvas id="chart-plantOutside"></canvas></div></div>
+                <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>GH Building</h3></div></div><div class="chart-wrapper"><canvas id="chart-gh"></canvas></div></div>
+                <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Executive Mess</h3></div></div><div class="chart-wrapper"><canvas id="chart-exec"></canvas></div></div>
+                <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Technical Office</h3></div></div><div class="chart-wrapper"><canvas id="chart-tech"></canvas></div></div>
+                <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Admin Building</h3></div></div><div class="chart-wrapper"><canvas id="chart-admin"></canvas></div></div>
+                <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Social Block</h3></div></div><div class="chart-wrapper"><canvas id="chart-social"></canvas></div></div>
+                <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Staff Mess</h3></div></div><div class="chart-wrapper"><canvas id="chart-staffmess"></canvas></div></div>
+                <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>GH Rooms</h3></div></div><div class="chart-wrapper"><canvas id="chart-ghrooms"></canvas></div></div>
+            </div>
         </div>
     </div>
 
@@ -392,6 +473,8 @@
         }
 
         // --- DATA LOGIC ---
+        const urlMeals = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyWDivX7vBSzc_PRweCDyiD1PyJNjBksbC9w_au6OuSRELSGeYttSvZK5nCQL0bVBfDFN2iHgPzVgS/pub?single=true&output=csv&gid=1198139594";
+        
         const urlIPAK = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSD6fL-gX0q_NiyLbcfvLYYEO1xal3B0CjtiRX9iAvEb_rC1Oxd1vbzhj5HIXMsxtrkcaUzcniQa_Kg/pub?single=true&output=csv&gid=";
         const urlPETPAK = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRwxU6lDnqY-uzfrqmJvOUUg8Wrv77iK1M5Z_IbXdvy0Vb45tl-Y9gB_ZrCEl4NFD0cZVMXg7MSkZGb/pub?single=true&output=csv&gid=";
 
@@ -406,6 +489,8 @@
             { id: 'ghrooms', name: "GH Rooms", urls: [urlIPAK + '1231003265', urlPETPAK + '1060301945'], data: [] }
         ];
 
+        let globalMealData = [];
+
         document.addEventListener("DOMContentLoaded", () => {
             fetchAllData(); 
         });
@@ -416,6 +501,7 @@
             document.getElementById('filterYear').value = String(today.getFullYear());
             document.getElementById('filterMonth').value = 'All';
             document.getElementById('filterDate').value = '';
+            document.getElementById('filterShift').value = 'All'; 
             triggerUpdate();
         });
 
@@ -423,6 +509,7 @@
             const syncStatus = document.getElementById('loadingMsg');
             
             try {
+                // 1. Fetch SLA Data
                 await Promise.all(endpoints.map(async (ep) => {
                     await Promise.all(ep.urls.map(async (url) => {
                         try {
@@ -431,11 +518,20 @@
                             const parsed = parseCSVData(csvText);
                             ep.data = ep.data.concat(parsed);
                         } catch (e) {
-                            console.error(`Failed to fetch ${url}:`, e);
+                            console.error(`Failed to fetch SLA data: ${url}`, e);
                         }
                     }));
                 }));
                 
+                // 2. Fetch Meal Tickets Data
+                try {
+                    const mealRes = await fetch(urlMeals);
+                    const mealCSVText = await mealRes.text();
+                    globalMealData = parseMealCSVData(mealCSVText);
+                } catch(e) {
+                    console.error(`Failed to fetch Meal data:`, e);
+                }
+
                 populateDropdowns();
                 
                 const todayYear = String(new Date().getFullYear());
@@ -446,10 +542,11 @@
                 
                 updateDashboard();
                 
-                // Smooth fade out lagane ke liye
+                // Smooth fade out & reveal
                 syncStatus.classList.add('hidden');
                 setTimeout(() => {
                     syncStatus.style.display = 'none';
+                    document.getElementById('mainContentWrapper').style.display = 'flex';
                     document.getElementById('dashboardContent').style.display = 'grid';
                     document.getElementById('generateImageBtn').style.display = 'inline-flex'; 
                 }, 500);
@@ -460,6 +557,98 @@
             }
         }
 
+        // --- CSV PARSING FOR MEAL TICKETS ---
+        function parseMealCSVData(csvText) {
+            const rows = csvText.split('\n');
+            let parsedData = [];
+            if (rows.length < 2) return parsedData;
+
+            const headers = rows[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(h => h.replace(/"/g, '').trim().toLowerCase());
+            
+            let idxDate = 0; 
+            
+            // Getting Location from Meal Tickets
+            let idxLoc = headers.findIndex(h => h === 'location' || h === 'company' || h === 'plant' || h === 'site');
+            if (idxLoc === -1) idxLoc = headers.findIndex(h => h.includes('location') || h.includes('company'));
+
+            let idxShiftFilter = headers.findIndex(h => h === 'shift' || h === 'duty shift' || h === 'timing');
+            
+            let idxPerm = headers.findIndex(h => h.includes('permanent'));
+            let idxThird = headers.findIndex(h => h.includes('third') || h.includes('3rd'));
+            let idxMeer = headers.findIndex(h => h.includes('meer'));
+            let idxOrient = headers.findIndex(h => h.includes('orient'));
+            let idxCash = headers.findIndex(h => h.includes('cash'));
+            
+            let idxShiftDrivers = headers.findIndex(h => h.includes('shift driver') || h.includes('driver'));
+            if(idxShiftDrivers === -1) idxShiftDrivers = headers.findIndex(h => h.includes('shift'));
+
+            let idxGuest = headers.findIndex(h => h.includes('guest'));
+            let idxOther = headers.findIndex(h => h.includes('other'));
+            let idxBreakfast = headers.findIndex(h => h.includes('break') || h.includes('fast'));
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row.trim()) continue;
+
+                const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                let rowDateStr = cols[idxDate] ? cols[idxDate].replace(/"/g, '').trim() : ''; 
+                
+                let parsedDate = ""; let parsedMonth = ""; let parsedYear = "";
+
+                if (rowDateStr) {
+                    let d = new Date(rowDateStr);
+                    if (!isNaN(d.getTime())) {
+                        let y = d.getFullYear();
+                        let m = String(d.getMonth() + 1).padStart(2, '0');
+                        let day = String(d.getDate()).padStart(2, '0');
+                        parsedDate = `${y}-${m}-${day}`;
+                        parsedMonth = `${y}-${m}`; 
+                        parsedYear = String(y);
+                    }
+                }
+
+                // Extracting Location Name for Filtering
+                let rowLocation = "Unknown";
+                if (idxLoc !== -1 && cols[idxLoc]) {
+                    rowLocation = cols[idxLoc].replace(/"/g, '').trim();
+                }
+
+                // Extracting Shift Name for Filtering
+                let rowShiftName = "Unknown";
+                if (idxShiftFilter !== -1 && cols[idxShiftFilter]) {
+                    rowShiftName = cols[idxShiftFilter].replace(/"/g, '').trim();
+                }
+
+                // Helper to safely parse numbers
+                const getNum = (idx) => {
+                    if(idx === -1 || !cols[idx]) return 0;
+                    let val = parseInt(cols[idx].replace(/[^0-9]/g, ''));
+                    return isNaN(val) ? 0 : val;
+                }
+
+                if (parsedYear) {
+                    parsedData.push({ 
+                        fullDate: parsedDate, 
+                        month: parsedMonth, 
+                        year: parsedYear,
+                        location: rowLocation,   // ADDED LOCATION HERE
+                        shiftName: rowShiftName, 
+                        perm: getNum(idxPerm),
+                        third: getNum(idxThird),
+                        meer: getNum(idxMeer),
+                        orient: getNum(idxOrient),
+                        cash: getNum(idxCash),
+                        shiftDrivers: getNum(idxShiftDrivers), 
+                        guest: getNum(idxGuest),
+                        other: getNum(idxOther),
+                        breakfast: getNum(idxBreakfast)
+                    });
+                }
+            }
+            return parsedData;
+        }
+
+        // --- CSV PARSING FOR SLA ---
         function parseCSVData(csvText) {
             const rows = csvText.split('\n');
             let parsedData = [];
@@ -511,7 +700,9 @@
         function populateDropdowns() {
             let allLocations = new Set();
             let allYears = new Set();
+            let allShifts = new Set();
 
+            // Populate from SLA Data
             endpoints.forEach(ep => {
                 ep.data.forEach(row => {
                     let loc = row.location ? row.location.trim() : "";
@@ -520,6 +711,17 @@
                     }
                     if (row.year) allYears.add(row.year);
                 });
+            });
+
+            // Add Years, Shifts, and Locations from Meal Data
+            globalMealData.forEach(row => {
+                if (row.year) allYears.add(row.year);
+                if (row.shiftName && row.shiftName.toLowerCase() !== 'unknown' && row.shiftName !== '') {
+                    allShifts.add(row.shiftName);
+                }
+                if (row.location && row.location.toLowerCase() !== 'unknown' && row.location !== '' && row.location.length < 30 && !row.location.toLowerCase().includes("http")) {
+                    allLocations.add(row.location);
+                }
             });
 
             const locSelect = document.getElementById('filterLocation');
@@ -544,22 +746,117 @@
                 opt.textContent = new Date().getFullYear();
                 yearSelect.appendChild(opt);
             }
+
+            // Populate Shift Filter Dropdown
+            const shiftSelect = document.getElementById('filterShift');
+            shiftSelect.innerHTML = '<option value="All">All Shifts</option>'; 
+            Array.from(allShifts).sort().forEach((shift) => {
+                const opt = document.createElement('option');
+                opt.value = shift; opt.textContent = shift;
+                shiftSelect.appendChild(opt);
+            });
         }
 
         function triggerUpdate() {
-            const grid = document.getElementById('dashboardContent');
-            grid.classList.add('fade-out');
+            const wrapper = document.getElementById('mainContentWrapper');
+            wrapper.classList.add('fade-out');
             setTimeout(() => {
                 updateDashboard();
-                grid.classList.remove('fade-out');
+                wrapper.classList.remove('fade-out');
             }, 300);
+        }
+
+        // --- ANIMATION HELPER FOR NUMBERS ---
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                
+                // Ease out function for smoother stop
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const current = Math.floor(easeOut * (end - start) + start);
+                
+                obj.innerHTML = current.toLocaleString();
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    obj.innerHTML = end.toLocaleString();
+                }
+            };
+            window.requestAnimationFrame(step);
         }
 
         // --- CORE RENDER LOGIC ---
         function updateDashboard() {
+            // Update Meals
+            updateMealCards();
+
+            // Update SLA 
             endpoints.forEach(ep => {
                 renderCardLogic(ep.data, ep.id);
             });
+        }
+
+        // --- MEAL TICKETS UPDATE LOGIC ---
+        function updateMealCards() {
+            const locFilter = document.getElementById('filterLocation').value; // Added Location Filter
+            const year = document.getElementById('filterYear').value;
+            const month = document.getElementById('filterMonth').value; 
+            const exactDate = document.getElementById('filterDate').value;
+            const shiftFilter = document.getElementById('filterShift').value;
+
+            let filteredMeals = globalMealData;
+
+            // Apply Location Filter
+            if (locFilter && locFilter !== 'All') {
+                filteredMeals = filteredMeals.filter(item => item.location === locFilter);
+            }
+
+            // Apply Time Filters
+            if (exactDate) {
+                filteredMeals = filteredMeals.filter(item => item.fullDate === exactDate);
+            } else if (month !== 'All') {
+                let targetMonthFormat = `${year}-${month}`;
+                filteredMeals = filteredMeals.filter(item => item.month === targetMonthFormat);
+            } else {
+                filteredMeals = filteredMeals.filter(item => item.year === year);
+            }
+
+            // Apply Shift Filter (Only impacts Meal Data)
+            if (shiftFilter && shiftFilter !== 'All') {
+                filteredMeals = filteredMeals.filter(item => item.shiftName === shiftFilter);
+            }
+
+            // Sum up values
+            let sums = { perm: 0, third: 0, meer: 0, orient: 0, cash: 0, shiftDrivers: 0, guest: 0, other: 0, breakfast: 0 };
+            
+            filteredMeals.forEach(row => {
+                sums.perm += row.perm;
+                sums.third += row.third;
+                sums.meer += row.meer;
+                sums.orient += row.orient;
+                sums.cash += row.cash;
+                sums.shiftDrivers += row.shiftDrivers;
+                sums.guest += row.guest;
+                sums.other += row.other;
+                sums.breakfast += row.breakfast;
+            });
+
+            let total = sums.perm + sums.third + sums.meer + sums.orient + sums.cash + sums.shiftDrivers + sums.guest + sums.other;
+
+            // Animate Numbers smoothly
+            animateValue("meal-total", 0, total, 800);
+            animateValue("meal-perm", 0, sums.perm, 800);
+            animateValue("meal-third", 0, sums.third, 800);
+            animateValue("meal-meer", 0, sums.meer, 800);
+            animateValue("meal-orient", 0, sums.orient, 800);
+            animateValue("meal-cash", 0, sums.cash, 800);
+            animateValue("meal-drivers", 0, sums.shiftDrivers, 800);
+            animateValue("meal-guest", 0, sums.guest, 800);
+            animateValue("meal-other", 0, sums.other, 800);
+            animateValue("meal-breakfast", 0, sums.breakfast, 800);
         }
 
         function renderCardLogic(dataArray, prefix) {
@@ -632,14 +929,7 @@
                     },
                     options: {
                         responsive: true, maintainAspectRatio: false,
-                        // --- NATIVE PROFESSIONAL ANIMATION ---
-                        // Ye Chart.js ki default animation behavior ko smooth karta hai.
-                        // Bars strictly X-axis (neechay) se start ho kar seedha upar jayengi.
-                        animation: { 
-                            duration: 1200, 
-                            easing: 'easeOutQuart'
-                        },
-                        // ------------------------------------------
+                        animation: { duration: 1200, easing: 'easeOutQuart' },
                         scales: {
                             y: { max: 100, min: 0, grid: { color: gridColor, drawBorder: false }, ticks: { color: textColor, font: {size: 10} } },
                             x: { grid: { display: false }, ticks: { color: textColor, font: {weight: 'bold', size: 9} } }
@@ -713,19 +1003,14 @@
                 `;
                 
                 endpoints.forEach(ep => {
-                    // --- NEW FILTERING RULES FOR EXPORT ---
                     let locUpper = loc.toUpperCase();
                     
-                    // GPAK Card: ONLY show Plant Outside and Technical Office
                     if (locUpper.includes('GPAK')) {
                         if (ep.id !== 'plantOutside' && ep.id !== 'tech') return;
                     }
-                    
-                    // IPAK Card: Remove GH Building, Executive Mess, Social Block
                     if (locUpper.includes('IPAK')) {
                         if (ep.id === 'gh' || ep.id === 'exec' || ep.id === 'social') return;
                     }
-                    // --------------------------------------
 
                     let fData = ep.data.filter(item => item.location === loc);
                     
