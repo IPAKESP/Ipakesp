@@ -6,7 +6,6 @@
     <title>SLA Corporate Dashboard - Admin</title>
     <link rel="icon" href="Logo.png" type="image/png">
     
-    <!-- Libraries for Chart & Image Generation -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -302,7 +301,6 @@
             <input type="date" id="filterDate" onchange="dateChangedAndTrigger()" title="Selecting a date will override Month/Year">
         </div>
 
-        <!-- SHIFT FILTER LINKED TO MEAL TICKETS -->
         <div class="filter-group">
             <label>Shift (Meals)</label>
             <select id="filterShift" onchange="triggerUpdate()">
@@ -326,10 +324,8 @@
             Syncing Live Data...
         </div>
 
-        <!-- MAIN WRAPPER FOR FADE ANIMATION -->
         <div id="mainContentWrapper" class="content-wrapper" style="display: none;">
             
-            <!-- MEAL TICKETS SECTION -->
             <h2 class="section-header"><span class="dot green"></span> Meal Tickets</h2>
             <div class="meal-cards-grid">
                 <div class="mini-card total-card">
@@ -372,9 +368,12 @@
                     <span class="mini-title">Breakfast</span>
                     <span class="mini-value" id="meal-breakfast">0</span>
                 </div>
+                <div class="mini-card">
+                    <span class="mini-title">Refreshments</span>
+                    <span class="mini-value" id="meal-refreshments">0</span>
+                </div>
             </div>
 
-            <!-- BUILDING SLA PERFORMANCE SECTION -->
             <h2 class="section-header"><span class="dot blue"></span> Building SLA Performance</h2>
             <div class="dashboard-grid" id="dashboardContent">
                 <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Plant Outside</h3></div></div><div class="chart-wrapper"><canvas id="chart-plantOutside"></canvas></div></div>
@@ -829,21 +828,32 @@
                 filteredMeals = filteredMeals.filter(item => item.shiftName === shiftFilter);
             }
 
-            // Sum up values
+            // Initialize sums and the NEW refreshment total
             let sums = { perm: 0, third: 0, meer: 0, orient: 0, cash: 0, shiftDrivers: 0, guest: 0, other: 0, breakfast: 0 };
+            let refreshmentTotal = 0;
             
             filteredMeals.forEach(row => {
-                sums.perm += row.perm;
-                sums.third += row.third;
-                sums.meer += row.meer;
-                sums.orient += row.orient;
-                sums.cash += row.cash;
-                sums.shiftDrivers += row.shiftDrivers;
-                sums.guest += row.guest;
-                sums.other += row.other;
-                sums.breakfast += row.breakfast;
+                // Check if the row belongs to the "Night" shift
+                let isNightShift = row.shiftName && row.shiftName.toLowerCase().includes('night');
+
+                if (isNightShift) {
+                    // For Night shifts, add all standard meal counts to Refreshments instead of the main sums
+                    refreshmentTotal += (row.perm + row.third + row.meer + row.orient + row.cash + row.shiftDrivers + row.guest + row.other);
+                } else {
+                    // For all other shifts, add to the main standard sums
+                    sums.perm += row.perm;
+                    sums.third += row.third;
+                    sums.meer += row.meer;
+                    sums.orient += row.orient;
+                    sums.cash += row.cash;
+                    sums.shiftDrivers += row.shiftDrivers;
+                    sums.guest += row.guest;
+                    sums.other += row.other;
+                    sums.breakfast += row.breakfast;
+                }
             });
 
+            // Calculate total based only on non-night shifts (Breakfast is excluded from Total as confirmed)
             let total = sums.perm + sums.third + sums.meer + sums.orient + sums.cash + sums.shiftDrivers + sums.guest + sums.other;
 
             // Animate Numbers smoothly
@@ -857,6 +867,9 @@
             animateValue("meal-guest", 0, sums.guest, 800);
             animateValue("meal-other", 0, sums.other, 800);
             animateValue("meal-breakfast", 0, sums.breakfast, 800);
+            
+            // Animate the NEW Refreshments card
+            animateValue("meal-refreshments", 0, refreshmentTotal, 800);
         }
 
         function renderCardLogic(dataArray, prefix) {
@@ -1048,10 +1061,18 @@
                 htmlContent += `</tbody></table></div>`;
             });
 
+            // Added specific footer details for IPAK (LHR) and PETPAK (SKP)
             htmlContent += `
                     </div>
-                    <div style="margin-top: 40px; text-align: center; color: #94A3B8; font-size: 16px; font-weight: 500;">
-                        Generated automatically by HR Corporate Dashboard System on ${new Date().toLocaleString()}
+                    <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="text-align: left;">
+                            <p style="margin: 0; color: #0F172A; font-size: 16px; font-weight: 800;">Facility Details:</p>
+                            <p style="margin: 4px 0 0 0; color: #3B82F6; font-size: 14px; font-weight: 700;">IPAK (LHR) | PETPAK (SKP)</p>
+                        </div>
+                        <div style="text-align: right; color: #94A3B8; font-size: 14px; font-weight: 500;">
+                            Generated automatically by HR Corporate Dashboard System<br>
+                            ${new Date().toLocaleString()}
+                        </div>
                     </div>
                 </div>
             `;
