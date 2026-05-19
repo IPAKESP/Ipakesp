@@ -151,9 +151,9 @@
             display: flex; align-items: center; gap: 8px; flex-shrink: 0;
         }
 
-        /* --- MINI MEAL CARDS --- */
+        /* --- MAIN DISPLAY: 6 Columns per row for 11 visible items -> 2 rows exactly --- */
         .meal-cards-grid {
-            display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
+            display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px;
             margin-bottom: 20px; flex-shrink: 0;
         }
 
@@ -168,7 +168,7 @@
         .mini-card.total-card { background: var(--card-highlight); border-color: var(--color-blue); }
         .mini-card.total-card .mini-value { color: var(--color-blue); }
 
-        .mini-title { font-size: 0.65rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .mini-title { font-size: 0.60rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; white-space: nowrap; }
         .mini-value { font-size: 1.4rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
 
         /* --- MAIN SLA GRID --- */
@@ -332,8 +332,14 @@
                     <span class="mini-title">Total Meals</span>
                     <span class="mini-value" id="meal-total">0</span>
                 </div>
+                
+                <div style="display: none;">
+                    <span id="meal-total-ipak">0</span>
+                    <span id="meal-total-petpak">0</span>
+                </div>
+
                 <div class="mini-card">
-                    <span class="mini-title">Permanent Employees</span>
+                    <span class="mini-title">Permanent Emp.</span>
                     <span class="mini-value" id="meal-perm">0</span>
                 </div>
                 <div class="mini-card">
@@ -345,7 +351,7 @@
                     <span class="mini-value" id="meal-meer">0</span>
                 </div>
                 <div class="mini-card">
-                    <span class="mini-title">Orient Employees</span>
+                    <span class="mini-title">Orient Emp.</span>
                     <span class="mini-value" id="meal-orient">0</span>
                 </div>
                 <div class="mini-card">
@@ -768,6 +774,7 @@
         // --- ANIMATION HELPER FOR NUMBERS ---
         function animateValue(id, start, end, duration) {
             const obj = document.getElementById(id);
+            if (!obj) return;
             let startTimestamp = null;
             const step = (timestamp) => {
                 if (!startTimestamp) startTimestamp = timestamp;
@@ -800,7 +807,7 @@
 
         // --- MEAL TICKETS UPDATE LOGIC ---
         function updateMealCards() {
-            const locFilter = document.getElementById('filterLocation').value; // Added Location Filter
+            const locFilter = document.getElementById('filterLocation').value; 
             const year = document.getElementById('filterYear').value;
             const month = document.getElementById('filterMonth').value; 
             const exactDate = document.getElementById('filterDate').value;
@@ -828,16 +835,17 @@
                 filteredMeals = filteredMeals.filter(item => item.shiftName === shiftFilter);
             }
 
-            // Initialize sums and the NEW refreshment total
+            // Initialize sums
             let sums = { perm: 0, third: 0, meer: 0, orient: 0, cash: 0, shiftDrivers: 0, guest: 0, other: 0, breakfast: 0 };
             let refreshmentTotal = 0;
+            let totalIpak = 0;
+            let totalPetpak = 0;
             
             filteredMeals.forEach(row => {
-                // Check if the row belongs to the "Night" shift
                 let isNightShift = row.shiftName && row.shiftName.toLowerCase().includes('night');
 
                 if (isNightShift) {
-                    // For Night shifts, add all standard meal counts to Refreshments instead of the main sums
+                    // For Night shifts, add all standard meal counts to Refreshments
                     refreshmentTotal += (row.perm + row.third + row.meer + row.orient + row.cash + row.shiftDrivers + row.guest + row.other);
                 } else {
                     // For all other shifts, add to the main standard sums
@@ -850,14 +858,24 @@
                     sums.guest += row.guest;
                     sums.other += row.other;
                     sums.breakfast += row.breakfast;
+
+                    // Calculate Location-wise Totals
+                    let rowTotal = row.perm + row.third + row.meer + row.orient + row.cash + row.shiftDrivers + row.guest + row.other;
+                    let locUpper = (row.location || "").toUpperCase();
+                    if (locUpper.includes('IPAK') || locUpper.includes('LHR')) {
+                        totalIpak += rowTotal;
+                    } else if (locUpper.includes('PETPAK') || locUpper.includes('SKP')) {
+                        totalPetpak += rowTotal;
+                    }
                 }
             });
 
-            // Calculate total based only on non-night shifts (Breakfast is excluded from Total as confirmed)
             let total = sums.perm + sums.third + sums.meer + sums.orient + sums.cash + sums.shiftDrivers + sums.guest + sums.other;
 
             // Animate Numbers smoothly
             animateValue("meal-total", 0, total, 800);
+            animateValue("meal-total-ipak", 0, totalIpak, 800);
+            animateValue("meal-total-petpak", 0, totalPetpak, 800);
             animateValue("meal-perm", 0, sums.perm, 800);
             animateValue("meal-third", 0, sums.third, 800);
             animateValue("meal-meer", 0, sums.meer, 800);
@@ -867,8 +885,6 @@
             animateValue("meal-guest", 0, sums.guest, 800);
             animateValue("meal-other", 0, sums.other, 800);
             animateValue("meal-breakfast", 0, sums.breakfast, 800);
-            
-            // Animate the NEW Refreshments card
             animateValue("meal-refreshments", 0, refreshmentTotal, 800);
         }
 
@@ -999,7 +1015,7 @@
             const reportContainer = document.getElementById('imageReportContainer');
             
             let htmlContent = `
-                <div style="background: #ffffff; padding: 50px; width: 1400px; font-family: 'Plus Jakarta Sans', sans-serif;">
+                <div style="background: #ffffff; padding: 50px; width: 1500px; font-family: 'Plus Jakarta Sans', sans-serif;">
                     <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #E2E8F0; padding-bottom: 25px;">
                         <h1 style="margin: 0; color: #0F172A; font-size: 38px; font-weight: 800; text-transform: uppercase;">IPAK SLA Report</h1>
                         <p style="margin: 15px 0 0 0; color: #64748B; font-size: 20px; font-weight: 600;">Timeframe Selection: <span style="color: #3B82F6;">${timeframeStr}</span></p>
@@ -1061,14 +1077,45 @@
                 htmlContent += `</tbody></table></div>`;
             });
 
-            // Added specific footer details for IPAK (LHR) and PETPAK (SKP)
+            // --- FETCH CURRENT MEAL VALUES ---
+            const mt_total = document.getElementById('meal-total').innerText;
+            const mt_total_ipak = document.getElementById('meal-total-ipak').innerText;
+            const mt_total_petpak = document.getElementById('meal-total-petpak').innerText;
+            const mt_perm = document.getElementById('meal-perm').innerText;
+            const mt_third = document.getElementById('meal-third').innerText;
+            const mt_meer = document.getElementById('meal-meer').innerText;
+            const mt_orient = document.getElementById('meal-orient').innerText;
+            const mt_cash = document.getElementById('meal-cash').innerText;
+            const mt_drivers = document.getElementById('meal-drivers').innerText;
+            const mt_guest = document.getElementById('meal-guest').innerText;
+            const mt_other = document.getElementById('meal-other').innerText;
+            const mt_breakfast = document.getElementById('meal-breakfast').innerText;
+            const mt_refresh = document.getElementById('meal-refreshments').innerText;
+
+            // --- APPEND MEALS TO EXPORT AND FINISH REPORT ---
             htmlContent += `
                     </div>
-                    <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
-                        <div style="text-align: left;">
-                            <p style="margin: 0; color: #0F172A; font-size: 16px; font-weight: 800;">Facility Details:</p>
-                            <p style="margin: 4px 0 0 0; color: #3B82F6; font-size: 14px; font-weight: 700;">IPAK (LHR) | PETPAK (SKP)</p>
+                    
+                    <div style="margin-top: 40px; padding-top: 30px; border-top: 3px solid #E2E8F0;">
+                        <h2 style="margin: 0 0 20px 0; color: #0F172A; font-size: 24px; text-transform: uppercase;">Meal Tickets Summary</h2>
+                        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 15px;">
+                            <div style="background: #F1F5F9; border: 1px solid #3B82F6; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Overall Total</div><div style="font-size: 22px; font-weight: 800; color: #3B82F6;">${mt_total}</div></div>
+                            <div style="background: #F1F5F9; border: 1px solid #3B82F6; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Total IPAK</div><div style="font-size: 22px; font-weight: 800; color: #3B82F6;">${mt_total_ipak}</div></div>
+                            <div style="background: #F1F5F9; border: 1px solid #3B82F6; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Total PETPAK</div><div style="font-size: 22px; font-weight: 800; color: #3B82F6;">${mt_total_petpak}</div></div>
+                            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Perm</div><div style="font-size: 22px; font-weight: 800; color: #0F172A;">${mt_perm}</div></div>
+                            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Third Party</div><div style="font-size: 22px; font-weight: 800; color: #0F172A;">${mt_third}</div></div>
+                            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Meer Security</div><div style="font-size: 22px; font-weight: 800; color: #0F172A;">${mt_meer}</div></div>
+                            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Orient Emp.</div><div style="font-size: 22px; font-weight: 800; color: #0F172A;">${mt_orient}</div></div>
+                            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Cash Meal</div><div style="font-size: 22px; font-weight: 800; color: #0F172A;">${mt_cash}</div></div>
+                            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Drivers</div><div style="font-size: 22px; font-weight: 800; color: #0F172A;">${mt_drivers}</div></div>
+                            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Guest</div><div style="font-size: 22px; font-weight: 800; color: #0F172A;">${mt_guest}</div></div>
+                            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Other</div><div style="font-size: 22px; font-weight: 800; color: #0F172A;">${mt_other}</div></div>
+                            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Breakfast</div><div style="font-size: 22px; font-weight: 800; color: #0F172A;">${mt_breakfast}</div></div>
+                            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Refreshments</div><div style="font-size: 22px; font-weight: 800; color: #0F172A;">${mt_refresh}</div></div>
                         </div>
+                    </div>
+
+                    <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #E2E8F0; display: flex; justify-content: flex-end; align-items: center;">
                         <div style="text-align: right; color: #94A3B8; font-size: 14px; font-weight: 500;">
                             Generated automatically by HR Corporate Dashboard System<br>
                             ${new Date().toLocaleString()}
