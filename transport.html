@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transport Dashboard - SLA</title>
+    <title>Transport Dashboard - SLA & Fuel</title>
     <link rel="icon" href="Logo.png" type="image/png">
     
     <!-- Libraries for Chart & Image Generation -->
@@ -63,12 +63,12 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             margin: 0; background-color: var(--bg-main); color: var(--text-primary);
-            display: flex; flex-direction: column; height: 100vh; overflow: hidden; /* STRICTLY NO SCROLL */
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
             transition: var(--transition);
         }
 
         /* ---------------------------------
-           HEADER & NAVIGATION
+           HEADER & NAVIGATION (CLEAN TABS)
         --------------------------------- */
         .top-header {
             display: flex; align-items: center; justify-content: space-between;
@@ -146,15 +146,38 @@
             overflow: hidden; position: relative;
         }
 
+        /* FUEL CARDS HORIZONTAL LIST */
+        .fuel-cards-wrapper {
+            display: flex; gap: 15px; margin-bottom: 15px; overflow-x: auto;
+            flex-shrink: 0; padding-bottom: 5px; scroll-behavior: smooth;
+            transition: opacity 0.3s ease, transform 0.3s ease; opacity: 1; transform: scale(1);
+        }
+        
+        /* Custom Scrollbar for Fuel Cards */
+        .fuel-cards-wrapper::-webkit-scrollbar { height: 6px; }
+        .fuel-cards-wrapper::-webkit-scrollbar-track { background: transparent; }
+        .fuel-cards-wrapper::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 10px; }
+        
+        .fuel-card {
+            background: var(--bg-surface); border-radius: var(--radius-md); padding: 12px 18px;
+            min-width: 140px; border: 1px solid var(--border-color); box-shadow: var(--shadow-card);
+            display: flex; flex-direction: column; gap: 4px; transition: var(--transition);
+            flex-shrink: 0; border-left: 4px solid var(--color-green);
+        }
+        .fuel-card:hover { transform: translateY(-2px); border-color: var(--text-secondary); box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
+        .fuel-card-title { font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .fuel-card-value-wrap { display: flex; align-items: baseline; gap: 4px; }
+        .fuel-card-value { font-size: 1.4rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
+        .fuel-card-unit { font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; }
+
         .dashboard-grid {
             display: grid; 
-            /* 3 Columns Grid for perfect top row fit */
             grid-template-columns: repeat(3, 1fr); 
             grid-template-rows: repeat(2, 1fr); 
             gap: 15px; width: 100%; height: 100%; display: none;
+            transition: opacity 0.3s ease, transform 0.3s ease; opacity: 1; transform: scale(1);
         }
 
-        /* Bottom Row spans all 3 columns */
         .col-span-3 { grid-column: span 3; }
 
         .kpi-widget {
@@ -166,7 +189,7 @@
             justify-content: flex-start; box-sizing: border-box;
         }
         
-        .kpi-widget:hover { border-color: var(--text-secondary); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+        .kpi-widget:hover { border-color: var(--text-secondary); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
         .kpi-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-shrink: 0; }
         
         .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
@@ -179,13 +202,8 @@
 
         .chart-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; }
 
-        /* ---------------------------------
-           HIDDEN CONTAINER FOR IMAGE GEN
-        --------------------------------- */
         #imageReportContainer { position: fixed; top: -9999px; left: -9999px; z-index: -1000; }
-
         .fade-out { opacity: 0 !important; transform: scale(0.97) !important; }
-        .dashboard-grid { transition: opacity 0.3s ease, transform 0.3s ease; opacity: 1; transform: scale(1); }
 
         /* ---------------------------------
            SMOOTH LOADING ANIMATION
@@ -200,19 +218,11 @@
         }
 
         #loadingMsg.hidden {
-            opacity: 0;
-            transform: translate(-50%, -40%);
-            pointer-events: none;
+            opacity: 0; transform: translate(-50%, -40%); pointer-events: none;
         }
 
-        .spinner {
-            width: 20px; height: 20px; animation: rotate 2s linear infinite;
-        }
-        
-        .spinner .path {
-            stroke: var(--color-blue); stroke-linecap: round;
-            animation: dash 1.5s ease-in-out infinite;
-        }
+        .spinner { width: 20px; height: 20px; animation: rotate 2s linear infinite; }
+        .spinner .path { stroke: var(--color-blue); stroke-linecap: round; animation: dash 1.5s ease-in-out infinite; }
 
         @keyframes rotate { 100% { transform: rotate(360deg); } }
         @keyframes dash {
@@ -229,6 +239,8 @@
             .nav-tabs, .header-actions, .filter-bar, #loadingMsg, .theme-toggle { display: none !important; }
             .workspace { height: auto !important; overflow: visible !important; padding: 0 !important; }
             .dashboard-grid { display: block !important; height: auto !important;}
+            .fuel-cards-wrapper { display: flex; flex-wrap: wrap; margin-bottom: 20px;}
+            .fuel-card { border: 1px solid #E2E8F0 !important; box-shadow: none !important; margin-bottom: 10px;}
             .kpi-widget { border: 1px solid #E2E8F0 !important; box-shadow: none !important; background: #FFFFFF !important; break-inside: avoid; border-radius: 16px !important; transform: none !important; height: 400px; margin-bottom: 20px;}
         }
     </style>
@@ -305,16 +317,20 @@
     </div>
 
     <div class="workspace">
-        <!-- UPDATED SMOOTH SPINNER -->
         <div id="loadingMsg">
             <svg class="spinner" viewBox="0 0 50 50">
                 <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
             </svg>
-            Syncing Live SLA Data...
+            Syncing Live SLA & Fuel Data...
+        </div>
+
+        <!-- NEW: Dedicated Fuel Cards Container -->
+        <div id="fuelCardsWrapper" class="fuel-cards-wrapper" style="display: none;">
+            <!-- Cards injected via JS -->
         </div>
 
         <div class="dashboard-grid" id="dashboardContent">
-            <!-- Top Row: Pool Vehicle, LHR, SKP (Each takes 1 column) -->
+            <!-- Top Row -->
             <div class="kpi-widget">
                 <div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Pool Vehicle</h3></div></div>
                 <div class="chart-wrapper"><canvas id="chart-poolvehicle"></canvas></div>
@@ -330,7 +346,7 @@
                 <div class="chart-wrapper"><canvas id="chart-staffTransportSKP"></canvas></div>
             </div>
 
-            <!-- Bottom Row: Vehicle SLA (Takes full width / 3 columns) -->
+            <!-- Bottom Row -->
             <div class="kpi-widget col-span-3">
                 <div class="kpi-header"><span class="dot purple"></span><div class="kpi-title"><h3>Vehicle SLA</h3></div></div>
                 <div class="chart-wrapper"><canvas id="chart-vehicleSLA"></canvas></div>
@@ -341,7 +357,6 @@
     <div id="imageReportContainer"></div>
 
     <script>
-        // --- HEADER THEME LOGIC ---
         const themeBtn = document.getElementById('themeToggle');
         
         function updateChartThemeColors() {
@@ -381,11 +396,9 @@
             updateChartThemeColors();
         });
 
-        // Set Default Font for Charts
         Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
         let myCharts = {}; 
 
-        // Center Text Plugin for Doughnut Charts
         const centerTextPlugin = {
             id: 'centerTextPlugin',
             beforeDraw: function(chart) {
@@ -421,10 +434,13 @@
             triggerUpdate();
         }
 
-        // --- DATA LOGIC ---
+        // --- DATA SOURCES ---
         const csvPoolVehicle = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRzT96Ec_exrDjox1CSyp_FAyP1sgbtqIDwswsqa-Kmwj9Bf-Orkt7eXVpQ4NLPVnqlTgO7mmu-aHJV/pub?gid=162985426&single=true&output=csv";
         const csvStaffLHR = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRwxU6lDnqY-uzfrqmJvOUUg8Wrv77iK1M5Z_IbXdvy0Vb45tl-Y9gB_ZrCEl4NFD0cZVMXg7MSkZGb/pub?gid=1529142728&single=true&output=csv";
         const csvStaffSKP = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSD6fL-gX0q_NiyLbcfvLYYEO1xal3B0CjtiRX9iAvEb_rC1Oxd1vbzhj5HIXMsxtrkcaUzcniQa_Kg/pub?gid=1075567590&single=true&output=csv";
+        
+        // NEW DEDICATED FUEL SOURCE (pubhtml converted to pub?output=csv)
+        const csvFuelData = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTqxSvjyHdi948kIhLsh7H5mHmpOMD9tEf4WffD1lvFE1as2wtjsO2ZEy5F5hQetkQCSzLya6_hinF0/pub?gid=0&single=true&output=csv";
 
         const endpoints = [
             { id: 'poolvehicle', name: "Pool Vehicle", urls: [csvPoolVehicle], data: [], dotColor: '#3B82F6' },
@@ -432,6 +448,8 @@
             { id: 'staffTransportLHR', name: "Staff Transport Lahore", urls: [csvStaffLHR], data: [], dotColor: '#EF4444' },
             { id: 'staffTransportSKP', name: "Staff Transport SKP", urls: [csvStaffSKP], data: [], dotColor: '#F59E0B' }
         ];
+
+        let globalFuelData = []; // Array to store pure fuel data
 
         document.addEventListener("DOMContentLoaded", () => {
             fetchAllData(); 
@@ -450,18 +468,27 @@
             const syncStatus = document.getElementById('loadingMsg');
             
             try {
-                await Promise.all(endpoints.map(async (ep) => {
+                // Fetch SLA Data
+                const slaPromises = endpoints.map(async (ep) => {
                     await Promise.all(ep.urls.map(async (url) => {
                         try {
                             const res = await fetch(url);
                             const csvText = await res.text();
-                            const parsed = parseCSVData(csvText);
-                            ep.data = ep.data.concat(parsed);
+                            ep.data = ep.data.concat(parseCSVData(csvText));
                         } catch (e) {
-                            console.error(`Failed to fetch ${url}:`, e);
+                            console.error(`Failed to fetch SLA ${url}:`, e);
                         }
                     }));
-                }));
+                });
+
+                // Fetch Dedicated Fuel Data
+                const fuelPromise = fetch(csvFuelData).then(async res => {
+                    const csvText = await res.text();
+                    globalFuelData = parseFuelCSVData(csvText);
+                }).catch(e => console.error("Failed to fetch Fuel Data:", e));
+
+                // Wait for all data to load
+                await Promise.all([...slaPromises, fuelPromise]);
                 
                 populateDropdowns();
                 
@@ -473,10 +500,10 @@
                 
                 updateDashboard();
                 
-                // --- UPDATED SMOOTH FADE OUT FOR LOADER ---
                 syncStatus.classList.add('hidden');
                 setTimeout(() => {
                     syncStatus.style.display = 'none';
+                    document.getElementById('fuelCardsWrapper').style.display = 'flex';
                     document.getElementById('dashboardContent').style.display = 'grid';
                     document.getElementById('generateImageBtn').style.display = 'inline-flex'; 
                 }, 500);
@@ -487,6 +514,56 @@
             }
         }
 
+        // --- NEW PARSER FOR DEDICATED FUEL DATA ---
+        function parseFuelCSVData(csvText) {
+            const rows = csvText.split('\n');
+            let parsed = [];
+            if (rows.length < 2) return parsed;
+
+            const headers = rows[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(h => h.replace(/"/g, '').trim().toLowerCase());
+            
+            let locIdx = headers.findIndex(h => h.includes('location') || h.includes('plant') || h.includes('company'));
+            let vehIdx = headers.findIndex(h => h.includes('vehicle') || h.includes('reg') || h.includes('car'));
+            let fuelIdx = headers.findIndex(h => h.includes('fuel') || h.includes('average') || h.includes('km/l') || h.includes('mileage'));
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row.trim()) continue;
+
+                const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                
+                let dateStr = cols[0] ? cols[0].replace(/"/g, '').trim() : '';
+                if (!dateStr) continue;
+
+                let d = new Date(dateStr);
+                if (isNaN(d.getTime())) continue;
+
+                let y = String(d.getFullYear());
+                let m = String(d.getMonth() + 1).padStart(2, '0');
+                let day = String(d.getDate()).padStart(2, '0');
+
+                let loc = (locIdx !== -1 && cols[locIdx]) ? cols[locIdx].replace(/"/g, '').trim() : "Unknown";
+                let veh = (vehIdx !== -1 && cols[vehIdx]) ? cols[vehIdx].replace(/"/g, '').trim() : "Unknown";
+                let fuel = (fuelIdx !== -1 && cols[fuelIdx]) ? parseFloat(cols[fuelIdx].replace(/"/g, '').trim()) : 0;
+
+                if (isNaN(fuel)) fuel = 0;
+
+                // Ensure we only store valid vehicles
+                if (veh && veh !== "Unknown" && !veh.toLowerCase().includes("select")) {
+                    parsed.push({
+                        fullDate: `${y}-${m}-${day}`,
+                        month: `${y}-${m}`,
+                        year: y,
+                        location: loc,
+                        vehicle: veh,
+                        fuelAverage: fuel
+                    });
+                }
+            }
+            return parsed;
+        }
+
+        // --- ORIGINAL SLA DATA PARSER ---
         function parseCSVData(csvText) {
             const rows = csvText.split('\n');
             let parsedData = [];
@@ -497,10 +574,8 @@
             let locIndex = headers.findIndex(h => h === 'location' || h === 'company' || h === 'plant' || h === 'site');
             if (locIndex === -1) locIndex = headers.findIndex(h => h.includes('location') || h.includes('company'));
             
-            // Extract vehicle column
             let vehicleIndex = headers.findIndex(h => h.includes('vehicle') || h.includes('reg') || h.includes('number'));
             if (vehicleIndex === locIndex) {
-                // In case location and vehicle column match the same keyword, find the next one
                 vehicleIndex = headers.findIndex((h, idx) => idx !== locIndex && (h.includes('vehicle') || h.includes('reg')));
             }
 
@@ -536,14 +611,18 @@
 
                 let rowTotal = 0; let rowYes = 0;
                 for (let j = 1; j < cols.length; j++) {
-                    if (j === locIndex || j === vehicleIndex) continue; // skip location & vehicle column from Yes/No count
+                    if (j === locIndex || j === vehicleIndex) continue; 
                     let cellValue = cols[j] ? cols[j].replace(/"/g, '').trim().toLowerCase() : '';
                     if (cellValue === "yes") { rowTotal++; rowYes++; } 
                     else if (cellValue === "no" || cellValue === "n/a") { rowTotal++; }
                 }
                 
                 if (parsedYear) {
-                    parsedData.push({ fullDate: parsedDate, month: parsedMonth, year: parsedYear, location: rowLocation, vehicle: rowVehicle, totalQuestions: rowTotal, achievedYes: rowYes });
+                    parsedData.push({ 
+                        fullDate: parsedDate, month: parsedMonth, year: parsedYear, 
+                        location: rowLocation, vehicle: rowVehicle,
+                        totalQuestions: rowTotal, achievedYes: rowYes 
+                    });
                 }
             }
             return parsedData;
@@ -553,6 +632,7 @@
             let allLocations = new Set();
             let allYears = new Set();
 
+            // Populate from SLA Data
             endpoints.forEach(ep => {
                 ep.data.forEach(row => {
                     let loc = row.location ? row.location.trim() : "";
@@ -561,6 +641,15 @@
                     }
                     if (row.year) allYears.add(row.year);
                 });
+            });
+
+            // Populate from Fuel Data (to ensure synchronization)
+            globalFuelData.forEach(row => {
+                let loc = row.location ? row.location.trim() : "";
+                if (loc && loc.toLowerCase() !== 'unknown' && loc.length < 30) {
+                    allLocations.add(loc);
+                }
+                if (row.year) allYears.add(row.year);
             });
 
             const locSelect = document.getElementById('filterLocation');
@@ -589,15 +678,88 @@
 
         function triggerUpdate() {
             const grid = document.getElementById('dashboardContent');
+            const fuelCards = document.getElementById('fuelCardsWrapper');
             grid.classList.add('fade-out');
+            fuelCards.classList.add('fade-out');
+            
             setTimeout(() => {
                 updateDashboard();
                 grid.classList.remove('fade-out');
+                fuelCards.classList.remove('fade-out');
             }, 300);
         }
 
-        // --- CORE RENDER LOGIC ---
+        // --- FUEL CARDS GENERATOR USING DEDICATED DATA ---
+        function updateFuelCards() {
+            const loc = document.getElementById('filterLocation').value;
+            const year = document.getElementById('filterYear').value;
+            const month = document.getElementById('filterMonth').value;
+            const exactDate = document.getElementById('filterDate').value;
+
+            let filtered = globalFuelData; // Use the dedicated fuel data array
+
+            // Apply Filters
+            if (loc && loc !== 'All') {
+                filtered = filtered.filter(item => item.location === loc);
+            }
+
+            if (exactDate) {
+                filtered = filtered.filter(item => item.fullDate === exactDate);
+            } else if (month !== 'All') {
+                let targetMonthFormat = `${year}-${month}`;
+                filtered = filtered.filter(item => item.month === targetMonthFormat);
+            } else {
+                filtered = filtered.filter(item => item.year === year);
+            }
+
+            let vehicleStats = {};
+            
+            filtered.forEach(item => {
+                let vName = item.vehicle;
+                if (!vehicleStats[vName]) {
+                    vehicleStats[vName] = { totalFuel: 0, count: 0 };
+                }
+                
+                if(item.fuelAverage > 0) {
+                    vehicleStats[vName].totalFuel += item.fuelAverage;
+                    vehicleStats[vName].count += 1;
+                }
+            });
+
+            const container = document.getElementById('fuelCardsWrapper');
+            container.innerHTML = ''; 
+
+            let hasCards = false;
+
+            Object.keys(vehicleStats).sort().forEach(vName => {
+                let stats = vehicleStats[vName];
+                let avg = stats.count > 0 ? (stats.totalFuel / stats.count).toFixed(1) : 0;
+                
+                if (avg > 0) {
+                    hasCards = true;
+                    const card = document.createElement('div');
+                    card.className = 'fuel-card';
+                    card.innerHTML = `
+                        <div class="fuel-card-title" title="${vName}">${vName}</div>
+                        <div class="fuel-card-value-wrap">
+                            <div class="fuel-card-value">${avg}</div>
+                            <div class="fuel-card-unit">km/L</div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                }
+            });
+
+            if(!hasCards) {
+                container.innerHTML = `<div style="font-size: 0.85rem; color: var(--text-secondary); padding: 10px;">No fuel data available for the selected timeframe/location.</div>`;
+            }
+        }
+
         function updateDashboard() {
+            // Update the top cards
+            updateFuelCards();
+
+            // Update SLA graphs
             endpoints.forEach(ep => {
                 renderCardLogic(ep.data, ep.id, ep.dotColor);
             });
@@ -623,7 +785,6 @@
             const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim();
             const doughnutBg = getComputedStyle(document.documentElement).getPropertyValue('--doughnut-bg').trim();
 
-            // --- SPECIAL LOGIC FOR VEHICLE SLA ---
             if (prefix === 'vehicleSLA') {
                 if (exactDate) {
                     filteredRecords = filteredRecords.filter(item => item.fullDate === exactDate);
@@ -637,7 +798,6 @@
                 let vehicleStats = {};
                 filteredRecords.forEach(item => {
                     let vName = item.vehicle || "Unknown";
-                    // Skip if the parsed vehicle name is just a placeholder like "select vehicle"
                     if (vName.toLowerCase().includes('select vehicle') || vName.toLowerCase() === 'vehicle') return; 
                     
                     if (!vehicleStats[vName]) vehicleStats[vName] = { total: 0, yes: 0 };
@@ -653,7 +813,6 @@
                         labels.push(vName);
                         let pct = (stat.yes / stat.total) * 100;
                         dataPct.push(pct);
-                        // Rule applied: >= 95% is Green, otherwise Red
                         bgColors.push(pct >= 95 ? '#10B981' : '#EF4444');
                     }
                 });
@@ -666,11 +825,7 @@
                     },
                     options: {
                         responsive: true, maintainAspectRatio: false,
-                        // --- NATIVE PROFESSIONAL ANIMATION FOR VEHICLE SLA BAR CHART ---
-                        animation: { 
-                            duration: 1200, 
-                            easing: 'easeOutQuart'
-                        },
+                        animation: { duration: 1200, easing: 'easeOutQuart' },
                         scales: {
                             y: { max: 100, min: 0, grid: { color: gridColor, drawBorder: false }, ticks: { color: textColor, font: {size: 10} } },
                             x: { grid: { display: false }, ticks: { color: textColor, font: {weight: 'bold', size: 9}, maxRotation: 45, minRotation: 0 } }
@@ -678,10 +833,8 @@
                         plugins: { legend: { display: false }, tooltip: { enabled: true, callbacks: { label: (c) => c.parsed.y.toFixed(1) + "%" } } }
                     }
                 });
-                
-                return; // End execution for vehicleSLA here
+                return;
             }
-            // --- END SPECIAL LOGIC ---
 
             let showDoughnut = false;
 
@@ -697,7 +850,6 @@
             }
 
             if (!showDoughnut) {
-                // --- YEARLY TREND (BAR CHART) ---
                 let monthlyStats = {};
                 filteredRecords.forEach(item => {
                     if(!item.month) return;
@@ -718,7 +870,6 @@
                         let stat = monthlyStats[targetKey];
                         let pct = stat.total > 0 ? (stat.yes / stat.total) * 100 : 0;
                         dataPct.push(pct);
-                        // Rule applied: >= 95% is Green, otherwise Red
                         bgColors.push(pct >= 95 ? '#10B981' : '#EF4444');
                     } else {
                         dataPct.push(0);
@@ -734,11 +885,7 @@
                     },
                     options: {
                         responsive: true, maintainAspectRatio: false,
-                        // --- NATIVE PROFESSIONAL ANIMATION FOR YEARLY TREND BAR CHART ---
-                        animation: { 
-                            duration: 1200, 
-                            easing: 'easeOutQuart'
-                        },
+                        animation: { duration: 1200, easing: 'easeOutQuart' },
                         scales: {
                             y: { max: 100, min: 0, grid: { color: gridColor, drawBorder: false }, ticks: { color: textColor, font: {size: 10} } },
                             x: { grid: { display: false }, ticks: { color: textColor, font: {weight: 'bold', size: 9} } }
@@ -746,16 +893,12 @@
                         plugins: { legend: { display: false }, tooltip: { enabled: true, callbacks: { label: (c) => c.parsed.y.toFixed(1) + "%" } } }
                     }
                 });
-
             } else {
-                // --- SPECIFIC DATE/MONTH (DOUGHNUT CHART) ---
                 let overallTotal = 0; let overallYes = 0;
                 filteredRecords.forEach(item => { overallTotal += item.totalQuestions; overallYes += item.achievedYes; });
 
                 let pct = overallTotal > 0 ? (overallYes / overallTotal) * 100 : 0;
                 let displayPct = overallTotal > 0 ? pct.toFixed(0) + '%' : '0%';
-                
-                // Rule applied: >= 95% is Green, otherwise Red
                 let color = pct >= 95 ? '#10B981' : '#EF4444';
                 if(overallTotal === 0) color = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim(); 
 
@@ -767,7 +910,6 @@
                     },
                     options: {
                         responsive: true, maintainAspectRatio: false,
-                        // --- NATIVE PROFESSIONAL ANIMATION FOR DOUGHNUT CHART ---
                         animation: { animateScale: true, animateRotate: true, duration: 1200, easing: 'easeOutQuart' },
                         plugins: { legend: { display: false }, tooltip: { enabled: false } },
                         layout: { padding: 10 },
@@ -777,7 +919,7 @@
             }
         }
 
-        // --- IMAGE REPORT LOGIC ---
+        // Image Report Logic
         document.getElementById('generateImageBtn').addEventListener('click', async () => {
             const btn = document.getElementById('generateImageBtn');
             btn.innerHTML = 'Generating...';
@@ -814,13 +956,11 @@
                 `;
                 
                 endpoints.forEach(ep => {
-                    if (ep.id === 'vehicleSLA') return; // Skip in export to avoid duplicate Pool Vehicle total
+                    if (ep.id === 'vehicleSLA') return; 
 
-                    // --- NEW FILTERING RULES FOR EXPORT ---
                     let locUpper = loc.toUpperCase();
                     if (locUpper.includes('IPAK') && ep.id === 'staffTransportSKP') return;
                     if (locUpper.includes('PETPAK') && ep.id === 'staffTransportLHR') return;
-                    // --------------------------------------
                     
                     let fData = ep.data.filter(item => item.location === loc);
                     
@@ -837,7 +977,6 @@
 
                     if (total > 0) {
                         let pct = (yes / total) * 100;
-                        // Rule applied: >= 95% is Green, otherwise Red
                         let color = pct >= 95 ? '#10B981' : '#EF4444';
                         
                         htmlContent += `
