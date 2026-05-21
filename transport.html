@@ -153,7 +153,6 @@
             transition: opacity 0.3s ease, transform 0.3s ease; opacity: 1; transform: scale(1);
         }
         
-        /* Custom Scrollbar for Fuel Cards */
         .fuel-cards-wrapper::-webkit-scrollbar { height: 6px; }
         .fuel-cards-wrapper::-webkit-scrollbar-track { background: transparent; }
         .fuel-cards-wrapper::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 10px; }
@@ -324,7 +323,7 @@
             Syncing Live SLA & Fuel Data...
         </div>
 
-        <!-- NEW: Dedicated Fuel Cards Container -->
+        <!-- DEDICATED FUEL CARDS CONTAINER -->
         <div id="fuelCardsWrapper" class="fuel-cards-wrapper" style="display: none;">
             <!-- Cards injected via JS -->
         </div>
@@ -439,7 +438,7 @@
         const csvStaffLHR = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRwxU6lDnqY-uzfrqmJvOUUg8Wrv77iK1M5Z_IbXdvy0Vb45tl-Y9gB_ZrCEl4NFD0cZVMXg7MSkZGb/pub?gid=1529142728&single=true&output=csv";
         const csvStaffSKP = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSD6fL-gX0q_NiyLbcfvLYYEO1xal3B0CjtiRX9iAvEb_rC1Oxd1vbzhj5HIXMsxtrkcaUzcniQa_Kg/pub?gid=1075567590&single=true&output=csv";
         
-        // NEW DEDICATED FUEL SOURCE (pubhtml converted to pub?output=csv)
+        // FUEL SOURCE
         const csvFuelData = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTqxSvjyHdi948kIhLsh7H5mHmpOMD9tEf4WffD1lvFE1as2wtjsO2ZEy5F5hQetkQCSzLya6_hinF0/pub?gid=0&single=true&output=csv";
 
         const endpoints = [
@@ -449,7 +448,7 @@
             { id: 'staffTransportSKP', name: "Staff Transport SKP", urls: [csvStaffSKP], data: [], dotColor: '#F59E0B' }
         ];
 
-        let globalFuelData = []; // Array to store pure fuel data
+        let globalFuelData = []; 
 
         document.addEventListener("DOMContentLoaded", () => {
             fetchAllData(); 
@@ -468,7 +467,6 @@
             const syncStatus = document.getElementById('loadingMsg');
             
             try {
-                // Fetch SLA Data
                 const slaPromises = endpoints.map(async (ep) => {
                     await Promise.all(ep.urls.map(async (url) => {
                         try {
@@ -481,13 +479,11 @@
                     }));
                 });
 
-                // Fetch Dedicated Fuel Data
                 const fuelPromise = fetch(csvFuelData).then(async res => {
                     const csvText = await res.text();
                     globalFuelData = parseFuelCSVData(csvText);
                 }).catch(e => console.error("Failed to fetch Fuel Data:", e));
 
-                // Wait for all data to load
                 await Promise.all([...slaPromises, fuelPromise]);
                 
                 populateDropdowns();
@@ -514,7 +510,7 @@
             }
         }
 
-        // --- NEW PARSER FOR DEDICATED FUEL DATA ---
+        // --- SMART PROFESSIONAL FLEET PARSER ---
         function parseFuelCSVData(csvText) {
             const rows = csvText.split('\n');
             let parsed = [];
@@ -524,7 +520,10 @@
             
             let locIdx = headers.findIndex(h => h.includes('location') || h.includes('plant') || h.includes('company'));
             let vehIdx = headers.findIndex(h => h.includes('vehicle') || h.includes('reg') || h.includes('car'));
-            let fuelIdx = headers.findIndex(h => h.includes('fuel') || h.includes('average') || h.includes('km/l') || h.includes('mileage'));
+            
+            // Explicitly matching "Meter Reding" and "Fuel Quantity"
+            let distIdx = headers.findIndex(h => h.includes('meter reding') || h.includes('meter reading') || h.includes('reading'));
+            let literIdx = headers.findIndex(h => h.includes('fuel quantity') || h.includes('quantity') || h.includes('liters'));
 
             for (let i = 1; i < rows.length; i++) {
                 const row = rows[i];
@@ -544,26 +543,25 @@
 
                 let loc = (locIdx !== -1 && cols[locIdx]) ? cols[locIdx].replace(/"/g, '').trim() : "Unknown";
                 let veh = (vehIdx !== -1 && cols[vehIdx]) ? cols[vehIdx].replace(/"/g, '').trim() : "Unknown";
-                let fuel = (fuelIdx !== -1 && cols[fuelIdx]) ? parseFloat(cols[fuelIdx].replace(/"/g, '').trim()) : 0;
+                
+                let distance = (distIdx !== -1 && cols[distIdx]) ? parseFloat(cols[distIdx].replace(/"/g, '').trim()) : 0;
+                let liters = (literIdx !== -1 && cols[literIdx]) ? parseFloat(cols[literIdx].replace(/"/g, '').trim()) : 0;
 
-                if (isNaN(fuel)) fuel = 0;
+                if (isNaN(distance)) distance = 0;
+                if (isNaN(liters)) liters = 0;
 
-                // Ensure we only store valid vehicles
                 if (veh && veh !== "Unknown" && !veh.toLowerCase().includes("select")) {
                     parsed.push({
-                        fullDate: `${y}-${m}-${day}`,
-                        month: `${y}-${m}`,
-                        year: y,
-                        location: loc,
-                        vehicle: veh,
-                        fuelAverage: fuel
+                        fullDate: `${y}-${m}-${day}`, month: `${y}-${m}`, year: y,
+                        location: loc, vehicle: veh,
+                        distance: distance, liters: liters
                     });
                 }
             }
             return parsed;
         }
 
-        // --- ORIGINAL SLA DATA PARSER ---
+        // --- SLA DATA PARSER ---
         function parseCSVData(csvText) {
             const rows = csvText.split('\n');
             let parsedData = [];
@@ -594,9 +592,7 @@
                         let y = d.getFullYear();
                         let m = String(d.getMonth() + 1).padStart(2, '0');
                         let day = String(d.getDate()).padStart(2, '0');
-                        parsedDate = `${y}-${m}-${day}`;
-                        parsedMonth = `${y}-${m}`; 
-                        parsedYear = String(y);
+                        parsedDate = `${y}-${m}-${day}`; parsedMonth = `${y}-${m}`; parsedYear = String(y);
                     }
                 }
 
@@ -620,8 +616,7 @@
                 if (parsedYear) {
                     parsedData.push({ 
                         fullDate: parsedDate, month: parsedMonth, year: parsedYear, 
-                        location: rowLocation, vehicle: rowVehicle,
-                        totalQuestions: rowTotal, achievedYes: rowYes 
+                        location: rowLocation, vehicle: rowVehicle, totalQuestions: rowTotal, achievedYes: rowYes 
                     });
                 }
             }
@@ -632,7 +627,6 @@
             let allLocations = new Set();
             let allYears = new Set();
 
-            // Populate from SLA Data
             endpoints.forEach(ep => {
                 ep.data.forEach(row => {
                     let loc = row.location ? row.location.trim() : "";
@@ -643,7 +637,6 @@
                 });
             });
 
-            // Populate from Fuel Data (to ensure synchronization)
             globalFuelData.forEach(row => {
                 let loc = row.location ? row.location.trim() : "";
                 if (loc && loc.toLowerCase() !== 'unknown' && loc.length < 30) {
@@ -689,16 +682,15 @@
             }, 300);
         }
 
-        // --- FUEL CARDS GENERATOR USING DEDICATED DATA ---
+        // --- FUEL CARDS GENERATOR (SMART FORMULA) ---
         function updateFuelCards() {
             const loc = document.getElementById('filterLocation').value;
             const year = document.getElementById('filterYear').value;
             const month = document.getElementById('filterMonth').value;
             const exactDate = document.getElementById('filterDate').value;
 
-            let filtered = globalFuelData; // Use the dedicated fuel data array
+            let filtered = globalFuelData; 
 
-            // Apply Filters
             if (loc && loc !== 'All') {
                 filtered = filtered.filter(item => item.location === loc);
             }
@@ -717,12 +709,22 @@
             filtered.forEach(item => {
                 let vName = item.vehicle;
                 if (!vehicleStats[vName]) {
-                    vehicleStats[vName] = { totalFuel: 0, count: 0 };
+                    vehicleStats[vName] = { 
+                        minOdo: Infinity, 
+                        maxOdo: -Infinity, 
+                        sumDistance: 0, 
+                        totalLiters: 0 
+                    };
                 }
                 
-                if(item.fuelAverage > 0) {
-                    vehicleStats[vName].totalFuel += item.fuelAverage;
-                    vehicleStats[vName].count += 1;
+                if (item.distance > 0) {
+                    if (item.distance < vehicleStats[vName].minOdo) vehicleStats[vName].minOdo = item.distance;
+                    if (item.distance > vehicleStats[vName].maxOdo) vehicleStats[vName].maxOdo = item.distance;
+                    vehicleStats[vName].sumDistance += item.distance;
+                }
+                
+                if (item.liters > 0) {
+                    vehicleStats[vName].totalLiters += item.liters;
                 }
             });
 
@@ -733,16 +735,29 @@
 
             Object.keys(vehicleStats).sort().forEach(vName => {
                 let stats = vehicleStats[vName];
-                let avg = stats.count > 0 ? (stats.totalFuel / stats.count).toFixed(1) : 0;
+                let distanceCovered = 0;
                 
-                if (avg > 0) {
+                // Smart Logic: If the Meter Reading is an odometer (continuous large values)
+                if (stats.maxOdo > stats.minOdo && stats.maxOdo > 1000) {
+                    distanceCovered = stats.maxOdo - stats.minOdo;
+                } else {
+                    // If they just logged the trip km (e.g., 50, 60, 45)
+                    distanceCovered = stats.sumDistance;
+                }
+
+                let finalAvg = 0;
+                if (stats.totalLiters > 0 && distanceCovered > 0) {
+                    finalAvg = distanceCovered / stats.totalLiters;
+                }
+                
+                if (finalAvg > 0) {
                     hasCards = true;
                     const card = document.createElement('div');
                     card.className = 'fuel-card';
                     card.innerHTML = `
                         <div class="fuel-card-title" title="${vName}">${vName}</div>
                         <div class="fuel-card-value-wrap">
-                            <div class="fuel-card-value">${avg}</div>
+                            <div class="fuel-card-value">${finalAvg.toFixed(1)}</div>
                             <div class="fuel-card-unit">km/L</div>
                         </div>
                     `;
@@ -756,10 +771,7 @@
         }
 
         function updateDashboard() {
-            // Update the top cards
             updateFuelCards();
-
-            // Update SLA graphs
             endpoints.forEach(ep => {
                 renderCardLogic(ep.data, ep.id, ep.dotColor);
             });
