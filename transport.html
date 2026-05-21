@@ -143,38 +143,66 @@
         .workspace {
             flex: 1; padding: 15px 30px; display: flex; flex-direction: column;
             height: calc(100vh - 120px); box-sizing: border-box; 
-            overflow: hidden; position: relative;
+            overflow-y: auto; 
+            position: relative;
         }
 
-        /* FUEL CARDS HORIZONTAL LIST */
-        .fuel-cards-wrapper {
-            display: flex; gap: 15px; margin-bottom: 15px; overflow-x: auto;
-            flex-shrink: 0; padding-bottom: 5px; scroll-behavior: smooth;
-            transition: opacity 0.3s ease, transform 0.3s ease; opacity: 1; transform: scale(1);
+        /* FUEL CARDS - 2 LINE BENTO GRID LOGIC */
+        #fuelSection {
+            margin-bottom: 20px;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            opacity: 1; transform: scale(1);
         }
         
-        .fuel-cards-wrapper::-webkit-scrollbar { height: 6px; }
-        .fuel-cards-wrapper::-webkit-scrollbar-track { background: transparent; }
-        .fuel-cards-wrapper::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 10px; }
+        .fuel-section-title {
+            font-size: 0.85rem; 
+            color: var(--text-secondary); 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+            margin: 0 0 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .fuel-section-title::before {
+            content: '';
+            display: block;
+            width: 8px;
+            height: 8px;
+            background: var(--color-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--color-green);
+        }
+
+        .fuel-cards-wrapper {
+            display: grid; 
+            /* JS will dynamically inject the columns here to force exactly 2 rows */
+            gap: 12px;
+            width: 100%;
+        }
         
         .fuel-card {
-            background: var(--bg-surface); border-radius: var(--radius-md); padding: 12px 18px;
-            min-width: 140px; border: 1px solid var(--border-color); box-shadow: var(--shadow-card);
-            display: flex; flex-direction: column; gap: 4px; transition: var(--transition);
-            flex-shrink: 0; border-left: 4px solid var(--color-green);
+            background: var(--bg-surface); border-radius: var(--radius-md); padding: 8px 12px;
+            border: 1px solid var(--border-color); box-shadow: var(--shadow-card);
+            display: flex; flex-direction: column; gap: 2px; transition: var(--transition);
+            border-left: 4px solid var(--color-green);
+            min-width: 0; /* Allows card to shrink properly in grid */
         }
         .fuel-card:hover { transform: translateY(-2px); border-color: var(--text-secondary); box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
-        .fuel-card-title { font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .fuel-card-title { font-size: 0.65rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         .fuel-card-value-wrap { display: flex; align-items: baseline; gap: 4px; }
-        .fuel-card-value { font-size: 1.4rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
-        .fuel-card-unit { font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; }
+        .fuel-card-value { font-size: 1.15rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
+        .fuel-card-unit { font-size: 0.65rem; color: var(--text-secondary); font-weight: 600; }
 
         .dashboard-grid {
             display: grid; 
             grid-template-columns: repeat(3, 1fr); 
-            grid-template-rows: repeat(2, 1fr); 
-            gap: 15px; width: 100%; height: 100%; display: none;
+            grid-template-rows: repeat(2, minmax(220px, 1fr)); 
+            gap: 15px; width: 100%; display: none;
             transition: opacity 0.3s ease, transform 0.3s ease; opacity: 1; transform: scale(1);
+            flex-grow: 1;
         }
 
         .col-span-3 { grid-column: span 3; }
@@ -184,7 +212,7 @@
             padding: 15px; display: flex; flex-direction: column; 
             border: 1px solid var(--border-color);
             transition: var(--transition); position: relative; 
-            min-height: 0; height: 100%; overflow: hidden;
+            min-height: 200px; height: 100%; overflow: hidden;
             justify-content: flex-start; box-sizing: border-box;
         }
         
@@ -238,7 +266,8 @@
             .nav-tabs, .header-actions, .filter-bar, #loadingMsg, .theme-toggle { display: none !important; }
             .workspace { height: auto !important; overflow: visible !important; padding: 0 !important; }
             .dashboard-grid { display: block !important; height: auto !important;}
-            .fuel-cards-wrapper { display: flex; flex-wrap: wrap; margin-bottom: 20px;}
+            #fuelSection { display: block !important; margin-bottom: 20px; }
+            .fuel-cards-wrapper { display: flex; flex-wrap: wrap; margin-bottom: 20px; gap: 10px; }
             .fuel-card { border: 1px solid #E2E8F0 !important; box-shadow: none !important; margin-bottom: 10px;}
             .kpi-widget { border: 1px solid #E2E8F0 !important; box-shadow: none !important; background: #FFFFFF !important; break-inside: avoid; border-radius: 16px !important; transform: none !important; height: 400px; margin-bottom: 20px;}
         }
@@ -323,9 +352,12 @@
             Syncing Live SLA & Fuel Data...
         </div>
 
-        <!-- DEDICATED FUEL CARDS CONTAINER -->
-        <div id="fuelCardsWrapper" class="fuel-cards-wrapper" style="display: none;">
-            <!-- Cards injected via JS -->
+        <!-- NEW BENTO STYLE FUEL SECTION (Exactly 2 Lines) -->
+        <div id="fuelSection" style="display: none;">
+            <h2 class="fuel-section-title">Fleet Fuel Average (km/L)</h2>
+            <div id="fuelCardsWrapper" class="fuel-cards-wrapper">
+                <!-- Cards injected via JS -->
+            </div>
         </div>
 
         <div class="dashboard-grid" id="dashboardContent">
@@ -499,7 +531,7 @@
                 syncStatus.classList.add('hidden');
                 setTimeout(() => {
                     syncStatus.style.display = 'none';
-                    document.getElementById('fuelCardsWrapper').style.display = 'flex';
+                    document.getElementById('fuelSection').style.display = 'block';
                     document.getElementById('dashboardContent').style.display = 'grid';
                     document.getElementById('generateImageBtn').style.display = 'inline-flex'; 
                 }, 500);
@@ -521,7 +553,6 @@
             let locIdx = headers.findIndex(h => h.includes('location') || h.includes('plant') || h.includes('company'));
             let vehIdx = headers.findIndex(h => h.includes('vehicle') || h.includes('reg') || h.includes('car'));
             
-            // Explicitly matching "Meter Reding" and "Fuel Quantity"
             let distIdx = headers.findIndex(h => h.includes('meter reding') || h.includes('meter reading') || h.includes('reading'));
             let literIdx = headers.findIndex(h => h.includes('fuel quantity') || h.includes('quantity') || h.includes('liters'));
 
@@ -671,18 +702,18 @@
 
         function triggerUpdate() {
             const grid = document.getElementById('dashboardContent');
-            const fuelCards = document.getElementById('fuelCardsWrapper');
+            const fuelSection = document.getElementById('fuelSection');
             grid.classList.add('fade-out');
-            fuelCards.classList.add('fade-out');
+            fuelSection.classList.add('fade-out');
             
             setTimeout(() => {
                 updateDashboard();
                 grid.classList.remove('fade-out');
-                fuelCards.classList.remove('fade-out');
+                fuelSection.classList.remove('fade-out');
             }, 300);
         }
 
-        // --- FUEL CARDS GENERATOR (SMART FORMULA) ---
+        // --- FUEL CARDS GENERATOR (SMART 2-LINE FORMULA) ---
         function updateFuelCards() {
             const loc = document.getElementById('filterLocation').value;
             const year = document.getElementById('filterYear').value;
@@ -731,17 +762,16 @@
             const container = document.getElementById('fuelCardsWrapper');
             container.innerHTML = ''; 
 
+            let cardCount = 0;
             let hasCards = false;
 
             Object.keys(vehicleStats).sort().forEach(vName => {
                 let stats = vehicleStats[vName];
                 let distanceCovered = 0;
                 
-                // Smart Logic: If the Meter Reading is an odometer (continuous large values)
                 if (stats.maxOdo > stats.minOdo && stats.maxOdo > 1000) {
                     distanceCovered = stats.maxOdo - stats.minOdo;
                 } else {
-                    // If they just logged the trip km (e.g., 50, 60, 45)
                     distanceCovered = stats.sumDistance;
                 }
 
@@ -752,6 +782,7 @@
                 
                 if (finalAvg > 0) {
                     hasCards = true;
+                    cardCount++;
                     const card = document.createElement('div');
                     card.className = 'fuel-card';
                     card.innerHTML = `
@@ -765,7 +796,15 @@
                 }
             });
 
-            if(!hasCards) {
+            // Dynamically apply exactly 2 rows logic
+            if(hasCards) {
+                // Calculate required columns to make 2 rows
+                let columns = Math.ceil(cardCount / 2);
+                if (columns < 1) columns = 1;
+                // Force grid to split evenly across 'columns'
+                container.style.gridTemplateColumns = `repeat(${columns}, minmax(0, 1fr))`;
+            } else {
+                container.style.gridTemplateColumns = "1fr";
                 container.innerHTML = `<div style="font-size: 0.85rem; color: var(--text-secondary); padding: 10px;">No fuel data available for the selected timeframe/location.</div>`;
             }
         }
