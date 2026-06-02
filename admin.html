@@ -151,9 +151,14 @@
             display: flex; align-items: center; gap: 8px; flex-shrink: 0;
         }
 
-        /* --- MAIN DISPLAY: 6 Columns per row for 11 visible items -> 2 rows exactly --- */
-        .meal-cards-grid {
+        /* --- MAIN DISPLAY FOR CARDS --- */
+        .cards-grid {
             display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px;
+            margin-bottom: 20px; flex-shrink: 0;
+        }
+        
+        .visits-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
             margin-bottom: 20px; flex-shrink: 0;
         }
 
@@ -167,6 +172,8 @@
         
         .mini-card.total-card { background: var(--card-highlight); border-color: var(--color-blue); }
         .mini-card.total-card .mini-value { color: var(--color-blue); }
+        .mini-card.total-card-yellow { background: var(--card-highlight); border-color: var(--color-yellow); }
+        .mini-card.total-card-yellow .mini-value { color: var(--color-yellow); }
 
         .mini-title { font-size: 0.60rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; white-space: nowrap; }
         .mini-value { font-size: 1.4rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
@@ -191,6 +198,7 @@
         .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
         .dot.blue { background-color: var(--color-blue); box-shadow: 0 0 8px var(--color-blue); }
         .dot.green { background-color: var(--color-green); box-shadow: 0 0 8px var(--color-green); }
+        .dot.yellow { background-color: var(--color-yellow); box-shadow: 0 0 8px var(--color-yellow); }
 
         .kpi-title h3 { margin: 0; font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
@@ -327,7 +335,7 @@
         <div id="mainContentWrapper" class="content-wrapper" style="display: none;">
             
             <h2 class="section-header"><span class="dot green"></span> Meal Tickets</h2>
-            <div class="meal-cards-grid">
+            <div class="cards-grid">
                 <div class="mini-card total-card">
                     <span class="mini-title">Total Meals</span>
                     <span class="mini-value" id="meal-total">0</span>
@@ -380,7 +388,31 @@
                 </div>
             </div>
 
-            <h2 class="section-header"><span class="dot blue"></span> Building SLA Performance</h2>
+            <h2 class="section-header" style="margin-top: 5px;"><span class="dot yellow"></span> IPAK Visits</h2>
+            <div class="visits-grid">
+                <div class="mini-card total-card-yellow">
+                    <span class="mini-title">Total Visits</span>
+                    <span class="mini-value" id="visit-total">0</span>
+                </div>
+                <div class="mini-card">
+                    <span class="mini-title">Foreign Guest</span>
+                    <span class="mini-value" id="visit-foreign">0</span>
+                </div>
+                <div class="mini-card">
+                    <span class="mini-title">Other Guest</span>
+                    <span class="mini-value" id="visit-otherG">0</span>
+                </div>
+                <div class="mini-card">
+                    <span class="mini-title">Vendors</span>
+                    <span class="mini-value" id="visit-vendors">0</span>
+                </div>
+                <div class="mini-card">
+                    <span class="mini-title">Civil Labor</span>
+                    <span class="mini-value" id="visit-civil">0</span>
+                </div>
+            </div>
+
+            <h2 class="section-header" style="margin-top: 5px;"><span class="dot blue"></span> Building SLA Performance</h2>
             <div class="dashboard-grid" id="dashboardContent">
                 <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Plant Outside</h3></div></div><div class="chart-wrapper"><canvas id="chart-plantOutside"></canvas></div></div>
                 <div class="kpi-widget"><div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>GH Building</h3></div></div><div class="chart-wrapper"><canvas id="chart-gh"></canvas></div></div>
@@ -479,7 +511,9 @@
 
         // --- DATA LOGIC ---
         const urlMeals = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyWDivX7vBSzc_PRweCDyiD1PyJNjBksbC9w_au6OuSRELSGeYttSvZK5nCQL0bVBfDFN2iHgPzVgS/pub?single=true&output=csv&gid=1198139594";
-        
+        // Convert user pubhtml link to direct output=csv
+        const urlVisits = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRCVXwSe09epBdeh8Dwa3a43r7g-NbrD08CR8ycdWjY278Acb1v9YNjgsZn3fnvBOlGMkQlhqsADvAA/pub?single=true&output=csv&gid=1049405031";
+
         const urlIPAK = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSD6fL-gX0q_NiyLbcfvLYYEO1xal3B0CjtiRX9iAvEb_rC1Oxd1vbzhj5HIXMsxtrkcaUzcniQa_Kg/pub?single=true&output=csv&gid=";
         const urlPETPAK = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRwxU6lDnqY-uzfrqmJvOUUg8Wrv77iK1M5Z_IbXdvy0Vb45tl-Y9gB_ZrCEl4NFD0cZVMXg7MSkZGb/pub?single=true&output=csv&gid=";
 
@@ -495,6 +529,7 @@
         ];
 
         let globalMealData = [];
+        let globalVisitsData = [];
 
         document.addEventListener("DOMContentLoaded", () => {
             fetchAllData(); 
@@ -537,6 +572,15 @@
                     console.error(`Failed to fetch Meal data:`, e);
                 }
 
+                // 3. Fetch IPAK Visits Data
+                try {
+                    const visitRes = await fetch(urlVisits);
+                    const visitCSVText = await visitRes.text();
+                    globalVisitsData = parseVisitsCSVData(visitCSVText);
+                } catch(e) {
+                    console.error(`Failed to fetch Visits data:`, e);
+                }
+
                 populateDropdowns();
                 
                 const todayYear = String(new Date().getFullYear());
@@ -569,13 +613,10 @@
             if (rows.length < 2) return parsedData;
 
             const headers = rows[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(h => h.replace(/"/g, '').trim().toLowerCase());
-            
             let idxDate = 0; 
             
-            // Getting Location from Meal Tickets
             let idxLoc = headers.findIndex(h => h === 'location' || h === 'company' || h === 'plant' || h === 'site');
             if (idxLoc === -1) idxLoc = headers.findIndex(h => h.includes('location') || h.includes('company'));
-
             let idxShiftFilter = headers.findIndex(h => h === 'shift' || h === 'duty shift' || h === 'timing');
             
             let idxPerm = headers.findIndex(h => h.includes('permanent'));
@@ -587,8 +628,8 @@
             let idxShiftDrivers = headers.findIndex(h => h.includes('shift driver') || h.includes('driver'));
             if(idxShiftDrivers === -1) idxShiftDrivers = headers.findIndex(h => h.includes('shift'));
 
-            let idxGuest = headers.findIndex(h => h.includes('guest'));
-            let idxOther = headers.findIndex(h => h.includes('other'));
+            let idxGuest = headers.findIndex(h => h === 'guest' || h.includes('guest meal'));
+            let idxOther = headers.findIndex(h => h === 'other' || h.includes('other meal'));
             let idxBreakfast = headers.findIndex(h => h.includes('break') || h.includes('fast'));
 
             for (let i = 1; i < rows.length; i++) {
@@ -598,8 +639,7 @@
                 const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                 let rowDateStr = cols[idxDate] ? cols[idxDate].replace(/"/g, '').trim() : ''; 
                 
-                let parsedDate = ""; let parsedMonth = ""; let parsedYear = "";
-
+                let parsedDate = "", parsedMonth = "", parsedYear = "";
                 if (rowDateStr) {
                     let d = new Date(rowDateStr);
                     if (!isNaN(d.getTime())) {
@@ -612,19 +652,12 @@
                     }
                 }
 
-                // Extracting Location Name for Filtering
                 let rowLocation = "Unknown";
-                if (idxLoc !== -1 && cols[idxLoc]) {
-                    rowLocation = cols[idxLoc].replace(/"/g, '').trim();
-                }
+                if (idxLoc !== -1 && cols[idxLoc]) rowLocation = cols[idxLoc].replace(/"/g, '').trim();
 
-                // Extracting Shift Name for Filtering
                 let rowShiftName = "Unknown";
-                if (idxShiftFilter !== -1 && cols[idxShiftFilter]) {
-                    rowShiftName = cols[idxShiftFilter].replace(/"/g, '').trim();
-                }
+                if (idxShiftFilter !== -1 && cols[idxShiftFilter]) rowShiftName = cols[idxShiftFilter].replace(/"/g, '').trim();
 
-                // Helper to safely parse numbers
                 const getNum = (idx) => {
                     if(idx === -1 || !cols[idx]) return 0;
                     let val = parseInt(cols[idx].replace(/[^0-9]/g, ''));
@@ -633,20 +666,66 @@
 
                 if (parsedYear) {
                     parsedData.push({ 
-                        fullDate: parsedDate, 
-                        month: parsedMonth, 
-                        year: parsedYear,
-                        location: rowLocation,   // ADDED LOCATION HERE
-                        shiftName: rowShiftName, 
-                        perm: getNum(idxPerm),
-                        third: getNum(idxThird),
-                        meer: getNum(idxMeer),
-                        orient: getNum(idxOrient),
-                        cash: getNum(idxCash),
-                        shiftDrivers: getNum(idxShiftDrivers), 
-                        guest: getNum(idxGuest),
-                        other: getNum(idxOther),
-                        breakfast: getNum(idxBreakfast)
+                        fullDate: parsedDate, month: parsedMonth, year: parsedYear, location: rowLocation, shiftName: rowShiftName, 
+                        perm: getNum(idxPerm), third: getNum(idxThird), meer: getNum(idxMeer), orient: getNum(idxOrient),
+                        cash: getNum(idxCash), shiftDrivers: getNum(idxShiftDrivers), guest: getNum(idxGuest),
+                        other: getNum(idxOther), breakfast: getNum(idxBreakfast)
+                    });
+                }
+            }
+            return parsedData;
+        }
+
+        // --- CSV PARSING FOR IPAK VISITS ---
+        function parseVisitsCSVData(csvText) {
+            const rows = csvText.split('\n');
+            let parsedData = [];
+            if (rows.length < 2) return parsedData;
+
+            const headers = rows[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(h => h.replace(/"/g, '').trim().toLowerCase());
+            let idxDate = 0; 
+            
+            let idxLoc = headers.findIndex(h => h === 'location' || h === 'company' || h === 'plant' || h === 'site');
+            if (idxLoc === -1) idxLoc = headers.findIndex(h => h.includes('location') || h.includes('company'));
+            
+            let idxForeign = headers.findIndex(h => h.includes('foreign'));
+            let idxOtherG = headers.findIndex(h => h.includes('other guest') || (h.includes('guest') && h.includes('visit')));
+            let idxVendors = headers.findIndex(h => h.includes('vendor'));
+            let idxCivil = headers.findIndex(h => h.includes('civil'));
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row.trim()) continue;
+
+                const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                let rowDateStr = cols[idxDate] ? cols[idxDate].replace(/"/g, '').trim() : ''; 
+                
+                let parsedDate = "", parsedMonth = "", parsedYear = "";
+                if (rowDateStr) {
+                    let d = new Date(rowDateStr);
+                    if (!isNaN(d.getTime())) {
+                        let y = d.getFullYear();
+                        let m = String(d.getMonth() + 1).padStart(2, '0');
+                        let day = String(d.getDate()).padStart(2, '0');
+                        parsedDate = `${y}-${m}-${day}`;
+                        parsedMonth = `${y}-${m}`; 
+                        parsedYear = String(y);
+                    }
+                }
+
+                let rowLocation = "Unknown";
+                if (idxLoc !== -1 && cols[idxLoc]) rowLocation = cols[idxLoc].replace(/"/g, '').trim();
+
+                const getNum = (idx) => {
+                    if(idx === -1 || !cols[idx]) return 0;
+                    let val = parseInt(cols[idx].replace(/[^0-9]/g, ''));
+                    return isNaN(val) ? 0 : val;
+                }
+
+                if (parsedYear) {
+                    parsedData.push({ 
+                        fullDate: parsedDate, month: parsedMonth, year: parsedYear, location: rowLocation, 
+                        foreign: getNum(idxForeign), otherG: getNum(idxOtherG), vendors: getNum(idxVendors), civil: getNum(idxCivil)
                     });
                 }
             }
@@ -670,8 +749,7 @@
                 const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                 let rowDateStr = cols[0] ? cols[0].replace(/"/g, '').trim() : ''; 
                 
-                let parsedDate = ""; let parsedMonth = ""; let parsedYear = "";
-
+                let parsedDate = "", parsedMonth = "", parsedYear = "";
                 if (rowDateStr) {
                     let d = new Date(rowDateStr);
                     if (!isNaN(d.getTime())) {
@@ -724,6 +802,14 @@
                 if (row.shiftName && row.shiftName.toLowerCase() !== 'unknown' && row.shiftName !== '') {
                     allShifts.add(row.shiftName);
                 }
+                if (row.location && row.location.toLowerCase() !== 'unknown' && row.location !== '' && row.location.length < 30 && !row.location.toLowerCase().includes("http")) {
+                    allLocations.add(row.location);
+                }
+            });
+
+            // Add Years and Locations from Visits Data
+            globalVisitsData.forEach(row => {
+                if (row.year) allYears.add(row.year);
                 if (row.location && row.location.toLowerCase() !== 'unknown' && row.location !== '' && row.location.length < 30 && !row.location.toLowerCase().includes("http")) {
                     allLocations.add(row.location);
                 }
@@ -796,8 +882,8 @@
 
         // --- CORE RENDER LOGIC ---
         function updateDashboard() {
-            // Update Meals
-            updateMealCards();
+            // Update Meals & Visits
+            updateMealAndVisitCards();
 
             // Update SLA 
             endpoints.forEach(ep => {
@@ -805,8 +891,8 @@
             });
         }
 
-        // --- MEAL TICKETS UPDATE LOGIC ---
-        function updateMealCards() {
+        // --- MEAL & VISIT TICKETS UPDATE LOGIC ---
+        function updateMealAndVisitCards() {
             const locFilter = document.getElementById('filterLocation').value; 
             const year = document.getElementById('filterYear').value;
             const month = document.getElementById('filterMonth').value; 
@@ -814,29 +900,34 @@
             const shiftFilter = document.getElementById('filterShift').value;
 
             let filteredMeals = globalMealData;
+            let filteredVisits = globalVisitsData;
 
             // Apply Location Filter
             if (locFilter && locFilter !== 'All') {
                 filteredMeals = filteredMeals.filter(item => item.location === locFilter);
+                filteredVisits = filteredVisits.filter(item => item.location === locFilter);
             }
 
             // Apply Time Filters
             if (exactDate) {
                 filteredMeals = filteredMeals.filter(item => item.fullDate === exactDate);
+                filteredVisits = filteredVisits.filter(item => item.fullDate === exactDate);
             } else if (month !== 'All') {
                 let targetMonthFormat = `${year}-${month}`;
                 filteredMeals = filteredMeals.filter(item => item.month === targetMonthFormat);
+                filteredVisits = filteredVisits.filter(item => item.month === targetMonthFormat);
             } else {
                 filteredMeals = filteredMeals.filter(item => item.year === year);
+                filteredVisits = filteredVisits.filter(item => item.year === year);
             }
 
-            // Apply Shift Filter (Only impacts Meal Data)
+            // Apply Shift Filter (Only impacts Meal Data as visits usually don't have shift names in HR)
             if (shiftFilter && shiftFilter !== 'All') {
                 filteredMeals = filteredMeals.filter(item => item.shiftName === shiftFilter);
             }
 
-            // Initialize sums
-            let sums = { perm: 0, third: 0, meer: 0, orient: 0, cash: 0, shiftDrivers: 0, guest: 0, other: 0, breakfast: 0 };
+            // --- MEALS CALCULATION ---
+            let sumsMeals = { perm: 0, third: 0, meer: 0, orient: 0, cash: 0, shiftDrivers: 0, guest: 0, other: 0, breakfast: 0 };
             let refreshmentTotal = 0;
             let totalIpak = 0;
             let totalPetpak = 0;
@@ -845,21 +936,18 @@
                 let isNightShift = row.shiftName && row.shiftName.toLowerCase().includes('night');
 
                 if (isNightShift) {
-                    // For Night shifts, add all standard meal counts to Refreshments
                     refreshmentTotal += (row.perm + row.third + row.meer + row.orient + row.cash + row.shiftDrivers + row.guest + row.other);
                 } else {
-                    // For all other shifts, add to the main standard sums
-                    sums.perm += row.perm;
-                    sums.third += row.third;
-                    sums.meer += row.meer;
-                    sums.orient += row.orient;
-                    sums.cash += row.cash;
-                    sums.shiftDrivers += row.shiftDrivers;
-                    sums.guest += row.guest;
-                    sums.other += row.other;
-                    sums.breakfast += row.breakfast;
+                    sumsMeals.perm += row.perm;
+                    sumsMeals.third += row.third;
+                    sumsMeals.meer += row.meer;
+                    sumsMeals.orient += row.orient;
+                    sumsMeals.cash += row.cash;
+                    sumsMeals.shiftDrivers += row.shiftDrivers;
+                    sumsMeals.guest += row.guest;
+                    sumsMeals.other += row.other;
+                    sumsMeals.breakfast += row.breakfast;
 
-                    // Calculate Location-wise Totals
                     let rowTotal = row.perm + row.third + row.meer + row.orient + row.cash + row.shiftDrivers + row.guest + row.other;
                     let locUpper = (row.location || "").toUpperCase();
                     if (locUpper.includes('IPAK') || locUpper.includes('LHR')) {
@@ -870,22 +958,39 @@
                 }
             });
 
-            let total = sums.perm + sums.third + sums.meer + sums.orient + sums.cash + sums.shiftDrivers + sums.guest + sums.other;
+            let totalMeals = sumsMeals.perm + sumsMeals.third + sumsMeals.meer + sumsMeals.orient + sumsMeals.cash + sumsMeals.shiftDrivers + sumsMeals.guest + sumsMeals.other;
 
-            // Animate Numbers smoothly
-            animateValue("meal-total", 0, total, 800);
+            // --- VISITS CALCULATION ---
+            let sumsVisits = { foreign: 0, otherG: 0, vendors: 0, civil: 0 };
+            filteredVisits.forEach(row => {
+                sumsVisits.foreign += row.foreign;
+                sumsVisits.otherG += row.otherG;
+                sumsVisits.vendors += row.vendors;
+                sumsVisits.civil += row.civil;
+            });
+            let totalVisits = sumsVisits.foreign + sumsVisits.otherG + sumsVisits.vendors + sumsVisits.civil;
+
+            // Animate Meals
+            animateValue("meal-total", 0, totalMeals, 800);
             animateValue("meal-total-ipak", 0, totalIpak, 800);
             animateValue("meal-total-petpak", 0, totalPetpak, 800);
-            animateValue("meal-perm", 0, sums.perm, 800);
-            animateValue("meal-third", 0, sums.third, 800);
-            animateValue("meal-meer", 0, sums.meer, 800);
-            animateValue("meal-orient", 0, sums.orient, 800);
-            animateValue("meal-cash", 0, sums.cash, 800);
-            animateValue("meal-drivers", 0, sums.shiftDrivers, 800);
-            animateValue("meal-guest", 0, sums.guest, 800);
-            animateValue("meal-other", 0, sums.other, 800);
-            animateValue("meal-breakfast", 0, sums.breakfast, 800);
+            animateValue("meal-perm", 0, sumsMeals.perm, 800);
+            animateValue("meal-third", 0, sumsMeals.third, 800);
+            animateValue("meal-meer", 0, sumsMeals.meer, 800);
+            animateValue("meal-orient", 0, sumsMeals.orient, 800);
+            animateValue("meal-cash", 0, sumsMeals.cash, 800);
+            animateValue("meal-drivers", 0, sumsMeals.shiftDrivers, 800);
+            animateValue("meal-guest", 0, sumsMeals.guest, 800);
+            animateValue("meal-other", 0, sumsMeals.other, 800);
+            animateValue("meal-breakfast", 0, sumsMeals.breakfast, 800);
             animateValue("meal-refreshments", 0, refreshmentTotal, 800);
+
+            // Animate Visits
+            animateValue("visit-total", 0, totalVisits, 800);
+            animateValue("visit-foreign", 0, sumsVisits.foreign, 800);
+            animateValue("visit-otherG", 0, sumsVisits.otherG, 800);
+            animateValue("visit-vendors", 0, sumsVisits.vendors, 800);
+            animateValue("visit-civil", 0, sumsVisits.civil, 800);
         }
 
         function renderCardLogic(dataArray, prefix) {
@@ -1092,7 +1197,14 @@
             const mt_breakfast = document.getElementById('meal-breakfast').innerText;
             const mt_refresh = document.getElementById('meal-refreshments').innerText;
 
-            // --- APPEND MEALS TO EXPORT AND FINISH REPORT ---
+            // --- FETCH CURRENT VISITS VALUES ---
+            const vt_total = document.getElementById('visit-total').innerText;
+            const vt_foreign = document.getElementById('visit-foreign').innerText;
+            const vt_otherG = document.getElementById('visit-otherG').innerText;
+            const vt_vendors = document.getElementById('visit-vendors').innerText;
+            const vt_civil = document.getElementById('visit-civil').innerText;
+
+            // --- APPEND MEALS & VISITS TO EXPORT ---
             htmlContent += `
                     </div>
                     
@@ -1112,6 +1224,17 @@
                             <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Other</div><div style="font-size: 22px; font-weight: 800; color: #0F172A;">${mt_other}</div></div>
                             <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Breakfast</div><div style="font-size: 22px; font-weight: 800; color: #0F172A;">${mt_breakfast}</div></div>
                             <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Refreshments</div><div style="font-size: 22px; font-weight: 800; color: #0F172A;">${mt_refresh}</div></div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 40px; padding-top: 30px; border-top: 3px solid #E2E8F0;">
+                        <h2 style="margin: 0 0 20px 0; color: #0F172A; font-size: 24px; text-transform: uppercase;">IPAK Visits Summary</h2>
+                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px;">
+                            <div style="background: #F1F5F9; border: 1px solid #F59E0B; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Total Visits</div><div style="font-size: 22px; font-weight: 800; color: #F59E0B;">${vt_total}</div></div>
+                            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Foreign Guest</div><div style="font-size: 22px; font-weight: 800; color: #0F172A;">${vt_foreign}</div></div>
+                            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Other Guest</div><div style="font-size: 22px; font-weight: 800; color: #0F172A;">${vt_otherG}</div></div>
+                            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Vendors</div><div style="font-size: 22px; font-weight: 800; color: #0F172A;">${vt_vendors}</div></div>
+                            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 15px; border-radius: 12px;"><div style="font-size: 11px; color: #64748B; font-weight: 700; text-transform: uppercase;">Civil Labor</div><div style="font-size: 22px; font-weight: 800; color: #0F172A;">${vt_civil}</div></div>
                         </div>
                     </div>
 
