@@ -246,12 +246,16 @@
 
                     <div style="background: var(--bg-input); padding: 8px; border-radius: 8px; min-width: 0; display: flex; flex-direction: column; justify-content: center;">
                         <div style="display: flex; justify-content: space-between; font-size: 0.55rem; font-weight: 800; margin-bottom: 6px; white-space: nowrap;">
-                            <span id="male-text" style="color: var(--color-blue); text-transform: uppercase;">Male-97%</span>
-                            <span id="female-text" style="color: var(--color-red); text-transform: uppercase;">Female-3%</span>
+                            <span style="color: var(--color-blue); text-transform: uppercase;">MALE</span>
+                            <span style="color: var(--color-red); text-transform: uppercase;">FEMALE</span>
                         </div>
-                        <div style="height: 5px; width: 100%; display: flex; border-radius: 10px;">
-                            <div id="male-bar" style="width: 97%; background: var(--color-blue); border-radius: 10px; box-shadow: 0 0 8px rgba(59,130,246,0.4); transition: width 0.8s ease-out;"></div>
-                            <div id="female-bar" style="width: 3%; background: var(--color-red); border-radius: 10px; margin-left: 4px; box-shadow: 0 0 8px rgba(239,68,68,0.4); transition: width 0.8s ease-out;"></div>
+                        <div style="height: 24px; width: 100%; display: flex; border-radius: 6px; gap: 4px;">
+                            <div id="male-bar" style="width: 97%; min-width: 35px; background: var(--color-blue); border-radius: 6px; box-shadow: 0 0 8px rgba(59,130,246,0.4); transition: width 0.8s ease-out; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                <span id="male-text" style="color: #FFFFFF; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; white-space: nowrap;">97%</span>
+                            </div>
+                            <div id="female-bar" style="width: 3%; min-width: 35px; background: var(--color-red); border-radius: 6px; box-shadow: 0 0 8px rgba(239,68,68,0.4); transition: width 0.8s ease-out; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                <span id="female-text" style="color: #FFFFFF; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; white-space: nowrap;">3%</span>
+                            </div>
                         </div>
                     </div>
 
@@ -611,8 +615,8 @@
                 const oldMale = parseInt(maleText.innerText.replace(/[^\d]/g, '')) || 0;
                 const oldFemale = parseInt(femaleText.innerText.replace(/[^\d]/g, '')) || 0;
 
-                animatePercent(maleText, oldMale, data.male, 800, 'Male-');
-                animatePercent(femaleText, oldFemale, data.female, 800, 'Female-');
+                animatePercent(maleText, oldMale, data.male, 800, '');
+                animatePercent(femaleText, oldFemale, data.female, 800, '');
 
                 maleBar.style.width = data.male + '%';
                 femaleBar.style.width = data.female + '%';
