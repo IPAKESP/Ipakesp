@@ -1,1 +1,551 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPAK Corporate Dashboard - Sales Analytics</title>
+    <link rel="icon" href="Logo.png" type="image/png">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ---------------------------------
+            PREMIUM THEME VARIABLES
+        --------------------------------- */
+        :root {
+            --color-blue: #3B82F6;
+            --color-red: #EF4444;
+            --color-yellow: #F59E0B;
+            --color-green: #10B981;
+            --color-purple: #8B5CF6;
+            --color-teal: #14B8A6;
+            
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+        }
 
+        /* LIGHT MODE */
+        [data-theme="light"] {
+            --bg-main: #F8FAFC;
+            --bg-surface: #FFFFFF;
+            --text-primary: #0F172A;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --border-hover: #CBD5E1;
+            --grid-line: #F1F5F9;
+            --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+            --bg-input: #F1F5F9;
+        }
+
+        /* DARK MODE */
+        [data-theme="dark"] {
+            --bg-main: #09090B;
+            --bg-surface: #121212;
+            --text-primary: #FAFAFA;
+            --text-secondary: #A1A1AA;
+            --border-color: #27272A;
+            --border-hover: #3F3F46;
+            --grid-line: #18181B;
+            --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.5);
+            --bg-input: #18181B;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0; background-color: var(--bg-main); color: var(--text-primary);
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        /* ---------------------------------
+            HEADER & NAVIGATION
+        --------------------------------- */
+        .top-header { 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 12px 30px; background-color: var(--bg-surface); 
+            border-bottom: 1px solid var(--border-color); height: 60px; 
+            box-sizing: border-box; transition: var(--transition); 
+        }
+        .header-brand h1 { margin: 0; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.3px; }
+        .nav-tabs { display: flex; gap: 8px; align-items: center; }
+        .nav-tabs a { 
+            text-decoration: none; padding: 8px 16px; font-size: 0.85rem; font-weight: 600; 
+            color: var(--text-secondary); border-radius: 20px; transition: var(--transition); 
+        }
+        .nav-tabs a.active { background-color: var(--text-primary); color: var(--bg-surface); }
+        .nav-tabs a:hover:not(.active) { color: var(--text-primary); background-color: var(--bg-input); }
+        .theme-toggle { 
+            background: transparent; border: 1px solid var(--border-color); 
+            color: var(--text-primary); padding: 8px 16px; border-radius: 20px; 
+            font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: var(--transition); 
+            display: flex; align-items: center; gap: 6px; margin-left: 15px; 
+        }
+        .theme-toggle:hover { border-color: var(--text-secondary); }
+
+        /* ---------------------------------
+            SLEEK FILTER BAR
+        --------------------------------- */
+        .filter-bar { 
+            display: flex; align-items: center; gap: 15px; padding: 10px 30px; 
+            background-color: var(--bg-main); height: 50px; box-sizing: border-box; 
+            border-bottom: 1px solid var(--border-color); transition: var(--transition);
+        }
+        .filter-group { display: flex; align-items: center; gap: 8px; }
+        .filter-group label { font-size: 0.7rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .filter-group select { 
+            padding: 6px 28px 6px 12px; border-radius: 20px; border: 1px solid var(--border-color); 
+            background-color: var(--bg-surface); color: var(--text-primary); font-size: 0.75rem; font-weight: 600; 
+            font-family: inherit; cursor: pointer; outline: none; appearance: none; 
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2371717A%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); 
+            background-repeat: no-repeat; background-position: right 10px top 50%; background-size: 8px auto; 
+            transition: var(--transition);
+        }
+        .filter-group select:hover { border-color: var(--text-secondary); }
+        .clear-btn { 
+            background-color: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); 
+            padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; 
+            cursor: pointer; margin-left: auto; transition: var(--transition); font-family: inherit; 
+        }
+        .clear-btn:hover { color: var(--text-primary); border-color: var(--text-primary); }
+
+        /* ---------------------------------
+            PREMIUM BENTO GRID LAYOUT
+        --------------------------------- */
+        .workspace { 
+            flex: 1; padding: 15px 30px; display: flex; flex-direction: column; 
+            height: calc(100vh - 110px); box-sizing: border-box; position: relative; 
+        }
+        
+        /* Grid Entrance Animation */
+        @keyframes fadeUpGrid {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-grid { 
+            display: none; /* Hidden until loaded */
+            grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); 
+            gap: 15px; flex-grow: 1; height: 100%; min-height: 0; 
+            animation: fadeUpGrid 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        .col-span-2 { grid-column: span 2; }
+        .row-span-2 { grid-row: span 2; }
+        .col-span-3 { grid-column: span 3; }
+
+        .kpi-widget { 
+            background: var(--bg-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); 
+            padding: 12px 16px; display: flex; flex-direction: column; border: 1px solid var(--border-color); 
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, background-color 0.4s ease; 
+            overflow: hidden; min-height: 0; position: relative; 
+        }
+        .kpi-widget:hover { border-color: var(--border-hover); transform: translateY(-4px); box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1); }
+        
+        .kpi-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; transition: var(--transition); }
+        .dot.blue { background-color: var(--color-blue); box-shadow: 0 0 8px var(--color-blue); }
+        .dot.red { background-color: var(--color-red); box-shadow: 0 0 8px var(--color-red); }
+        .dot.yellow { background-color: var(--color-yellow); box-shadow: 0 0 8px var(--color-yellow); }
+        .dot.green { background-color: var(--color-green); box-shadow: 0 0 8px var(--color-green); }
+
+        .kpi-title h3 { margin: 0; font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; transition: color 0.4s; }
+        .chart-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; min-height: 0; }
+        
+        .kpi-numeric { display: flex; flex-direction: column; justify-content: center; height: 100%; }
+        .kpi-numeric .num { font-size: 1.8rem; font-weight: 800; color: var(--text-primary); transition: color 0.4s; }
+        .kpi-numeric .sub { font-size: 0.65rem; color: var(--text-secondary); font-weight: 700; margin-top: 2px; text-transform: uppercase; transition: color 0.4s; }
+
+        /* Loading Spinner */
+        #loadingMsg { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            color: var(--text-primary); font-weight: 700; background: var(--bg-surface); 
+            padding: 15px 30px; border-radius: 30px; border: 1px solid var(--border-color); 
+            box-shadow: var(--shadow-card); z-index: 10; font-size: 0.9rem; 
+            display: flex; align-items: center; gap: 12px; transition: var(--transition);
+        }
+        .mini-spinner {
+            width: 18px; height: 18px; border: 2.5px solid var(--border-color); 
+            border-top-color: var(--color-blue); border-radius: 50%; 
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <header class="top-header">
+        <div class="header-brand" style="display: flex; align-items: center; gap: 12px;">
+            <img src="Logo.png" alt="Logo" onerror="this.style.display='none'" style="height: 35px; width: auto; object-fit: contain;">
+            <h1>Sales Corporate Dashboard</h1>
+        </div>
+        <div style="display:flex; align-items:center;">
+            <div class="nav-tabs">
+                <a href="#" class="active">Sales</a>
+            </div>
+            <button class="theme-toggle" id="themeToggle">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Dark
+            </button>
+        </div>
+    </header>
+
+    <div class="filter-bar">
+        <div class="filter-group"><label>Year</label><select id="filterYear"><option value="All">All</option></select></div>
+        <div class="filter-group"><label>Month</label><select id="filterMonth"><option value="All">All</option></select></div>
+        <div class="filter-group"><label>Company</label><select id="filterCompany"><option value="All">All</option></select></div>
+        <div class="filter-group"><label>Dept</label><select id="filterDept"><option value="All">All</option></select></div>
+        <div class="filter-group"><label>Film</label><select id="filterFilm"><option value="All">All</option></select></div>
+        <div class="filter-group"><label>Type</label><select id="filterType"><option value="All">All</option></select></div>
+        <button id="clearFiltersBtn" class="clear-btn">Reset View</button>
+    </div>
+
+    <div class="workspace">
+        <div id="loadingMsg">
+            <div class="mini-spinner"></div> Synchronizing Data...
+        </div>
+
+        <div class="dashboard-grid" id="dashboardContent">
+            
+            <div class="kpi-widget col-span-3 row-span-2">
+                <div class="kpi-header">
+                    <span class="dot blue" id="dynamic-dot"></span>
+                    <div class="kpi-title"><h3 id="dynamicChartTitle">Film Type Sales Month-Wise Trend (Accumulated)</h3></div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chartMainSales"></canvas>
+                </div>
+            </div>
+
+            <div class="kpi-widget col-span-1 row-span-1">
+                <div class="kpi-numeric">
+                    <div style="font-size: 0.55rem; color: var(--text-secondary); font-weight: 800; letter-spacing: 0.5px;">TOTAL SALES ACHIEVED</div>
+                    <div class="num" id="kpi-total-sales" style="color: var(--color-blue);">0</div>
+                    <div class="sub">Accumulated Filtered Revenue</div>
+                </div>
+            </div>
+
+            <div class="kpi-widget col-span-1 row-span-1">
+                <div class="kpi-header"><span class="dot yellow"></span><div class="kpi-title"><h3>Sales Contribution %</h3></div></div>
+                <div class="chart-wrapper">
+                    <canvas id="chartSecondaryDistribution"></canvas>
+                </div>
+            </div>
+
+            <div class="kpi-widget col-span-2 row-span-2">
+                <div class="kpi-header"><span class="dot green"></span><div class="kpi-title"><h3>Film Wise Absolute Performance</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartFilmAbsolute"></canvas></div>
+            </div>
+
+            <div class="kpi-widget col-span-2 row-span-2">
+                <div class="kpi-header"><span class="dot red"></span><div class="kpi-title"><h3>Department & Company Split Metrics</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartDeptSplit"></canvas></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- THEME & CONFIG STANDARDS ---
+        const themeBtn = document.getElementById('themeToggle');
+        let currentThemeIsDark = false;
+
+        themeBtn.addEventListener('click', () => {
+            const html = document.documentElement;
+            currentThemeIsDark = html.getAttribute('data-theme') === 'light';
+            html.setAttribute('data-theme', currentThemeIsDark ? 'dark' : 'light');
+            themeBtn.innerHTML = currentThemeIsDark 
+                ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Light`
+                : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Dark`;
+            updateChartThemeColors(currentThemeIsDark);
+        });
+
+        function updateChartThemeColors(isDark) {
+            Chart.defaults.color = isDark ? '#A1A1AA' : '#64748B';
+            updateDashboard();
+        }
+
+        // --- DATA PROCESSING LOGIC ---
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTPzzR8TLIYXF774RZcCdomSXwlWVuwJIG8YsfimKg1y29I1zGSq0r8GYum2hP_-28F8KbsH6_3GtJt/pub?output=csv';
+        let sheetData = []; let headers = []; const charts = {};
+
+        function parseCSV(str) {
+            const arr = []; let quote = false; let row = 0, col = 0;
+            for (let c = 0; c < str.length; c++) {
+                let cc = str[c], nc = str[c+1];
+                arr[row] = arr[row] || []; arr[row][col] = arr[row][col] || '';
+                if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
+                if (cc == '"') { quote = !quote; continue; }
+                if (cc == ',' && !quote) { ++col; continue; }
+                if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
+                if (cc == '\n' && !quote) { ++row; col = 0; continue; }
+                arr[row][col] += cc;
+            }
+            return arr;
+        }
+
+        function findColumn(row, keywords) {
+            if(!row) return null;
+            return Object.keys(row).find(key => keywords.some(kw => key.toLowerCase().includes(kw)));
+        }
+
+        function cleanNumber(val) {
+            if (!val) return 0; if (typeof val === 'number') return val;
+            let cleaned = val.toString().replace(/,/g, '').replace(/%/g, '').replace(/[^\d.-]/g, '');
+            return parseFloat(cleaned) || 0;
+        }
+
+        function formatNum(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toLocaleString('en-US');
+        }
+
+        // Global Chart.js Styling
+        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+        Chart.defaults.color = '#64748B';
+        
+        // Fluid Animation for all Charts
+        Chart.defaults.animation = {
+            duration: 800,
+            easing: 'easeOutQuart'
+        };
+
+        async function fetchGoogleSheetData() {
+            try {
+                const response = await fetch(csvUrl);
+                const csvText = await response.text();
+                const rows = parseCSV(csvText);
+                headers = rows[0].map(h => h.trim());
+                sheetData = rows.slice(1).map(row => {
+                    let obj = {}; row.forEach((cell, i) => { obj[headers[i]] = cell ? cell.trim() : ""; }); return obj;
+                }).filter(row => Object.values(row).some(x => x !== ""));
+                
+                // Hide loading, show grid with fade-up animation
+                document.getElementById('loadingMsg').style.display = 'none';
+                document.getElementById('dashboardContent').style.display = 'grid';
+                
+                populateDropdowns();
+                updateDashboard();
+            } catch (error) {
+                document.getElementById('loadingMsg').innerHTML = "Failed to load Sales data asset.";
+            }
+        }
+
+        function populateDropdowns() {
+            const compCol = findColumn(sheetData[0], ['company', 'comp']);
+            const yearCol = findColumn(sheetData[0], ['year']);
+            const monthCol = findColumn(sheetData[0], ['month']);
+            const deptCol = findColumn(sheetData[0], ['department', 'dept']);
+            const filmCol = findColumn(sheetData[0], ['film']);
+            const typeCol = findColumn(sheetData[0], ['type']);
+
+            const companies = new Set(), years = new Set(), months = new Set(), depts = new Set(), films = new Set(), types = new Set();
+            
+            sheetData.forEach(row => {
+                if (compCol && row[compCol]) companies.add(row[compCol]);
+                if (yearCol && row[yearCol]) years.add(row[yearCol]);
+                if (monthCol && row[monthCol]) months.add(row[monthCol]);
+                if (deptCol && row[deptCol]) depts.add(row[deptCol]);
+                if (filmCol && row[filmCol]) films.add(row[filmCol]);
+                if (typeCol && row[typeCol]) types.add(row[typeCol]);
+            });
+
+            const addOptions = (setId, dataSet) => {
+                const select = document.getElementById(setId);
+                if(!select) return; select.innerHTML = `<option value="All">All</option>`;
+                dataSet.forEach(val => { let opt = document.createElement('option'); opt.value = val; opt.innerHTML = val; select.appendChild(opt); });
+            };
+
+            addOptions('filterCompany', companies); addOptions('filterYear', years);
+            addOptions('filterMonth', months); addOptions('filterDept', depts);
+            addOptions('filterFilm', films); addOptions('filterType', types);
+        }
+
+        const monthsMap = { "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6, "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12 };
+        const colorPalette = ['#3B82F6', '#EF4444', '#F59E0B', '#10B981', '#8B5CF6', '#14B8A6', '#EC4899', '#34D399'];
+
+        function updateDashboard() {
+            if(sheetData.length === 0) return;
+            
+            const selectedComp = document.getElementById('filterCompany').value;
+            const selectedYear = document.getElementById('filterYear').value;
+            const selectedMonth = document.getElementById('filterMonth').value;
+            const selectedDept = document.getElementById('filterDept').value;
+            const selectedFilm = document.getElementById('filterFilm').value;
+            const selectedType = document.getElementById('filterType').value;
+
+            const compCol = findColumn(sheetData[0], ['company']);
+            const yearCol = findColumn(sheetData[0], ['year']);
+            const monthCol = findColumn(sheetData[0], ['month']);
+            const deptCol = findColumn(sheetData[0], ['department', 'dept']);
+            const filmCol = findColumn(sheetData[0], ['film']);
+            const typeCol = findColumn(sheetData[0], ['type']);
+            const valueCol = findColumn(sheetData[0], ['achieved', 'value', 'sales', 'amount']);
+
+            // Dynamic filter execution
+            let filteredData = sheetData.filter(item => {
+                if(selectedComp !== "All" && item[compCol] !== selectedComp) return false;
+                if(selectedYear !== "All" && item[yearCol] !== selectedYear) return false;
+                if(selectedMonth !== "All" && item[monthCol] !== selectedMonth) return false;
+                if(selectedDept !== "All" && item[deptCol] !== selectedDept) return false;
+                if(selectedFilm !== "All" && item[filmCol] !== selectedFilm) return false;
+                if(selectedType !== "All" && item[typeCol] !== selectedType) return false;
+                return true;
+            });
+
+            // Calculate KPIs
+            let totalSalesSum = 0;
+            let productMetrics = {}; 
+            let filmAbsoluteMetrics = {};
+            let monthlyTypeTrend = {}; 
+            let uniqueMonths = new Set();
+
+            filteredData.forEach(item => {
+                let val = cleanNumber(item[valueCol]);
+                let typeKey = item[typeCol] || "Standard Type";
+                let filmKey = item[filmCol] || "General Film";
+                let monthKey = item[monthCol] || "Unknown Month";
+
+                totalSalesSum += val;
+                uniqueMonths.add(monthKey);
+
+                productMetrics[typeKey] = (productMetrics[typeKey] || 0) + val;
+                filmAbsoluteMetrics[filmKey] = (filmAbsoluteMetrics[filmKey] || 0) + val;
+
+                if(!monthlyTypeTrend[typeKey]) monthlyTypeTrend[typeKey] = {};
+                monthlyTypeTrend[typeKey][monthKey] = (monthlyTypeTrend[typeKey][monthKey] || 0) + val;
+            });
+
+            document.getElementById('kpi-total-sales').innerText = formatNum(totalSalesSum);
+
+            // Sort months sequentially
+            let sortedMonths = Array.from(uniqueMonths).sort((a, b) => {
+                return (monthsMap[a.toLowerCase().substring(0, 3)] || 99) - (monthsMap[b.toLowerCase().substring(0, 3)] || 99);
+            });
+
+            // ---------------------------------
+            // CORE HIGH QUALITY DYNAMIC GRAPH LOGIC
+            // ---------------------------------
+            if(charts.mainSalesChart) charts.mainSalesChart.destroy();
+            
+            const mainCtx = document.getElementById('chartMainSales').getContext('2d');
+            let gridThemeColor = currentThemeIsDark ? '#27272A' : '#F1F5F9';
+
+            if (selectedMonth === "All") {
+                // RENDER ACCUMULATED TREND GRAPH
+                document.getElementById('dynamicChartTitle').innerText = "Film Type Sales Month-Wise Trend (Accumulated)";
+                document.getElementById('dynamic-dot').className = "dot blue";
+
+                let lineDatasets = Object.keys(monthlyTypeTrend).map((typeLabel, idx) => {
+                    let datasetPoints = sortedMonths.map(m => monthlyTypeTrend[typeLabel][m] || 0);
+                    return {
+                        label: typeLabel,
+                        data: datasetPoints,
+                        borderColor: colorPalette[idx % colorPalette.length],
+                        backgroundColor: 'transparent',
+                        borderWidth: 2.5,
+                        tension: 0.35,
+                        pointRadius: 3
+                    };
+                });
+
+                charts.mainSalesChart = new Chart(mainCtx, {
+                    type: 'line',
+                    data: { labels: sortedMonths, datasets: lineDatasets },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 12, font: { weight: 600, size: 10 } } } },
+                        scales: {
+                            y: { grid: { color: gridThemeColor }, ticks: { callback: formatNum } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            } else {
+                // RENDER MONTH SPECIFIC DISTRIBUTION PIE/DOUGHNUT CHART Automatically
+                document.getElementById('dynamicChartTitle').innerText = `Sales Distribution Pie - ${selectedMonth}`;
+                document.getElementById('dynamic-dot').className = "dot yellow";
+
+                charts.mainSalesChart = new Chart(mainCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(productMetrics),
+                        datasets: [{
+                            data: Object.values(productMetrics),
+                            backgroundColor: colorPalette,
+                            borderWidth: currentThemeIsDark ? 2 : 1,
+                            borderColor: currentThemeIsDark ? '#121212' : '#FFFFFF'
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: true, position: 'right', labels: { boxWidth: 12, font: { weight: 600, size: 11 } } } }
+                    }
+                });
+            }
+
+            // --- SUPPORTING ASYMMETRIC BENTO CHARTS ---
+            
+            // Secondary Distribution Doughnut
+            if(charts.secDistribution) charts.secDistribution.destroy();
+            charts.secDistribution = new Chart(document.getElementById('chartSecondaryDistribution').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(productMetrics),
+                    datasets: [{ data: Object.values(productMetrics), backgroundColor: colorPalette, borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
+            });
+
+            // Film Wise Absolute Performance Bar
+            if(charts.filmAbsolute) charts.filmAbsolute.destroy();
+            charts.filmAbsolute = new Chart(document.getElementById('chartFilmAbsolute').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(filmAbsoluteMetrics),
+                    datasets: [{ data: Object.values(filmAbsoluteMetrics), backgroundColor: 'rgba(59, 130, 246, 0.85)', borderRadius: 6 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { grid: { color: gridThemeColor } }, x: { grid: { display: false } } }
+                }
+            });
+
+            // Department / Corporate Split Metrics
+            let deptData = {};
+            filteredData.forEach(item => { let d = item[deptCol] || "Commercial"; deptData[d] = (deptData[d] || 0) + cleanNumber(item[valueCol]); });
+            
+            if(charts.deptSplit) charts.deptSplit.destroy();
+            charts.deptSplit = new Chart(document.getElementById('chartDeptSplit').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(deptData),
+                    datasets: [{ data: Object.values(deptData), backgroundColor: '#10B981', borderRadius: 4, barPercentage: 0.6 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { grid: { color: gridThemeColor } }, x: { grid: { display: false } } }
+                }
+            });
+        }
+
+        // Initialize Fetch Automatically
+        window.onload = () => {
+            fetchGoogleSheetData();
+        };
+
+        // Attach listeners across unified filters
+        document.querySelectorAll('select').forEach(sel => {
+            sel.addEventListener('change', () => { updateDashboard(); });
+        });
+
+        document.getElementById('clearFiltersBtn').addEventListener('click', () => {
+            document.querySelectorAll('select').forEach(s => s.value = 'All');
+            updateDashboard();
+        });
+    </script>
+</body>
+</html>
