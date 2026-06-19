@@ -262,10 +262,18 @@
 
         function updateChartThemeColors(isDark) {
             Chart.defaults.color = isDark ? '#A1A1AA' : '#64748B';
+            
+            // Dynamically update tooltip theme to blend with the UI
+            Chart.defaults.plugins.tooltip.backgroundColor = isDark ? '#18181B' : '#FFFFFF';
+            Chart.defaults.plugins.tooltip.titleColor = isDark ? '#FAFAFA' : '#0F172A';
+            Chart.defaults.plugins.tooltip.bodyColor = isDark ? '#A1A1AA' : '#64748B';
+            Chart.defaults.plugins.tooltip.borderColor = isDark ? '#27272A' : '#E2E8F0';
+            
             updateDashboard();
         }
 
         // --- DATA PROCESSING LOGIC ---
+        // Updated to use the correct CSV export link
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTPzzR8TLIYXF774RZcCdomSXwlWVuwJIG8YsfimKg1y29I1zGSq0r8GYum2hP_-28F8KbsH6_3GtJt/pub?output=csv';
         let sheetData = []; let headers = []; const charts = {};
 
@@ -304,7 +312,33 @@
         // Global Chart.js Styling
         Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
         Chart.defaults.color = '#64748B';
-        
+
+        // Premium Tooltip Styling Matching Your Dashboard Pattern
+        Chart.defaults.plugins.tooltip = {
+            backgroundColor: '#FFFFFF',
+            titleColor: '#0F172A',
+            bodyColor: '#64748B',
+            borderColor: '#E2E8F0',
+            borderWidth: 1,
+            padding: 12,
+            cornerRadius: 8,
+            boxPadding: 6,
+            usePointStyle: true, 
+            titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 13, weight: '700' },
+            bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '600' },
+            callbacks: {
+                label: function(context) {
+                    let label = context.dataset.label || context.label || '';
+                    if (label) {
+                        label += ': ';
+                    }
+                    let value = context.parsed.y !== undefined ? context.parsed.y : context.parsed;
+                    label += formatNum(value); 
+                    return label;
+                }
+            }
+        };
+
         // Fluid Animation for all Charts
         Chart.defaults.animation = {
             duration: 800,
@@ -321,7 +355,6 @@
                     let obj = {}; row.forEach((cell, i) => { obj[headers[i]] = cell ? cell.trim() : ""; }); return obj;
                 }).filter(row => Object.values(row).some(x => x !== ""));
                 
-                // Hide loading, show grid with fade-up animation
                 document.getElementById('loadingMsg').style.display = 'none';
                 document.getElementById('dashboardContent').style.display = 'grid';
                 
@@ -329,6 +362,7 @@
                 updateDashboard();
             } catch (error) {
                 document.getElementById('loadingMsg').innerHTML = "Failed to load Sales data asset.";
+                console.error("Data Fetch Error: ", error);
             }
         }
 
@@ -375,13 +409,14 @@
             const selectedFilm = document.getElementById('filterFilm').value;
             const selectedType = document.getElementById('filterType').value;
 
-            const compCol = findColumn(sheetData[0], ['company']);
+            // Updated column finders to catch variations like 'revenue' or 'total'
+            const compCol = findColumn(sheetData[0], ['company', 'comp']);
             const yearCol = findColumn(sheetData[0], ['year']);
             const monthCol = findColumn(sheetData[0], ['month']);
             const deptCol = findColumn(sheetData[0], ['department', 'dept']);
             const filmCol = findColumn(sheetData[0], ['film']);
             const typeCol = findColumn(sheetData[0], ['type']);
-            const valueCol = findColumn(sheetData[0], ['achieved', 'value', 'sales', 'amount']);
+            const valueCol = findColumn(sheetData[0], ['achieved', 'value', 'sales', 'amount', 'revenue', 'total']);
 
             // Dynamic filter execution
             let filteredData = sheetData.filter(item => {
