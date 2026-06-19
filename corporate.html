@@ -125,7 +125,7 @@
         }
 
         .dashboard-grid { 
-            display: none; /* Hidden until loaded */
+            display: none;
             grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); 
             gap: 15px; flex-grow: 1; height: 100%; min-height: 0; 
             animation: fadeUpGrid 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -246,7 +246,6 @@
     </div>
 
     <script>
-        // --- THEME & CONFIG STANDARDS ---
         const themeBtn = document.getElementById('themeToggle');
         let currentThemeIsDark = false;
 
@@ -262,19 +261,10 @@
 
         function updateChartThemeColors(isDark) {
             Chart.defaults.color = isDark ? '#A1A1AA' : '#64748B';
-            
-            // Safely updating tooltip colors dynamically for dark mode
-            if (Chart.defaults.plugins && Chart.defaults.plugins.tooltip) {
-                Chart.defaults.plugins.tooltip.backgroundColor = isDark ? '#18181B' : '#FFFFFF';
-                Chart.defaults.plugins.tooltip.titleColor = isDark ? '#FAFAFA' : '#0F172A';
-                Chart.defaults.plugins.tooltip.bodyColor = isDark ? '#A1A1AA' : '#64748B';
-                Chart.defaults.plugins.tooltip.borderColor = isDark ? '#27272A' : '#E2E8F0';
-            }
-            
+            // Calling updateDashboard will safely recreate all charts with the new tooltip/grid colors
             updateDashboard();
         }
 
-        // --- DATA PROCESSING LOGIC ---
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTPzzR8TLIYXF774RZcCdomSXwlWVuwJIG8YsfimKg1y29I1zGSq0r8GYum2hP_-28F8KbsH6_3GtJt/pub?output=csv';
         let sheetData = []; let headers = []; const charts = {};
 
@@ -310,47 +300,39 @@
             return num.toLocaleString('en-US');
         }
 
-        // --- CHART GLOBAL STYLING & TOOLTIP FIX ---
+        // --- SAFE CHART GLOBAL SETTINGS (No tooltip overrides here) ---
         Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
         Chart.defaults.color = '#64748B';
+        Chart.defaults.interaction = { mode: 'index', intersect: false };
+        Chart.defaults.animation = { duration: 800, easing: 'easeOutQuart' };
 
-        // Smooth Hover Interaction
-        Chart.defaults.interaction = {
-            mode: 'index',
-            intersect: false,
-        };
-
-        // Initialize tooltip plugin if not fully structured
-        if (!Chart.defaults.plugins.tooltip) Chart.defaults.plugins.tooltip = {};
-
-        // Safely assigning individual properties to prevent breaking internals
-        Chart.defaults.plugins.tooltip.backgroundColor = '#FFFFFF';
-        Chart.defaults.plugins.tooltip.titleColor = '#0F172A';
-        Chart.defaults.plugins.tooltip.bodyColor = '#64748B';
-        Chart.defaults.plugins.tooltip.borderColor = '#E2E8F0';
-        Chart.defaults.plugins.tooltip.borderWidth = 1;
-        Chart.defaults.plugins.tooltip.padding = 12;
-        Chart.defaults.plugins.tooltip.cornerRadius = 8;
-        Chart.defaults.plugins.tooltip.boxPadding = 6;
-        Chart.defaults.plugins.tooltip.usePointStyle = true;
-        Chart.defaults.plugins.tooltip.titleFont = { family: "'Plus Jakarta Sans', sans-serif", size: 13, weight: '700' };
-        Chart.defaults.plugins.tooltip.bodyFont = { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '600' };
-
-        Chart.defaults.plugins.tooltip.callbacks = {
-            label: function(context) {
-                let label = context.dataset.label || context.label || '';
-                if (label) {
-                    label += ': ';
+        // --- BULLETPROOF TOOLTIP CONFIGURATION FUNCTION ---
+        function getTooltipStyle() {
+            return {
+                backgroundColor: currentThemeIsDark ? '#18181B' : '#FFFFFF',
+                titleColor: currentThemeIsDark ? '#FAFAFA' : '#0F172A',
+                bodyColor: currentThemeIsDark ? '#A1A1AA' : '#64748B',
+                borderColor: currentThemeIsDark ? '#27272A' : '#E2E8F0',
+                borderWidth: 1,
+                padding: 12,
+                cornerRadius: 8,
+                boxPadding: 6,
+                usePointStyle: true,
+                titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 13, weight: '700' },
+                bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '600' },
+                callbacks: {
+                    label: function(context) {
+                        let label = context.dataset.label || context.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        // Ensures we get the exact number securely
+                        let value = context.raw !== undefined ? context.raw : 0;
+                        return label + formatNum(value);
+                    }
                 }
-                let value = context.raw !== undefined ? context.raw : 0;
-                return label + formatNum(value);
-            }
-        };
-
-        Chart.defaults.animation = {
-            duration: 800,
-            easing: 'easeOutQuart'
-        };
+            };
+        }
 
         async function fetchGoogleSheetData() {
             try {
@@ -489,7 +471,10 @@
                     data: { labels: sortedMonths, datasets: lineDatasets },
                     options: {
                         responsive: true, maintainAspectRatio: false,
-                        plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 12, font: { weight: 600, size: 10 } } } },
+                        plugins: { 
+                            legend: { display: true, position: 'top', labels: { boxWidth: 12, font: { weight: 600, size: 10 } } },
+                            tooltip: getTooltipStyle() // <--- SECURE INJECTION HERE
+                        },
                         scales: {
                             y: { grid: { color: gridThemeColor }, ticks: { callback: formatNum } },
                             x: { grid: { display: false } }
@@ -513,7 +498,10 @@
                     },
                     options: {
                         responsive: true, maintainAspectRatio: false,
-                        plugins: { legend: { display: true, position: 'right', labels: { boxWidth: 12, font: { weight: 600, size: 11 } } } }
+                        plugins: { 
+                            legend: { display: true, position: 'right', labels: { boxWidth: 12, font: { weight: 600, size: 11 } } },
+                            tooltip: getTooltipStyle() // <--- SECURE INJECTION HERE
+                        }
                     }
                 });
             }
@@ -525,7 +513,13 @@
                     labels: Object.keys(productMetrics),
                     datasets: [{ data: Object.values(productMetrics), backgroundColor: colorPalette, borderWidth: 0 }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
+                options: { 
+                    responsive: true, maintainAspectRatio: false, cutout: '75%', 
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: getTooltipStyle() // <--- SECURE INJECTION HERE
+                    } 
+                }
             });
 
             if(charts.filmAbsolute) charts.filmAbsolute.destroy();
@@ -537,8 +531,11 @@
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { grid: { color: gridThemeColor } }, x: { grid: { display: false } } }
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: getTooltipStyle() // <--- SECURE INJECTION HERE
+                    },
+                    scales: { y: { grid: { color: gridThemeColor }, ticks: { callback: formatNum } }, x: { grid: { display: false } } }
                 }
             });
 
@@ -554,8 +551,11 @@
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { grid: { color: gridThemeColor } }, x: { grid: { display: false } } }
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: getTooltipStyle() // <--- SECURE INJECTION HERE
+                    },
+                    scales: { y: { grid: { color: gridThemeColor }, ticks: { callback: formatNum } }, x: { grid: { display: false } } }
                 }
             });
         }
