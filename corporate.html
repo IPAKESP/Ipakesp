@@ -263,17 +263,18 @@
         function updateChartThemeColors(isDark) {
             Chart.defaults.color = isDark ? '#A1A1AA' : '#64748B';
             
-            // Dynamically update tooltip theme to blend with the UI
-            Chart.defaults.plugins.tooltip.backgroundColor = isDark ? '#18181B' : '#FFFFFF';
-            Chart.defaults.plugins.tooltip.titleColor = isDark ? '#FAFAFA' : '#0F172A';
-            Chart.defaults.plugins.tooltip.bodyColor = isDark ? '#A1A1AA' : '#64748B';
-            Chart.defaults.plugins.tooltip.borderColor = isDark ? '#27272A' : '#E2E8F0';
+            // Safely updating tooltip colors dynamically for dark mode
+            if (Chart.defaults.plugins && Chart.defaults.plugins.tooltip) {
+                Chart.defaults.plugins.tooltip.backgroundColor = isDark ? '#18181B' : '#FFFFFF';
+                Chart.defaults.plugins.tooltip.titleColor = isDark ? '#FAFAFA' : '#0F172A';
+                Chart.defaults.plugins.tooltip.bodyColor = isDark ? '#A1A1AA' : '#64748B';
+                Chart.defaults.plugins.tooltip.borderColor = isDark ? '#27272A' : '#E2E8F0';
+            }
             
             updateDashboard();
         }
 
         // --- DATA PROCESSING LOGIC ---
-        // Updated to use the correct CSV export link
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTPzzR8TLIYXF774RZcCdomSXwlWVuwJIG8YsfimKg1y29I1zGSq0r8GYum2hP_-28F8KbsH6_3GtJt/pub?output=csv';
         let sheetData = []; let headers = []; const charts = {};
 
@@ -309,37 +310,43 @@
             return num.toLocaleString('en-US');
         }
 
-        // Global Chart.js Styling
+        // --- CHART GLOBAL STYLING & TOOLTIP FIX ---
         Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
         Chart.defaults.color = '#64748B';
 
-        // Premium Tooltip Styling Matching Your Dashboard Pattern
-        Chart.defaults.plugins.tooltip = {
-            backgroundColor: '#FFFFFF',
-            titleColor: '#0F172A',
-            bodyColor: '#64748B',
-            borderColor: '#E2E8F0',
-            borderWidth: 1,
-            padding: 12,
-            cornerRadius: 8,
-            boxPadding: 6,
-            usePointStyle: true, 
-            titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 13, weight: '700' },
-            bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '600' },
-            callbacks: {
-                label: function(context) {
-                    let label = context.dataset.label || context.label || '';
-                    if (label) {
-                        label += ': ';
-                    }
-                    let value = context.parsed.y !== undefined ? context.parsed.y : context.parsed;
-                    label += formatNum(value); 
-                    return label;
+        // Smooth Hover Interaction
+        Chart.defaults.interaction = {
+            mode: 'index',
+            intersect: false,
+        };
+
+        // Initialize tooltip plugin if not fully structured
+        if (!Chart.defaults.plugins.tooltip) Chart.defaults.plugins.tooltip = {};
+
+        // Safely assigning individual properties to prevent breaking internals
+        Chart.defaults.plugins.tooltip.backgroundColor = '#FFFFFF';
+        Chart.defaults.plugins.tooltip.titleColor = '#0F172A';
+        Chart.defaults.plugins.tooltip.bodyColor = '#64748B';
+        Chart.defaults.plugins.tooltip.borderColor = '#E2E8F0';
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
+        Chart.defaults.plugins.tooltip.padding = 12;
+        Chart.defaults.plugins.tooltip.cornerRadius = 8;
+        Chart.defaults.plugins.tooltip.boxPadding = 6;
+        Chart.defaults.plugins.tooltip.usePointStyle = true;
+        Chart.defaults.plugins.tooltip.titleFont = { family: "'Plus Jakarta Sans', sans-serif", size: 13, weight: '700' };
+        Chart.defaults.plugins.tooltip.bodyFont = { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '600' };
+
+        Chart.defaults.plugins.tooltip.callbacks = {
+            label: function(context) {
+                let label = context.dataset.label || context.label || '';
+                if (label) {
+                    label += ': ';
                 }
+                let value = context.raw !== undefined ? context.raw : 0;
+                return label + formatNum(value);
             }
         };
 
-        // Fluid Animation for all Charts
         Chart.defaults.animation = {
             duration: 800,
             easing: 'easeOutQuart'
@@ -409,7 +416,6 @@
             const selectedFilm = document.getElementById('filterFilm').value;
             const selectedType = document.getElementById('filterType').value;
 
-            // Updated column finders to catch variations like 'revenue' or 'total'
             const compCol = findColumn(sheetData[0], ['company', 'comp']);
             const yearCol = findColumn(sheetData[0], ['year']);
             const monthCol = findColumn(sheetData[0], ['month']);
@@ -418,7 +424,6 @@
             const typeCol = findColumn(sheetData[0], ['type']);
             const valueCol = findColumn(sheetData[0], ['achieved', 'value', 'sales', 'amount', 'revenue', 'total']);
 
-            // Dynamic filter execution
             let filteredData = sheetData.filter(item => {
                 if(selectedComp !== "All" && item[compCol] !== selectedComp) return false;
                 if(selectedYear !== "All" && item[yearCol] !== selectedYear) return false;
@@ -429,7 +434,6 @@
                 return true;
             });
 
-            // Calculate KPIs
             let totalSalesSum = 0;
             let productMetrics = {}; 
             let filmAbsoluteMetrics = {};
@@ -454,21 +458,16 @@
 
             document.getElementById('kpi-total-sales').innerText = formatNum(totalSalesSum);
 
-            // Sort months sequentially
             let sortedMonths = Array.from(uniqueMonths).sort((a, b) => {
                 return (monthsMap[a.toLowerCase().substring(0, 3)] || 99) - (monthsMap[b.toLowerCase().substring(0, 3)] || 99);
             });
 
-            // ---------------------------------
-            // CORE HIGH QUALITY DYNAMIC GRAPH LOGIC
-            // ---------------------------------
             if(charts.mainSalesChart) charts.mainSalesChart.destroy();
             
             const mainCtx = document.getElementById('chartMainSales').getContext('2d');
             let gridThemeColor = currentThemeIsDark ? '#27272A' : '#F1F5F9';
 
             if (selectedMonth === "All") {
-                // RENDER ACCUMULATED TREND GRAPH
                 document.getElementById('dynamicChartTitle').innerText = "Film Type Sales Month-Wise Trend (Accumulated)";
                 document.getElementById('dynamic-dot').className = "dot blue";
 
@@ -498,7 +497,6 @@
                     }
                 });
             } else {
-                // RENDER MONTH SPECIFIC DISTRIBUTION PIE/DOUGHNUT CHART Automatically
                 document.getElementById('dynamicChartTitle').innerText = `Sales Distribution Pie - ${selectedMonth}`;
                 document.getElementById('dynamic-dot').className = "dot yellow";
 
@@ -520,9 +518,6 @@
                 });
             }
 
-            // --- SUPPORTING ASYMMETRIC BENTO CHARTS ---
-            
-            // Secondary Distribution Doughnut
             if(charts.secDistribution) charts.secDistribution.destroy();
             charts.secDistribution = new Chart(document.getElementById('chartSecondaryDistribution').getContext('2d'), {
                 type: 'doughnut',
@@ -533,7 +528,6 @@
                 options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
             });
 
-            // Film Wise Absolute Performance Bar
             if(charts.filmAbsolute) charts.filmAbsolute.destroy();
             charts.filmAbsolute = new Chart(document.getElementById('chartFilmAbsolute').getContext('2d'), {
                 type: 'bar',
@@ -548,7 +542,6 @@
                 }
             });
 
-            // Department / Corporate Split Metrics
             let deptData = {};
             filteredData.forEach(item => { let d = item[deptCol] || "Commercial"; deptData[d] = (deptData[d] || 0) + cleanNumber(item[valueCol]); });
             
@@ -567,12 +560,10 @@
             });
         }
 
-        // Initialize Fetch Automatically
         window.onload = () => {
             fetchGoogleSheetData();
         };
 
-        // Attach listeners across unified filters
         document.querySelectorAll('select').forEach(sel => {
             sel.addEventListener('change', () => { updateDashboard(); });
         });
