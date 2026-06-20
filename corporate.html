@@ -177,7 +177,6 @@
 </head>
 <body>
 
-    <!-- TOP NAVIGATION -->
     <header class="top-header">
         <div class="header-brand">
             <a href="index.html" title="Go to Home">
@@ -199,7 +198,6 @@
         </div>
     </header>
 
-    <!-- FILTER BAR -->
     <div class="filter-bar">
         <div class="filter-group">
             <label>Year</label>
@@ -220,12 +218,10 @@
         <button id="clearFiltersBtn" class="clear-btn">Reset View</button>
     </div>
 
-    <!-- MAIN WORKSPACE -->
     <div class="workspace">
-        <div id="loadingMsg"><div class="spinner"></div> Fetching Isolated KPIs...</div>
+        <div id="loadingMsg"><div class="spinner"></div> Fetching KPIs Data...</div>
         <div class="dashboard-grid" id="dashboardContent">
-            <!-- Dedicated KPI Cards will be injected here -->
-        </div>
+            </div>
     </div>
 
     <script>
@@ -237,7 +233,7 @@
             html.setAttribute('data-theme', isDark ? 'light' : 'dark');
             themeBtn.innerHTML = isDark 
                 ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Dark`
-                : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Light`;
+                : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg> Light`;
             
             Chart.defaults.color = isDark ? '#64748B' : '#A1A1AA';
             Object.values(kpiCharts).forEach(chart => chart.update());
@@ -251,15 +247,15 @@
         
         let colYear = null, colMonth = null, colComp = null, colDept = null;
 
-        // SMART MAPPING: Ab multiple keywords set kar diye hain taake koi mapping miss na ho.
+        // SMART MAPPING: Updated with broader keywords to ensure columns get mapped
         const specificKPIs = [
-            { id: "fatality", title: "Fatality Rate", matchKeys: ["fatality"], calcType: "avg", isPercent: false, gridClass: "span-col-2 span-row-2", color: "#EF4444" },
-            { id: "safety", title: "Safety Training Compliance Rate", matchKeys: ["safety", "compliance"], calcType: "avg", isPercent: true, gridClass: "", color: "#3B82F6" },
-            { id: "risk", title: "Risk Assessment Coverage", matchKeys: ["risk", "assessment"], calcType: "avg", isPercent: true, gridClass: "span-col-2", color: "#8B5CF6" },
-            { id: "env", title: "Environmental Non-Compliance", matchKeys: ["environmental", "non-compliance"], calcType: "sum", isPercent: false, gridClass: "", color: "#F59E0B" },
-            { id: "ltifr", title: "Lost Time Injury Frequency (LTIFR)", matchKeys: ["ltifr", "lost time"], calcType: "avg", isPercent: false, gridClass: "span-row-2", color: "#EC4899" },
-            { id: "trir", title: "Total Recordable Incident Rate (TRIR)", matchKeys: ["trir", "recordable"], calcType: "avg", isPercent: false, gridClass: "span-col-2", color: "#06B6D4" },
-            { id: "nearmiss", title: "Near-Miss Reporting Rate", matchKeys: ["near-miss", "near miss", "near"], calcType: "avg", isPercent: false, gridClass: "", color: "#10B981" }
+            { id: "fatality", title: "Fatality Rate", matchKeys: ["fatality", "death"], calcType: "avg", isPercent: false, gridClass: "span-col-2 span-row-2", color: "#EF4444" },
+            { id: "safety", title: "Safety Training Compliance", matchKeys: ["safety", "training", "compliance"], calcType: "avg", isPercent: true, gridClass: "", color: "#3B82F6" },
+            { id: "risk", title: "Risk Assessment Coverage", matchKeys: ["risk", "assessment", "coverage"], calcType: "avg", isPercent: true, gridClass: "span-col-2", color: "#8B5CF6" },
+            { id: "env", title: "Environmental Non-Compliance", matchKeys: ["environment", "environmental", "non compliance", "non-compliance"], calcType: "sum", isPercent: false, gridClass: "", color: "#F59E0B" },
+            { id: "ltifr", title: "Lost Time Injury (LTIFR)", matchKeys: ["ltifr", "lost time", "lti"], calcType: "avg", isPercent: false, gridClass: "span-row-2", color: "#EC4899" },
+            { id: "trir", title: "Total Recordable (TRIR)", matchKeys: ["trir", "recordable", "incident"], calcType: "avg", isPercent: false, gridClass: "span-col-2", color: "#06B6D4" },
+            { id: "nearmiss", title: "Near-Miss Reporting", matchKeys: ["near miss", "near-miss", "near"], calcType: "avg", isPercent: false, gridClass: "", color: "#10B981" }
         ];
 
         function parseCSV(str) {
@@ -267,19 +263,19 @@
             for (let c = 0; c < str.length; c++) {
                 let cc = str[c], nc = str[c+1];
                 arr[row] = arr[row] || []; arr[row][col] = arr[row][col] || '';
-                if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
-                if (cc == '"') { quote = !quote; continue; }
-                if (cc == ',' && !quote) { ++col; continue; }
-                if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
-                if (cc == '\n' && !quote) { ++row; col = 0; continue; }
-                if (cc == '\r' && !quote) { ++row; col = 0; continue; }
+                if (cc === '"' && quote && nc === '"') { arr[row][col] += cc; ++c; continue; }
+                if (cc === '"') { quote = !quote; continue; }
+                if (cc === ',' && !quote) { ++col; continue; }
+                if (cc === '\r' && nc === '\n' && !quote) { ++row; col = 0; ++c; continue; }
+                if (cc === '\n' && !quote) { ++row; col = 0; continue; }
+                if (cc === '\r' && !quote) { ++row; col = 0; continue; }
                 arr[row][col] += cc;
             }
             return arr;
         }
 
         function findColumn(keywords) {
-            return headers.find(h => keywords.some(kw => h.toLowerCase().includes(kw)));
+            return headers.find(h => keywords.some(kw => h.toLowerCase().includes(kw.toLowerCase())));
         }
 
         async function initApp() {
@@ -288,24 +284,26 @@
                 const csvText = await response.text();
                 const rows = parseCSV(csvText);
                 
-                headers = rows[0].map(h => h.trim());
+                headers = rows[0].map(h => h.trim().replace(/\n/g, ' '));
+                console.log("📝 Sheet Columns Found:", headers);
+                
                 rawData = rows.slice(1).map(row => {
                     let obj = {};
                     row.forEach((cell, i) => { obj[headers[i]] = cell ? cell.trim() : ""; });
                     return obj;
                 }).filter(row => Object.values(row).some(x => x !== ""));
 
-                colYear = findColumn(['year', 'saal']);
-                colMonth = findColumn(['month', 'date']);
-                colComp = findColumn(['company', 'comp']);
-                colDept = findColumn(['department', 'dept']);
+                colYear = findColumn(['year', 'saal', 'date']);
+                colMonth = findColumn(['month', 'mahina']);
+                colComp = findColumn(['company', 'comp', 'organization']);
+                colDept = findColumn(['department', 'dept', 'unit']);
 
                 document.getElementById('loadingMsg').style.display = 'none';
                 populateFilters();
                 renderDashboard();
             } catch (error) {
-                document.getElementById('loadingMsg').innerHTML = "Failed to synchronize data. Check CSV link.";
-                console.error(error);
+                document.getElementById('loadingMsg').innerHTML = "Failed to load data. Please check the console.";
+                console.error("Data Fetching Error:", error);
             }
         }
 
@@ -322,6 +320,7 @@
             const addOptions = (setId, dataSet) => {
                 const select = document.getElementById(setId);
                 if(!select) return;
+                select.innerHTML = '<option value="All">All</option>'; // Reset options before adding
                 dataSet.forEach(val => {
                     let opt = document.createElement('option');
                     opt.value = val; opt.innerHTML = val; select.appendChild(opt);
@@ -373,7 +372,6 @@
             const selectedComp = document.getElementById('filterCompany').value;
             const selectedDept = document.getElementById('filterDept').value;
             
-            // FIXED: Removed the logic that hid "Group" company rows completely.
             let filteredData = rawData.filter(row => {
                 if (selectedYear !== "All" && colYear && row[colYear] !== selectedYear) return false;
                 if (selectedMonth !== "All" && colMonth && row[colMonth] !== selectedMonth) return false;
@@ -393,8 +391,7 @@
             let cardsGenerated = 0;
 
             specificKPIs.forEach((kpiDef) => {
-                // Find matching column intelligently
-                let colName = headers.find(h => kpiDef.matchKeys.some(kw => h.toLowerCase().includes(kw)));
+                let colName = findColumn(kpiDef.matchKeys);
                 if(!colName) return; 
 
                 cardsGenerated++;
@@ -464,7 +461,7 @@
                 }
             });
 
-            // DEBUGGING FALLBACK: Agar phir bhi koi column na milay
+            // DEBUGGING FALLBACK:
             if (cardsGenerated === 0) {
                 container.innerHTML = `
                     <div style="grid-column: 1/-1; text-align: center; color: var(--color-red); padding: 40px; font-weight: 700; background: var(--bg-surface); border-radius: 20px;">
