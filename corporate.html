@@ -19,6 +19,7 @@
             --color-green: #10B981;
             --color-purple: #8B5CF6;
             --color-pink: #EC4899;
+            --color-cyan: #06B6D4;
             
             --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             --radius-lg: 20px;
@@ -116,50 +117,42 @@
             background-color: transparent; color: var(--text-secondary); border: 1px solid var(--border-color);
             padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
             cursor: pointer; transition: var(--transition); font-family: inherit;
-            margin-left: auto; /* Pushesh the button to the right end */
+            margin-left: auto;
         }
         .clear-btn:hover { color: var(--text-primary); border-color: var(--text-primary); background: var(--bg-surface); }
 
         /* ---------------------------------
-           DYNAMIC ASYMMETRIC BENTO GRID
+           UNIFORM BENTO GRID
         --------------------------------- */
         .workspace {
-            flex: 1; padding: 20px 30px 30px 30px; display: flex; flex-direction: column;
+            flex: 1; padding: 25px 30px 40px 30px; display: flex; flex-direction: column;
             overflow-y: auto; box-sizing: border-box; position: relative;
         }
 
         .dashboard-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); grid-auto-flow: dense;
-            gap: 20px; flex-grow: 1;
+            /* Changed to uniform grid with minimum width of 260px */
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
+            gap: 24px; flex-grow: 1; align-content: flex-start;
         }
 
-        /* Asymmetric overrides applied dynamically via JS */
         .kpi-widget {
             background: var(--bg-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
             padding: 24px; display: flex; flex-direction: column; justify-content: space-between;
             border: 1px solid var(--border-color); transition: var(--transition);
-            position: relative; overflow: hidden; min-height: 160px;
+            position: relative; overflow: hidden; height: 160px; /* Fixed height for uniformity */
         }
         .kpi-widget:hover { border-color: var(--border-hover); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
 
-        .kpi-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; position: relative; z-index: 2; }
-        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-        .kpi-title h3 { margin: 0; font-size: 0.8rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .kpi-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; position: relative; z-index: 2; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+        .kpi-title h3 { margin: 0; font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2; }
         
-        .kpi-value-container { position: relative; z-index: 2; }
-        .kpi-value { font-size: 2.5rem; font-weight: 800; color: var(--text-primary); line-height: 1; letter-spacing: -1px; margin-bottom: 5px; }
-        .kpi-trend { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
+        .kpi-value-container { position: relative; z-index: 2; margin-top: auto; }
+        .kpi-value { font-size: 2.2rem; font-weight: 800; color: var(--text-primary); line-height: 1; letter-spacing: -1px; margin-bottom: 6px; }
+        .kpi-trend { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
 
         .chart-bg-wrapper {
-            position: absolute; bottom: 0; left: 0; right: 0; height: 60%; opacity: 0.3; z-index: 1; pointer-events: none;
-        }
-
-        /* Utility span classes */
-        .span-col-2 { grid-column: span 2; }
-        .span-row-2 { grid-row: span 2; min-height: 340px; }
-
-        @media (max-width: 900px) {
-            .span-col-2 { grid-column: span 1; }
+            position: absolute; bottom: 0; left: 0; right: 0; height: 50%; opacity: 0.25; z-index: 1; pointer-events: none;
         }
 
         #loadingMsg {
@@ -174,6 +167,7 @@
 </head>
 <body>
 
+    <!-- TOP NAVIGATION -->
     <header class="top-header">
         <div class="header-brand">
             <a href="index.html" title="Go to Home">
@@ -182,6 +176,7 @@
             <h1>Corporate Dashboard</h1>
         </div>
         
+        <!-- Centered Clean Tabs -->
         <div class="nav-tabs-container">
             <div class="nav-tabs">
                 <a href="#" class="active">Corporate</a>
@@ -195,6 +190,7 @@
         </div>
     </header>
 
+    <!-- FILTER BAR -->
     <div class="filter-bar">
         <div class="filter-group">
             <label>Year</label>
@@ -215,10 +211,12 @@
         <button id="clearFiltersBtn" class="clear-btn">Reset View</button>
     </div>
 
+    <!-- MAIN WORKSPACE -->
     <div class="workspace">
         <div id="loadingMsg"><div class="spinner"></div> Fetching KPI Data...</div>
         <div class="dashboard-grid" id="dashboardContent">
-            </div>
+            <!-- Dynamic KPI Cards will be injected here individually -->
+        </div>
     </div>
 
     <script>
@@ -244,7 +242,7 @@
         
         let colYear = null, colMonth = null, colComp = null, colDept = null;
         
-        // Premium Color Palette for random assignment
+        // Premium Color Palette
         const palette = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4'];
 
         function parseCSV(str) {
@@ -280,7 +278,6 @@
                     return obj;
                 }).filter(row => Object.values(row).some(x => x !== ""));
 
-                // Identify filter columns dynamically
                 colYear = findColumn(['year', 'saal']);
                 colMonth = findColumn(['month', 'date']);
                 colComp = findColumn(['company', 'comp']);
@@ -320,7 +317,6 @@
             addOptions('filterCompany', companies);
             addOptions('filterDept', depts);
             
-            // Clear Filters Button logic
             document.getElementById('clearFiltersBtn').addEventListener('click', () => {
                 document.querySelectorAll('.filter-bar select').forEach(s => s.value = 'All');
                 renderDashboard();
@@ -360,18 +356,16 @@
             const selectedComp = document.getElementById('filterCompany').value;
             const selectedDept = document.getElementById('filterDept').value;
             
-            // Filter the data based on all 4 dropdowns
             let filteredData = rawData.filter(row => {
                 if (selectedYear !== "All" && colYear && row[colYear] !== selectedYear) return false;
                 if (selectedMonth !== "All" && colMonth && row[colMonth] !== selectedMonth) return false;
-                // Exclude 'Group' summaries if filtering by specific company, or if viewing 'All' (to avoid double counting)
                 if (colComp && row[colComp] && row[colComp].toLowerCase() === 'group') return false; 
                 if (selectedComp !== "All" && colComp && row[colComp] !== selectedComp) return false;
                 if (selectedDept !== "All" && colDept && row[colDept] !== selectedDept) return false;
                 return true;
             });
 
-            // Identify KPI columns (Exclude metadata columns)
+            // Exclude metadata to find pure KPI columns
             const excludeCols = [colYear, colMonth, colComp, colDept, 'id', 'date'].map(x => x?.toLowerCase());
             const kpiColumns = headers.filter(h => !excludeCols.includes(h.toLowerCase()));
 
@@ -388,7 +382,6 @@
                 let trendData = []; let trendLabels = [];
                 let isPercent = filteredData.some(r => r[kpi] && r[kpi].includes('%')) || kpi.includes('%');
 
-                // Aggregate Data
                 filteredData.forEach(row => {
                     let val = cleanNum(row[kpi]);
                     total += val;
@@ -400,24 +393,18 @@
                     }
                 });
 
-                // Calculate final value to show
                 let displayValue = isPercent && count > 0 ? (total / count) : total;
 
-                // UI/Bento Assignment logic (Asymmetric generation)
+                // Color assignment
                 const colorHex = palette[index % palette.length];
-                let spanClass = "";
-                // Random asymmetric variations
-                if (index % 5 === 0) spanClass = "span-col-2 span-row-2";
-                else if (index % 3 === 0) spanClass = "span-col-2";
-
-                // Generate Card HTML
+                
+                // Uniform card generation (No span classes)
                 const cardId = `kpi-card-${index}`;
                 const chartId = `kpi-chart-${index}`;
-                
                 let trendText = selectedMonth === "All" ? "Accumulated Total" : "Filtered Metric";
                 
                 const cardHTML = `
-                    <div class="kpi-widget ${spanClass}" id="${cardId}">
+                    <div class="kpi-widget" id="${cardId}">
                         <div>
                             <div class="kpi-header">
                                 <span class="dot" style="background-color: ${colorHex}; box-shadow: 0 0 8px ${colorHex}"></span>
@@ -440,7 +427,7 @@
                 animateValue(valEl, 0, displayValue, 1000);
                 if(isPercent) setTimeout(() => { valEl.innerHTML += '<span style="font-size:0.5em">%</span>'; }, 1050);
 
-                // Draw Background Sparkline (if we have multiple data points to show a trend)
+                // Sparkline background graph
                 if (trendData.length > 1 && selectedMonth === "All") {
                     const ctx = document.getElementById(chartId).getContext('2d');
                     let bgGradient = ctx.createLinearGradient(0, 0, 0, 100);
