@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Corporate Dashboard - Bento Box</title>
+    <title>Corporate & Sales Dashboard</title>
     <link rel="icon" href="Logo.png" type="image/png">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -20,6 +20,7 @@
             --color-purple: #8B5CF6;
             --color-pink: #EC4899;
             --color-cyan: #06B6D4;
+            --color-indigo: #4F46E5;
             
             --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             --radius-lg: 20px;
@@ -27,7 +28,6 @@
             --radius-sm: 8px;
         }
 
-        /* LIGHT MODE */
         [data-theme="light"] {
             --bg-main: #F8FAFC;
             --bg-surface: #FFFFFF;
@@ -39,7 +39,6 @@
             --bg-input: #F1F5F9;
         }
 
-        /* DARK MODE */
         [data-theme="dark"] {
             --bg-main: #09090B;
             --bg-surface: #121212;
@@ -58,9 +57,7 @@
             transition: background-color 0.4s ease, color 0.4s ease;
         }
 
-        /* ---------------------------------
-           HEADER & NAVIGATION
-        --------------------------------- */
+        /* HEADER & NAVIGATION */
         .top-header {
             display: flex; align-items: center; justify-content: space-between;
             padding: 12px 30px; background-color: var(--bg-surface);
@@ -69,21 +66,7 @@
         }
 
         .header-brand { display: flex; align-items: center; gap: 12px; }
-        .header-brand a { display: flex; align-items: center; text-decoration: none; color: inherit; }
         .header-brand h1 { margin: 0; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.3px; }
-
-        /* Centered Clean Tabs */
-        .nav-tabs-container {
-            flex-grow: 1; display: flex; justify-content: center;
-        }
-        
-        .nav-tabs { display: flex; gap: 8px; align-items: center; background: var(--bg-input); padding: 4px; border-radius: 24px; border: 1px solid var(--border-color); }
-        .nav-tabs a {
-            text-decoration: none; padding: 6px 20px; font-size: 0.85rem; font-weight: 700;
-            color: var(--text-secondary); border-radius: 20px; transition: var(--transition);
-        }
-        .nav-tabs a.active { background-color: var(--text-primary); color: var(--bg-surface); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .nav-tabs a:hover:not(.active) { color: var(--text-primary); }
 
         .theme-toggle {
             background: transparent; border: 1px solid var(--border-color);
@@ -93,18 +76,15 @@
         }
         .theme-toggle:hover { border-color: var(--text-secondary); }
 
-        /* ---------------------------------
-           SLEEK FILTER BAR
-        --------------------------------- */
+        /* FILTER BAR */
         .filter-bar {
             display: flex; align-items: center; justify-content: flex-start; gap: 15px; padding: 15px 30px;
             background-color: var(--bg-main); box-sizing: border-box; flex-wrap: wrap;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color); z-index: 5; position: relative;
         }
 
-        .filter-group { display: flex; align-items: center; gap: 8px; background: var(--bg-surface); padding: 6px 16px; border-radius: 30px; border: 1px solid var(--border-color); box-shadow: var(--shadow-card); transition: var(--transition); }
-        .filter-group:hover { border-color: var(--border-hover); }
-        .filter-group label { font-size: 0.7rem; color: var(--text-secondary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .filter-group { display: flex; align-items: center; gap: 8px; background: var(--bg-surface); padding: 6px 16px; border-radius: 30px; border: 1px solid var(--border-color); box-shadow: var(--shadow-card); }
+        .filter-group label { font-size: 0.7rem; color: var(--text-secondary); font-weight: 800; text-transform: uppercase; }
         .filter-group select {
             padding: 4px 24px 4px 0; border: none; background: transparent;
             color: var(--text-primary); font-size: 0.8rem; font-weight: 700;
@@ -116,59 +96,58 @@
         .clear-btn {
             background-color: transparent; color: var(--text-secondary); border: 1px solid var(--border-color);
             padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
-            cursor: pointer; transition: var(--transition); font-family: inherit;
-            margin-left: auto;
+            cursor: pointer; margin-left: auto;
         }
-        .clear-btn:hover { color: var(--text-primary); border-color: var(--text-primary); background: var(--bg-surface); }
 
-        /* ---------------------------------
-           ASYMMETRIC BENTO GRID
-        --------------------------------- */
+        /* WORKSPACE & GRID */
         .workspace {
             flex: 1; padding: 25px 30px 40px 30px; display: flex; flex-direction: column;
-            overflow-y: auto; box-sizing: border-box; position: relative;
+            overflow-y: auto; box-sizing: border-box; position: relative; gap: 40px;
+        }
+
+        .section-title {
+            margin: 0 0 15px 0; font-size: 1.4rem; font-weight: 800; color: var(--text-primary);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .section-title::before {
+            content: ''; display: block; width: 6px; height: 24px;
+            background: var(--color-blue); border-radius: 4px;
         }
 
         .dashboard-grid {
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            grid-auto-flow: dense;
-            gap: 24px; flex-grow: 1; align-content: flex-start;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            grid-auto-flow: dense; gap: 24px; align-content: flex-start;
         }
 
         .kpi-widget {
             background: var(--bg-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
             padding: 24px; display: flex; flex-direction: column; justify-content: space-between;
-            border: 1px solid var(--border-color); transition: var(--transition);
-            position: relative; overflow: hidden; min-height: 180px;
+            border: 1px solid var(--border-color); position: relative; overflow: hidden; min-height: 200px;
         }
-        .kpi-widget:hover { border-color: var(--border-hover); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
 
         .span-col-2 { grid-column: span 2; }
-        .span-row-2 { grid-row: span 2; min-height: 384px; }
-
-        @media (max-width: 900px) {
-            .span-col-2 { grid-column: span 1; }
-            .span-row-2 { grid-row: span 1; min-height: 180px; }
-        }
+        .span-row-2 { grid-row: span 2; min-height: 400px; }
+        @media (max-width: 900px) { .span-col-2 { grid-column: span 1; } .span-row-2 { grid-row: span 1; min-height: 200px; } }
 
         .kpi-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; position: relative; z-index: 2; }
         .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-        .kpi-title h3 { margin: 0; font-size: 0.8rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.3; }
+        .kpi-title h3 { margin: 0; font-size: 0.8rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; }
         
         .kpi-value-container { position: relative; z-index: 2; margin-top: auto; }
-        .kpi-value { font-size: 2.8rem; font-weight: 800; color: var(--text-primary); line-height: 1; letter-spacing: -1px; margin-bottom: 8px; }
-        .kpi-trend { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
+        .kpi-value { font-size: 2.5rem; font-weight: 800; color: var(--text-primary); line-height: 1; letter-spacing: -1px; margin-bottom: 8px; }
+        .kpi-trend { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
 
         .chart-bg-wrapper {
-            position: absolute; bottom: 0; left: 0; right: 0; height: 55%; opacity: 0.25; z-index: 1; pointer-events: none;
+            position: absolute; bottom: 0; left: 0; right: 0; height: 60%; opacity: 0.9; z-index: 1; padding: 0 10px;
         }
+        /* Make line charts transparent in background, but bar charts fully visible */
+        .chart-bg-wrapper.type-line { opacity: 0.25; pointer-events: none; padding: 0; }
 
         #loadingMsg {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             color: var(--text-primary); font-weight: 700; background: var(--bg-surface);
             padding: 15px 30px; border-radius: 30px; border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-card); z-index: 10; font-size: 0.9rem; display: flex; align-items: center; gap: 10px;
+            box-shadow: var(--shadow-card); z-index: 10; display: flex; align-items: center; gap: 10px;
         }
         .spinner { width: 20px; height: 20px; border: 3px solid var(--border-color); border-top-color: var(--color-blue); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -178,53 +157,38 @@
 
     <header class="top-header">
         <div class="header-brand">
-            <a href="index.html" title="Go to Home">
-                <img src="Logo.png" alt="Logo" style="height: 35px; width: auto; object-fit: contain; margin-right: 12px;" onerror="this.style.display='none'">
-            </a>
-            <h1>Corporate Dashboard</h1>
+            <h1>Executive Dashboard</h1>
         </div>
-        
-        <div class="nav-tabs-container">
-            <div class="nav-tabs">
-                <a href="#" class="active">Corporate</a>
-            </div>
-        </div>
-
-        <div>
-            <button class="theme-toggle" id="themeToggle">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Dark
-            </button>
-        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Dark
+        </button>
     </header>
 
     <div class="filter-bar">
-        <div class="filter-group">
-            <label>Year</label>
-            <select id="filterYear"><option value="All">All</option></select>
-        </div>
-        <div class="filter-group">
-            <label>Month</label>
-            <select id="filterMonth"><option value="All">All</option></select>
-        </div>
-        <div class="filter-group">
-            <label>Company</label>
-            <select id="filterCompany"><option value="All">All</option></select>
-        </div>
-        <div class="filter-group">
-            <label>Department</label>
-            <select id="filterDept"><option value="All">All</option></select>
-        </div>
+        <div class="filter-group"><label>Year</label><select id="filterYear"><option value="All">All</option></select></div>
+        <div class="filter-group"><label>Month</label><select id="filterMonth"><option value="All">All</option></select></div>
+        <div class="filter-group"><label>Company</label><select id="filterCompany"><option value="All">All</option></select></div>
+        <div class="filter-group"><label>Department</label><select id="filterDept"><option value="All">All</option></select></div>
+        <div class="filter-group" id="regionFilterGroup" style="display:none;"><label>Region</label><select id="filterRegion"><option value="All">All</option></select></div>
         <button id="clearFiltersBtn" class="clear-btn">Reset View</button>
     </div>
 
     <div class="workspace">
-        <div id="loadingMsg"><div class="spinner"></div> Fetching KPIs Data...</div>
-        <div class="dashboard-grid" id="dashboardContent">
-            </div>
+        <div id="loadingMsg"><div class="spinner"></div> Fetching Live Data...</div>
+        
+        <div>
+            <h2 class="section-title" style="--color-blue: var(--color-red);">Safety & Compliance</h2>
+            <div class="dashboard-grid" id="safetyContent"></div>
+        </div>
+
+        <div>
+            <h2 class="section-title" style="--color-blue: var(--color-indigo);">Sales & Revenue</h2>
+            <div class="dashboard-grid" id="salesContent"></div>
+        </div>
     </div>
 
     <script>
-        // --- THEME TOGGLE LOGIC ---
+        // --- THEME LOGIC ---
         const themeBtn = document.getElementById('themeToggle');
         themeBtn.addEventListener('click', () => {
             const html = document.documentElement;
@@ -232,32 +196,35 @@
             html.setAttribute('data-theme', isDark ? 'light' : 'dark');
             themeBtn.innerHTML = isDark 
                 ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Dark`
-                : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg> Light`;
+                : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line></svg> Light`;
             
             Chart.defaults.color = isDark ? '#64748B' : '#A1A1AA';
             Object.values(kpiCharts).forEach(chart => chart.update());
         });
 
-        // --- DATA FETCHING & PARSING LOGIC ---
-        const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTPzzR8TLIYXF774RZcCdomSXwlWVuwJIG8YsfimKg1y29I1zGSq0r8GYum2hP_-28F8KbsH6_3GtJt/pub?gid=1558196711&single=true&output=csv';
-        let rawData = [];
-        let headers = [];
-        let kpiCharts = {};
-        
-        let colYear = null, colMonth = null, colComp = null, colDept = null;
-        let colKPI = null, colAchieved = null;
+        // --- CONFIGURATION ---
+        const urlSafety = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTPzzR8TLIYXF774RZcCdomSXwlWVuwJIG8YsfimKg1y29I1zGSq0r8GYum2hP_-28F8KbsH6_3GtJt/pub?gid=1558196711&single=true&output=csv';
+        const urlSales = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTPzzR8TLIYXF774RZcCdomSXwlWVuwJIG8YsfimKg1y29I1zGSq0r8GYum2hP_-28F8KbsH6_3GtJt/pub?gid=0&single=true&output=csv';
 
-        // SMART MAPPING: MatchKeys search for values within the 'KPI' column
-        const specificKPIs = [
-            { id: "fatality", title: "Fatality Rate", matchKeys: ["fatality", "death"], calcType: "avg", isPercent: false, gridClass: "span-col-2 span-row-2", color: "#EF4444" },
-            { id: "safety", title: "Safety Training Compliance", matchKeys: ["safety", "training", "compliance"], calcType: "avg", isPercent: true, gridClass: "", color: "#3B82F6" },
-            { id: "risk", title: "Risk Assessment Coverage", matchKeys: ["risk", "assessment", "coverage"], calcType: "avg", isPercent: true, gridClass: "span-col-2", color: "#8B5CF6" },
-            { id: "env", title: "Environmental Non-Compliance", matchKeys: ["environment", "environmental", "non compliance", "non-compliance"], calcType: "sum", isPercent: false, gridClass: "", color: "#F59E0B" },
-            { id: "ltifr", title: "Lost Time Injury (LTIFR)", matchKeys: ["ltifr", "lost time", "lti"], calcType: "avg", isPercent: false, gridClass: "span-row-2", color: "#EC4899" },
-            { id: "trir", title: "Total Recordable (TRIR)", matchKeys: ["trir", "recordable", "incident"], calcType: "avg", isPercent: false, gridClass: "span-col-2", color: "#06B6D4" },
-            { id: "nearmiss", title: "Near-Miss Reporting", matchKeys: ["near miss", "near-miss", "near"], calcType: "avg", isPercent: false, gridClass: "", color: "#10B981" }
+        let safetyDataRaw = [], salesDataRaw = [];
+        let kpiCharts = {};
+
+        // KPIs Definitions
+        const safetyKPIs = [
+            { id: "fatality", title: "Fatality Rate", matchKeys: ["fatality", "death"], calcType: "avg", isPercent: false, gridClass: "span-col-2", color: "#EF4444", chartType: "line" },
+            { id: "safety", title: "Training Compliance", matchKeys: ["safety", "training", "compliance"], calcType: "avg", isPercent: true, gridClass: "", color: "#3B82F6", chartType: "line" },
+            { id: "ltifr", title: "Lost Time Injury (LTIFR)", matchKeys: ["ltifr", "lost time", "lti"], calcType: "avg", isPercent: false, gridClass: "", color: "#EC4899", chartType: "line" },
+            { id: "trir", title: "Total Recordable (TRIR)", matchKeys: ["trir", "recordable", "incident"], calcType: "avg", isPercent: false, gridClass: "span-col-2", color: "#06B6D4", chartType: "line" }
         ];
 
+        const salesKPIs = [
+            { id: "revenue", title: "Total Revenue / Sales", matchKeys: ["revenue", "sales", "turnover"], calcType: "sum", isPercent: false, gridClass: "span-col-2 span-row-2", color: "#4F46E5", chartType: "bar" },
+            { id: "profit", title: "Net Profit", matchKeys: ["profit", "net income"], calcType: "sum", isPercent: false, gridClass: "span-col-2", color: "#10B981", chartType: "bar" },
+            { id: "volume", title: "Sales Volume", matchKeys: ["volume", "qty", "quantity"], calcType: "sum", isPercent: false, gridClass: "", color: "#F59E0B", chartType: "bar" },
+            { id: "target", title: "Target Achieved", matchKeys: ["target", "achievement"], calcType: "avg", isPercent: true, gridClass: "", color: "#8B5CF6", chartType: "bar" }
+        ];
+
+        // --- HELPER FUNCTIONS ---
         function parseCSV(str) {
             const arr = []; let quote = false; let row = 0, col = 0;
             for (let c = 0; c < str.length; c++) {
@@ -274,71 +241,16 @@
             return arr;
         }
 
-        function findColumn(keywords) {
-            return headers.find(h => keywords.some(kw => h.toLowerCase().includes(kw.toLowerCase())));
-        }
-
-        async function initApp() {
-            try {
-                const response = await fetch(sheetUrl);
-                const csvText = await response.text();
-                const rows = parseCSV(csvText);
-                
-                headers = rows[0].map(h => h.trim().replace(/\n/g, ' '));
-                console.log("📝 Sheet Columns Found:", headers);
-                
-                rawData = rows.slice(1).map(row => {
-                    let obj = {};
-                    row.forEach((cell, i) => { obj[headers[i]] = cell ? cell.trim() : ""; });
-                    return obj;
-                }).filter(row => Object.values(row).some(x => x !== ""));
-
-                colYear = findColumn(['year']);
-                colMonth = findColumn(['month']);
-                colComp = findColumn(['company']);
-                colDept = findColumn(['department']);
-                colKPI = findColumn(['kpi']);
-                colAchieved = findColumn(['achieved']);
-
-                document.getElementById('loadingMsg').style.display = 'none';
-                populateFilters();
-                renderDashboard();
-            } catch (error) {
-                document.getElementById('loadingMsg').innerHTML = "Failed to load data. Please check the console.";
-                console.error("Data Fetching Error:", error);
-            }
-        }
-
-        function populateFilters() {
-            const years = new Set(), months = new Set(), companies = new Set(), depts = new Set();
-            
-            rawData.forEach(row => {
-                if(colYear && row[colYear]) years.add(row[colYear]);
-                if(colMonth && row[colMonth]) months.add(row[colMonth]);
-                if(colComp && row[colComp]) companies.add(row[colComp]);
-                if(colDept && row[colDept]) depts.add(row[colDept]);
-            });
-            
-            const addOptions = (setId, dataSet) => {
-                const select = document.getElementById(setId);
-                if(!select) return;
-                select.innerHTML = '<option value="All">All</option>';
-                dataSet.forEach(val => {
-                    let opt = document.createElement('option');
-                    opt.value = val; opt.innerHTML = val; select.appendChild(opt);
-                });
-                select.addEventListener('change', renderDashboard);
-            };
-
-            addOptions('filterYear', years);
-            addOptions('filterMonth', months);
-            addOptions('filterCompany', companies);
-            addOptions('filterDept', depts);
-            
-            document.getElementById('clearFiltersBtn').addEventListener('click', () => {
-                document.querySelectorAll('.filter-bar select').forEach(s => s.value = 'All');
-                renderDashboard();
-            });
+        function formatData(csvText) {
+            const rows = parseCSV(csvText);
+            if(rows.length < 2) return { data: [], headers: [] };
+            const headers = rows[0].map(h => h.trim().replace(/\n/g, ' '));
+            const data = rows.slice(1).map(row => {
+                let obj = {};
+                row.forEach((cell, i) => { obj[headers[i]] = cell ? cell.trim() : ""; });
+                return obj;
+            }).filter(row => Object.values(row).some(x => x !== ""));
+            return { data, headers };
         }
 
         function cleanNum(val) {
@@ -355,7 +267,7 @@
                 const easeProgress = 1 - Math.pow(1 - progress, 4);
                 let currentVal = (easeProgress * (end - start) + start);
                 
-                if (Number.isInteger(end)) {
+                if (Number.isInteger(end) || end > 1000) {
                     obj.innerHTML = Math.floor(currentVal).toLocaleString('en-US');
                 } else {
                     obj.innerHTML = currentVal.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -366,119 +278,241 @@
             window.requestAnimationFrame(step);
         }
 
-        function renderDashboard() {
-            const container = document.getElementById('dashboardContent');
+        // --- APP INITIALIZATION ---
+        async function initApp() {
+            try {
+                const [resSafety, resSales] = await Promise.all([ fetch(urlSafety), fetch(urlSales) ]);
+                const safetyCSV = await resSafety.text();
+                const salesCSV = await resSales.text();
+
+                const parsedSafety = formatData(safetyCSV);
+                const parsedSales = formatData(salesCSV);
+
+                safetyDataRaw = { data: parsedSafety.data, headers: parsedSafety.headers };
+                salesDataRaw = { data: parsedSales.data, headers: parsedSales.headers };
+
+                document.getElementById('loadingMsg').style.display = 'none';
+                
+                populateFilters();
+                renderDashboards();
+            } catch (error) {
+                document.getElementById('loadingMsg').innerHTML = "Error loading data. Check console.";
+                console.error(error);
+            }
+        }
+
+        function populateFilters() {
+            const years = new Set(), months = new Set(), companies = new Set(), depts = new Set(), regions = new Set();
             
+            const processFilters = (dataset) => {
+                let colYear = dataset.headers.find(h => h.toLowerCase().includes('year'));
+                let colMonth = dataset.headers.find(h => h.toLowerCase().includes('month'));
+                let colComp = dataset.headers.find(h => h.toLowerCase().includes('company'));
+                let colDept = dataset.headers.find(h => h.toLowerCase().includes('department'));
+                let colReg = dataset.headers.find(h => h.toLowerCase().includes('region') || h.toLowerCase().includes('zone'));
+
+                dataset.data.forEach(row => {
+                    if(colYear && row[colYear]) years.add(row[colYear]);
+                    if(colMonth && row[colMonth]) months.add(row[colMonth]);
+                    if(colComp && row[colComp]) companies.add(row[colComp]);
+                    if(colDept && row[colDept]) depts.add(row[colDept]);
+                    if(colReg && row[colReg]) regions.add(row[colReg]);
+                });
+            };
+
+            processFilters(safetyDataRaw);
+            processFilters(salesDataRaw);
+
+            const addOptions = (setId, dataSet) => {
+                const select = document.getElementById(setId);
+                if(!select) return;
+                select.innerHTML = '<option value="All">All</option>';
+                dataSet.forEach(val => { let opt = document.createElement('option'); opt.value = val; opt.innerHTML = val; select.appendChild(opt); });
+                select.addEventListener('change', renderDashboards);
+            };
+
+            addOptions('filterYear', years);
+            addOptions('filterMonth', months);
+            addOptions('filterCompany', companies);
+            addOptions('filterDept', depts);
+            
+            if(regions.size > 0) {
+                document.getElementById('regionFilterGroup').style.display = 'flex';
+                addOptions('filterRegion', regions);
+            }
+
+            document.getElementById('clearFiltersBtn').addEventListener('click', () => {
+                document.querySelectorAll('.filter-bar select').forEach(s => s.value = 'All');
+                renderDashboards();
+            });
+        }
+
+        // --- RENDERING ENGINE ---
+        function renderDashboards() {
+            // Destroy old charts
+            Object.values(kpiCharts).forEach(chart => chart.destroy());
+            kpiCharts = {};
+
             const selectedYear = document.getElementById('filterYear').value;
             const selectedMonth = document.getElementById('filterMonth').value;
             const selectedComp = document.getElementById('filterCompany').value;
             const selectedDept = document.getElementById('filterDept').value;
-            
-            let filteredData = rawData.filter(row => {
-                if (selectedYear !== "All" && colYear && row[colYear] !== selectedYear) return false;
-                if (selectedMonth !== "All" && colMonth && row[colMonth] !== selectedMonth) return false;
-                if (selectedComp !== "All" && colComp && row[colComp] !== selectedComp) return false;
-                if (selectedDept !== "All" && colDept && row[colDept] !== selectedDept) return false;
-                return true;
-            });
+            const selectedRegion = document.getElementById('filterRegion') ? document.getElementById('filterRegion').value : "All";
 
+            const filterData = (dataset) => {
+                let h = dataset.headers.map(x => x.toLowerCase());
+                let colYear = dataset.headers[h.findIndex(x => x.includes('year'))];
+                let colMonth = dataset.headers[h.findIndex(x => x.includes('month'))];
+                let colComp = dataset.headers[h.findIndex(x => x.includes('company'))];
+                let colDept = dataset.headers[h.findIndex(x => x.includes('department') || x.includes('dept'))];
+                let colReg = dataset.headers[h.findIndex(x => x.includes('region') || x.includes('zone'))];
+
+                return dataset.data.filter(row => {
+                    if (selectedYear !== "All" && colYear && row[colYear] !== selectedYear) return false;
+                    if (selectedMonth !== "All" && colMonth && row[colMonth] !== selectedMonth) return false;
+                    if (selectedComp !== "All" && colComp && row[colComp] !== selectedComp) return false;
+                    if (selectedDept !== "All" && colDept && row[colDept] !== selectedDept) return false;
+                    if (selectedRegion !== "All" && colReg && row[colReg] !== selectedRegion) return false;
+                    return true;
+                });
+            };
+
+            const filteredSafety = filterData(safetyDataRaw);
+            const filteredSales = filterData(salesDataRaw);
+
+            renderSection(filteredSafety, safetyDataRaw.headers, safetyKPIs, 'safetyContent', selectedMonth);
+            renderSection(filteredSales, salesDataRaw.headers, salesKPIs, 'salesContent', selectedMonth);
+        }
+
+        function renderSection(data, headers, kpiDefs, containerId, selectedMonth) {
+            const container = document.getElementById(containerId);
             container.innerHTML = '';
-            kpiCharts = {};
 
-            if (filteredData.length === 0) {
-                container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 40px; font-weight: 700;">No data found for the selected filters. Please adjust your criteria.</div>`;
+            if (data.length === 0) {
+                container.innerHTML = `<div style="grid-column: 1/-1; color: var(--text-secondary); text-align:center;">No data matches your filters for this section.</div>`;
                 return;
             }
 
-            let cardsGenerated = 0;
+            // Find key columns
+            let hLower = headers.map(x => x.toLowerCase());
+            let colMonth = headers[hLower.findIndex(x => x.includes('month'))];
+            let colKPI = headers[hLower.findIndex(x => x === 'kpi' || x === 'metric' || x === 'indicator')];
+            let colAchieved = headers[hLower.findIndex(x => x === 'achieved' || x === 'value' || x === 'actual')];
 
-            specificKPIs.forEach((kpiDef) => {
-                if (!colKPI || !colAchieved) return; 
+            kpiDefs.forEach((kpi) => {
+                let trendMap = {}; 
+                let total = 0; let count = 0; let hasData = false;
 
-                let total = 0; let count = 0;
-                let trendData = []; let trendLabels = [];
-                let hasData = false;
+                data.forEach(row => {
+                    let val = null;
+                    let m = colMonth ? row[colMonth] : "Unknown";
 
-                filteredData.forEach(row => {
-                    let rowKpiName = (row[colKPI] || "").toLowerCase();
-                    let isMatch = kpiDef.matchKeys.some(kw => rowKpiName.includes(kw.toLowerCase()));
-
-                    if (isMatch) {
-                        hasData = true;
-                        let rawVal = row[colAchieved];
-                        if (rawVal !== undefined && rawVal !== "") {
-                            let val = cleanNum(rawVal);
-                            total += val;
-                            count++;
-                            
-                            if (colMonth && selectedMonth === "All") {
-                                trendLabels.push(row[colMonth]);
-                                trendData.push(val);
-                            }
+                    // Hybrid Check: Long format (KPI col) vs Wide format (KPI is a header)
+                    if (colKPI && colAchieved) {
+                        let rowKpiName = (row[colKPI] || "").toLowerCase();
+                        if (kpi.matchKeys.some(kw => rowKpiName.includes(kw.toLowerCase()))) {
+                            val = cleanNum(row[colAchieved]);
                         }
+                    } else {
+                        // Wide format fallback
+                        let matchedHeader = headers.find(h => kpi.matchKeys.some(kw => h.toLowerCase().includes(kw.toLowerCase())));
+                        if (matchedHeader && row[matchedHeader] !== undefined) {
+                            val = cleanNum(row[matchedHeader]);
+                        }
+                    }
+
+                    if (val !== null && !isNaN(val)) {
+                        hasData = true;
+                        total += val; count++;
+                        if(!trendMap[m]) trendMap[m] = { sum: 0, count: 0 };
+                        trendMap[m].sum += val;
+                        trendMap[m].count += 1;
                     }
                 });
 
                 if (!hasData) return;
-                cardsGenerated++;
 
-                let displayValue = 0;
-                if (count > 0) {
-                    displayValue = (kpiDef.calcType === "avg") ? (total / count) : total;
-                }
-
-                const cardId = `kpi-card-${kpiDef.id}`;
-                const chartId = `kpi-chart-${kpiDef.id}`;
-                let trendText = selectedMonth === "All" ? `Accumulated ${kpiDef.calcType === 'avg' ? 'Average' : 'Total'}` : "Specific Month Metric";
+                let displayValue = (kpi.calcType === "avg" && count > 0) ? (total / count) : total;
                 
-                const cardHTML = `
-                    <div class="kpi-widget ${kpiDef.gridClass}" id="${cardId}">
+                // Prepare Chart Data (Grouped by Month)
+                let labels = Object.keys(trendMap);
+                let chartDataValues = labels.map(l => kpi.calcType === "avg" ? (trendMap[l].sum / trendMap[l].count) : trendMap[l].sum);
+
+                // Build HTML
+                const cardId = `kpi-${kpi.id}`;
+                const chartId = `chart-${kpi.id}`;
+                
+                container.insertAdjacentHTML('beforeend', `
+                    <div class="kpi-widget ${kpi.gridClass}" id="${cardId}">
                         <div>
                             <div class="kpi-header">
-                                <span class="dot" style="background-color: ${kpiDef.color}; box-shadow: 0 0 8px ${kpiDef.color}"></span>
-                                <div class="kpi-title"><h3>${kpiDef.title}</h3></div>
+                                <span class="dot" style="background-color: ${kpi.color}; box-shadow: 0 0 8px ${kpi.color}"></span>
+                                <div class="kpi-title"><h3>${kpi.title}</h3></div>
                             </div>
                             <div class="kpi-value-container">
-                                <div class="kpi-value" id="val-${kpiDef.id}">0</div>
-                                <div class="kpi-trend">${trendText}</div>
+                                <div class="kpi-value" id="val-${kpi.id}">0</div>
+                                <div class="kpi-trend">${selectedMonth === "All" ? 'YTD ' + (kpi.calcType==='avg'?'Average':'Total') : 'Monthly Metric'}</div>
                             </div>
                         </div>
-                        <div class="chart-bg-wrapper">
+                        <div class="chart-bg-wrapper type-${kpi.chartType}">
                             <canvas id="${chartId}"></canvas>
                         </div>
                     </div>
-                `;
-                container.insertAdjacentHTML('beforeend', cardHTML);
+                `);
 
-                const valEl = document.getElementById(`val-${kpiDef.id}`);
+                const valEl = document.getElementById(`val-${kpi.id}`);
                 animateValue(valEl, 0, displayValue, 1000);
-                
-                if(kpiDef.isPercent) {
-                    setTimeout(() => { valEl.innerHTML += '<span style="font-size:0.5em">%</span>'; }, 1050);
-                }
+                if(kpi.isPercent) setTimeout(() => { valEl.innerHTML += '<span style="font-size:0.5em">%</span>'; }, 1050);
 
-                if (trendData.length > 1 && selectedMonth === "All") {
+                // Render Chart (Bar for Sales, Line for Safety)
+                if (labels.length > 0 && selectedMonth === "All") {
                     const ctx = document.getElementById(chartId).getContext('2d');
-                    let bgGradient = ctx.createLinearGradient(0, 0, 0, 100);
-                    bgGradient.addColorStop(0, kpiDef.color + '60'); 
-                    bgGradient.addColorStop(1, 'transparent'); 
+                    
+                    let chartOptions = {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: kpi.chartType === 'bar' ? {
+                                enabled: true,
+                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                titleFont: { size: 13, family: "'Plus Jakarta Sans', sans-serif" },
+                                bodyFont: { size: 14, weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" },
+                                padding: 12, cornerRadius: 8, displayColors: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        let v = context.parsed.y;
+                                        return v > 1000 ? v.toLocaleString('en-US') : v.toFixed(1);
+                                    }
+                                }
+                            } : { enabled: false }
+                        },
+                        scales: {
+                            x: { display: kpi.chartType === 'bar', grid: { display: false }, ticks: { font: { family: "'Plus Jakarta Sans', sans-serif", size: 10 } } },
+                            y: { display: false, beginAtZero: true }
+                        },
+                        layout: { padding: kpi.chartType === 'bar' ? { top: 20 } : 0 }
+                    };
 
-                    kpiCharts[kpiDef.id] = new Chart(ctx, {
-                        type: 'line',
-                        data: { labels: trendLabels, datasets: [{ data: trendData, borderColor: kpiDef.color, backgroundColor: bgGradient, borderWidth: 2, fill: true, pointRadius: 0, tension: 0.4 }] },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: false }, y: { display: false, min: Math.min(...trendData) * 0.9 } }, layout: { padding: 0 } }
-                    });
+                    let datasetConfig = {
+                        data: chartDataValues,
+                        backgroundColor: kpi.color,
+                        borderColor: kpi.color,
+                        borderWidth: kpi.chartType === 'line' ? 2 : 0,
+                        borderRadius: kpi.chartType === 'bar' ? 4 : 0,
+                        fill: kpi.chartType === 'line',
+                        tension: 0.4,
+                        pointRadius: 0
+                    };
+
+                    if (kpi.chartType === 'line') {
+                        let gradient = ctx.createLinearGradient(0, 0, 0, 150);
+                        gradient.addColorStop(0, kpi.color + '80'); gradient.addColorStop(1, 'transparent');
+                        datasetConfig.backgroundColor = gradient;
+                    }
+
+                    kpiCharts[kpi.id] = new Chart(ctx, { type: kpi.chartType, data: { labels: labels, datasets: [datasetConfig] }, options: chartOptions });
                 }
             });
-
-            if (cardsGenerated === 0) {
-                container.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; color: var(--color-red); padding: 40px; font-weight: 700; background: var(--bg-surface); border-radius: 20px;">
-                        Data load hua hai lekin "KPI" aur "Achieved" columns mein koi matching data nahi mila.<br>
-                        <span style="font-size: 0.8rem; color: var(--text-secondary);">Sheet Columns Found: ${headers.join(', ')}</span>
-                    </div>
-                `;
-            }
         }
 
         window.onload = initApp;
