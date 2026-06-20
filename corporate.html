@@ -1,230 +1,4 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Corporate Dashboard - Bento Box</title>
-    <link rel="icon" href="Logo.png" type="image/png">
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        /* ---------------------------------
-           PREMIUM THEME VARIABLES
-        --------------------------------- */
-        :root {
-            --color-blue: #3B82F6;
-            --color-red: #EF4444;
-            --color-yellow: #F59E0B;
-            --color-green: #10B981;
-            --color-purple: #8B5CF6;
-            --color-pink: #EC4899;
-            --color-cyan: #06B6D4;
-            
-            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            --radius-lg: 20px;
-            --radius-md: 16px;
-            --radius-sm: 8px;
-        }
-
-        /* LIGHT MODE */
-        [data-theme="light"] {
-            --bg-main: #F8FAFC;
-            --bg-surface: #FFFFFF;
-            --text-primary: #0F172A;
-            --text-secondary: #64748B;
-            --border-color: #E2E8F0;
-            --border-hover: #CBD5E1;
-            --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
-            --bg-input: #F1F5F9;
-        }
-
-        /* DARK MODE */
-        [data-theme="dark"] {
-            --bg-main: #09090B;
-            --bg-surface: #121212;
-            --text-primary: #FAFAFA;
-            --text-secondary: #A1A1AA;
-            --border-color: #27272A;
-            --border-hover: #3F3F46;
-            --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.5);
-            --bg-input: #18181B;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            margin: 0; background-color: var(--bg-main); color: var(--text-primary);
-            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
-            transition: background-color 0.4s ease, color 0.4s ease;
-        }
-
-        /* ---------------------------------
-           HEADER & NAVIGATION
-        --------------------------------- */
-        .top-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 30px; background-color: var(--bg-surface);
-            border-bottom: 1px solid var(--border-color); height: 60px;
-            box-sizing: border-box; transition: var(--transition);
-        }
-
-        .header-brand { display: flex; align-items: center; gap: 12px; }
-        .header-brand a { display: flex; align-items: center; text-decoration: none; color: inherit; }
-        .header-brand h1 { margin: 0; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.3px; }
-
-        /* Centered Clean Tabs */
-        .nav-tabs-container {
-            flex-grow: 1; display: flex; justify-content: center;
-        }
-        
-        .nav-tabs { display: flex; gap: 8px; align-items: center; background: var(--bg-input); padding: 4px; border-radius: 24px; border: 1px solid var(--border-color); }
-        .nav-tabs a {
-            text-decoration: none; padding: 6px 20px; font-size: 0.85rem; font-weight: 700;
-            color: var(--text-secondary); border-radius: 20px; transition: var(--transition);
-        }
-        .nav-tabs a.active { background-color: var(--text-primary); color: var(--bg-surface); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .nav-tabs a:hover:not(.active) { color: var(--text-primary); }
-
-        .theme-toggle {
-            background: transparent; border: 1px solid var(--border-color);
-            color: var(--text-primary); padding: 8px 16px; border-radius: 20px;
-            font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: var(--transition);
-            display: flex; align-items: center; gap: 6px;
-        }
-        .theme-toggle:hover { border-color: var(--text-secondary); }
-
-        /* ---------------------------------
-           SLEEK FILTER BAR
-        --------------------------------- */
-        .filter-bar {
-            display: flex; align-items: center; justify-content: flex-start; gap: 15px; padding: 15px 30px;
-            background-color: var(--bg-main); box-sizing: border-box; flex-wrap: wrap;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .filter-group { display: flex; align-items: center; gap: 8px; background: var(--bg-surface); padding: 6px 16px; border-radius: 30px; border: 1px solid var(--border-color); box-shadow: var(--shadow-card); transition: var(--transition); }
-        .filter-group:hover { border-color: var(--border-hover); }
-        .filter-group label { font-size: 0.7rem; color: var(--text-secondary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-        .filter-group select {
-            padding: 4px 24px 4px 0; border: none; background: transparent;
-            color: var(--text-primary); font-size: 0.8rem; font-weight: 700;
-            font-family: inherit; cursor: pointer; outline: none; appearance: none;
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2371717A%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat; background-position: right top 50%; background-size: 10px auto;
-        }
-
-        .clear-btn {
-            background-color: transparent; color: var(--text-secondary); border: 1px solid var(--border-color);
-            padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
-            cursor: pointer; transition: var(--transition); font-family: inherit;
-            margin-left: auto;
-        }
-        .clear-btn:hover { color: var(--text-primary); border-color: var(--text-primary); background: var(--bg-surface); }
-
-        /* ---------------------------------
-           ASYMMETRIC BENTO GRID (PREMIUM)
-        --------------------------------- */
-        .workspace {
-            flex: 1; padding: 25px 30px 40px 30px; display: flex; flex-direction: column;
-            overflow-y: auto; box-sizing: border-box; position: relative;
-        }
-
-        .dashboard-grid {
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            grid-auto-flow: dense;
-            gap: 24px; flex-grow: 1; align-content: flex-start;
-        }
-
-        .kpi-widget {
-            background: var(--bg-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
-            padding: 24px; display: flex; flex-direction: column; justify-content: space-between;
-            border: 1px solid var(--border-color); transition: var(--transition);
-            position: relative; overflow: hidden; min-height: 180px;
-        }
-        .kpi-widget:hover { border-color: var(--border-hover); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
-
-        /* Asymmetric Sizes */
-        .span-col-2 { grid-column: span 2; }
-        .span-row-2 { grid-row: span 2; min-height: 384px; }
-
-        @media (max-width: 900px) {
-            .span-col-2 { grid-column: span 1; }
-            .span-row-2 { grid-row: span 1; min-height: 180px; }
-        }
-
-        .kpi-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; position: relative; z-index: 2; }
-        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-        .kpi-title h3 { margin: 0; font-size: 0.8rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.3; }
-        
-        .kpi-value-container { position: relative; z-index: 2; margin-top: auto; }
-        .kpi-value { font-size: 2.8rem; font-weight: 800; color: var(--text-primary); line-height: 1; letter-spacing: -1px; margin-bottom: 8px; }
-        .kpi-trend { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
-
-        .chart-bg-wrapper {
-            position: absolute; bottom: 0; left: 0; right: 0; height: 55%; opacity: 0.25; z-index: 1; pointer-events: none;
-        }
-
-        #loadingMsg {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            color: var(--text-primary); font-weight: 700; background: var(--bg-surface);
-            padding: 15px 30px; border-radius: 30px; border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-card); z-index: 10; font-size: 0.9rem; display: flex; align-items: center; gap: 10px;
-        }
-        .spinner { width: 20px; height: 20px; border: 3px solid var(--border-color); border-top-color: var(--color-blue); border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-    </style>
-</head>
-<body>
-
-    <header class="top-header">
-        <div class="header-brand">
-            <a href="index.html" title="Go to Home">
-                <img src="Logo.png" alt="Logo" style="height: 35px; width: auto; object-fit: contain; margin-right: 12px;" onerror="this.style.display='none'">
-            </a>
-            <h1>Corporate Dashboard</h1>
-        </div>
-        
-        <div class="nav-tabs-container">
-            <div class="nav-tabs">
-                <a href="#" class="active">Corporate</a>
-            </div>
-        </div>
-
-        <div>
-            <button class="theme-toggle" id="themeToggle">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Dark
-            </button>
-        </div>
-    </header>
-
-    <div class="filter-bar">
-        <div class="filter-group">
-            <label>Year</label>
-            <select id="filterYear"><option value="All">All</option></select>
-        </div>
-        <div class="filter-group">
-            <label>Month</label>
-            <select id="filterMonth"><option value="All">All</option></select>
-        </div>
-        <div class="filter-group">
-            <label>Company</label>
-            <select id="filterCompany"><option value="All">All</option></select>
-        </div>
-        <div class="filter-group">
-            <label>Department</label>
-            <select id="filterDept"><option value="All">All</option></select>
-        </div>
-        <button id="clearFiltersBtn" class="clear-btn">Reset View</button>
-    </div>
-
-    <div class="workspace">
-        <div id="loadingMsg"><div class="spinner"></div> Fetching KPIs Data...</div>
-        <div class="dashboard-grid" id="dashboardContent">
-            </div>
-    </div>
-
-    <script>
+<script>
         // --- THEME TOGGLE LOGIC ---
         const themeBtn = document.getElementById('themeToggle');
         themeBtn.addEventListener('click', () => {
@@ -245,9 +19,11 @@
         let headers = [];
         let kpiCharts = {};
         
+        // Naye columns add kiye hain
         let colYear = null, colMonth = null, colComp = null, colDept = null;
+        let colKPI = null, colAchieved = null;
 
-        // SMART MAPPING: Updated with broader keywords to ensure columns get mapped
+        // SMART MAPPING: Ab yeh column ki bajaye 'KPI' column ki row values mein in words ko dhoondega
         const specificKPIs = [
             { id: "fatality", title: "Fatality Rate", matchKeys: ["fatality", "death"], calcType: "avg", isPercent: false, gridClass: "span-col-2 span-row-2", color: "#EF4444" },
             { id: "safety", title: "Safety Training Compliance", matchKeys: ["safety", "training", "compliance"], calcType: "avg", isPercent: true, gridClass: "", color: "#3B82F6" },
@@ -293,10 +69,13 @@
                     return obj;
                 }).filter(row => Object.values(row).some(x => x !== ""));
 
-                colYear = findColumn(['year', 'saal', 'date']);
-                colMonth = findColumn(['month', 'mahina']);
-                colComp = findColumn(['company', 'comp', 'organization']);
-                colDept = findColumn(['department', 'dept', 'unit']);
+                // Filter dropdowns aur KPI columns map kar rahe hain
+                colYear = findColumn(['year']);
+                colMonth = findColumn(['month']);
+                colComp = findColumn(['company']);
+                colDept = findColumn(['department']);
+                colKPI = findColumn(['kpi']);             // KPI column dhond raha hai
+                colAchieved = findColumn(['achieved']);   // Achieved value column dhoond raha hai
 
                 document.getElementById('loadingMsg').style.display = 'none';
                 populateFilters();
@@ -320,7 +99,7 @@
             const addOptions = (setId, dataSet) => {
                 const select = document.getElementById(setId);
                 if(!select) return;
-                select.innerHTML = '<option value="All">All</option>'; // Reset options before adding
+                select.innerHTML = '<option value="All">All</option>';
                 dataSet.forEach(val => {
                     let opt = document.createElement('option');
                     opt.value = val; opt.innerHTML = val; select.appendChild(opt);
@@ -391,26 +170,37 @@
             let cardsGenerated = 0;
 
             specificKPIs.forEach((kpiDef) => {
-                let colName = findColumn(kpiDef.matchKeys);
-                if(!colName) return; 
+                // Agar sheet mein KPI aur Achieved column nahi milte to ruk jao
+                if (!colKPI || !colAchieved) return; 
 
-                cardsGenerated++;
                 let total = 0; let count = 0;
                 let trendData = []; let trendLabels = [];
+                let hasData = false;
 
                 filteredData.forEach(row => {
-                    let rawVal = row[colName];
-                    if (rawVal !== undefined && rawVal !== "") {
-                        let val = cleanNum(rawVal);
-                        total += val;
-                        count++;
-                        
-                        if (colMonth && selectedMonth === "All") {
-                            trendLabels.push(row[colMonth]);
-                            trendData.push(val);
+                    // Check karein ke row ka KPI hamare required KPI se match karta hai ya nahi
+                    let rowKpiName = (row[colKPI] || "").toLowerCase();
+                    let isMatch = kpiDef.matchKeys.some(kw => rowKpiName.includes(kw.toLowerCase()));
+
+                    if (isMatch) {
+                        hasData = true;
+                        let rawVal = row[colAchieved];
+                        if (rawVal !== undefined && rawVal !== "") {
+                            let val = cleanNum(rawVal);
+                            total += val;
+                            count++;
+                            
+                            if (colMonth && selectedMonth === "All") {
+                                trendLabels.push(row[colMonth]);
+                                trendData.push(val);
+                            }
                         }
                     }
                 });
+
+                // Sirf wo cards draw karo jinka data sheet mein mila hai
+                if (!hasData) return;
+                cardsGenerated++;
 
                 let displayValue = 0;
                 if (count > 0) {
@@ -443,10 +233,12 @@
                 const valEl = document.getElementById(`val-${kpiDef.id}`);
                 animateValue(valEl, 0, displayValue, 1000);
                 
-                if(kpiDef.isPercent || colName.includes('%')) {
+                // Add % sign if required
+                if(kpiDef.isPercent) {
                     setTimeout(() => { valEl.innerHTML += '<span style="font-size:0.5em">%</span>'; }, 1050);
                 }
 
+                // Render Chart
                 if (trendData.length > 1 && selectedMonth === "All") {
                     const ctx = document.getElementById(chartId).getContext('2d');
                     let bgGradient = ctx.createLinearGradient(0, 0, 0, 100);
@@ -465,7 +257,7 @@
             if (cardsGenerated === 0) {
                 container.innerHTML = `
                     <div style="grid-column: 1/-1; text-align: center; color: var(--color-red); padding: 40px; font-weight: 700; background: var(--bg-surface); border-radius: 20px;">
-                        Data load hua hai lekin columns map nahi ho sake.<br>
+                        Data load hua hai lekin "KPI" aur "Achieved" columns mein koi matching data nahi mila.<br>
                         <span style="font-size: 0.8rem; color: var(--text-secondary);">Sheet Columns Found: ${headers.join(', ')}</span>
                     </div>
                 `;
@@ -474,5 +266,3 @@
 
         window.onload = initApp;
     </script>
-</body>
-</html>
