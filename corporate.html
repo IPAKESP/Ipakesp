@@ -251,15 +251,15 @@
         
         let colYear = null, colMonth = null, colComp = null, colDept = null;
 
-        // SPECIFIC 7 KPIs MAPPED DIRECTLY (Isolated & Handled Separately)
+        // SMART MAPPING: Ab multiple keywords set kar diye hain taake koi mapping miss na ho.
         const specificKPIs = [
-            { id: "fatality", title: "Fatality Rate across IPAK Group", matchKey: "fatality rate", calcType: "avg", isPercent: false, gridClass: "span-col-2 span-row-2", color: "#EF4444" },
-            { id: "safety", title: "Safety Training Compliance Rate", matchKey: "safety training compliance", calcType: "avg", isPercent: true, gridClass: "", color: "#3B82F6" },
-            { id: "risk", title: "Risk Assessment Coverage", matchKey: "risk assessment", calcType: "avg", isPercent: true, gridClass: "span-col-2", color: "#8B5CF6" },
-            { id: "env", title: "Environmental Non-Compliance Incidents", matchKey: "environmental non-compliance", calcType: "sum", isPercent: false, gridClass: "", color: "#F59E0B" },
-            { id: "ltifr", title: "Lost Time Injury Frequency Rate (LTIFR)", matchKey: "ltifr", calcType: "avg", isPercent: false, gridClass: "span-row-2", color: "#EC4899" },
-            { id: "trir", title: "Total Recordable Incident Rate (TRIR)", matchKey: "trir", calcType: "avg", isPercent: false, gridClass: "span-col-2", color: "#06B6D4" },
-            { id: "nearmiss", title: "Near-Miss Reporting Rate", matchKey: "near-miss", calcType: "avg", isPercent: false, gridClass: "", color: "#10B981" }
+            { id: "fatality", title: "Fatality Rate", matchKeys: ["fatality"], calcType: "avg", isPercent: false, gridClass: "span-col-2 span-row-2", color: "#EF4444" },
+            { id: "safety", title: "Safety Training Compliance Rate", matchKeys: ["safety", "compliance"], calcType: "avg", isPercent: true, gridClass: "", color: "#3B82F6" },
+            { id: "risk", title: "Risk Assessment Coverage", matchKeys: ["risk", "assessment"], calcType: "avg", isPercent: true, gridClass: "span-col-2", color: "#8B5CF6" },
+            { id: "env", title: "Environmental Non-Compliance", matchKeys: ["environmental", "non-compliance"], calcType: "sum", isPercent: false, gridClass: "", color: "#F59E0B" },
+            { id: "ltifr", title: "Lost Time Injury Frequency (LTIFR)", matchKeys: ["ltifr", "lost time"], calcType: "avg", isPercent: false, gridClass: "span-row-2", color: "#EC4899" },
+            { id: "trir", title: "Total Recordable Incident Rate (TRIR)", matchKeys: ["trir", "recordable"], calcType: "avg", isPercent: false, gridClass: "span-col-2", color: "#06B6D4" },
+            { id: "nearmiss", title: "Near-Miss Reporting Rate", matchKeys: ["near-miss", "near miss", "near"], calcType: "avg", isPercent: false, gridClass: "", color: "#10B981" }
         ];
 
         function parseCSV(str) {
@@ -315,7 +315,7 @@
             rawData.forEach(row => {
                 if(colYear && row[colYear]) years.add(row[colYear]);
                 if(colMonth && row[colMonth]) months.add(row[colMonth]);
-                if(colComp && row[colComp] && row[colComp].toLowerCase() !== 'group') companies.add(row[colComp]);
+                if(colComp && row[colComp]) companies.add(row[colComp]);
                 if(colDept && row[colDept]) depts.add(row[colDept]);
             });
             
@@ -373,10 +373,10 @@
             const selectedComp = document.getElementById('filterCompany').value;
             const selectedDept = document.getElementById('filterDept').value;
             
+            // FIXED: Removed the logic that hid "Group" company rows completely.
             let filteredData = rawData.filter(row => {
                 if (selectedYear !== "All" && colYear && row[colYear] !== selectedYear) return false;
                 if (selectedMonth !== "All" && colMonth && row[colMonth] !== selectedMonth) return false;
-                if (colComp && row[colComp] && row[colComp].toLowerCase() === 'group') return false; 
                 if (selectedComp !== "All" && colComp && row[colComp] !== selectedComp) return false;
                 if (selectedDept !== "All" && colDept && row[colDept] !== selectedDept) return false;
                 return true;
@@ -386,16 +386,18 @@
             kpiCharts = {};
 
             if (filteredData.length === 0) {
-                container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 40px; font-weight: 700;">No data found for the selected filters.</div>`;
+                container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 40px; font-weight: 700;">No data found for the selected filters. Please adjust your criteria.</div>`;
                 return;
             }
 
-            // Loop strictly through our predefined 7 KPIs
-            specificKPIs.forEach((kpiDef) => {
-                // Find matching column in CSV headers
-                let colName = headers.find(h => h.toLowerCase().includes(kpiDef.matchKey));
-                if(!colName) return; // Skip if this exact KPI isn't found in sheet
+            let cardsGenerated = 0;
 
+            specificKPIs.forEach((kpiDef) => {
+                // Find matching column intelligently
+                let colName = headers.find(h => kpiDef.matchKeys.some(kw => h.toLowerCase().includes(kw)));
+                if(!colName) return; 
+
+                cardsGenerated++;
                 let total = 0; let count = 0;
                 let trendData = []; let trendLabels = [];
 
@@ -413,7 +415,6 @@
                     }
                 });
 
-                // Calculate display value based on sum vs average
                 let displayValue = 0;
                 if (count > 0) {
                     displayValue = (kpiDef.calcType === "avg") ? (total / count) : total;
@@ -442,16 +443,13 @@
                 `;
                 container.insertAdjacentHTML('beforeend', cardHTML);
 
-                // Animate Number
                 const valEl = document.getElementById(`val-${kpiDef.id}`);
                 animateValue(valEl, 0, displayValue, 1000);
                 
-                // Add % sign safely
                 if(kpiDef.isPercent || colName.includes('%')) {
                     setTimeout(() => { valEl.innerHTML += '<span style="font-size:0.5em">%</span>'; }, 1050);
                 }
 
-                // Render Background trend line only on Accumulated view
                 if (trendData.length > 1 && selectedMonth === "All") {
                     const ctx = document.getElementById(chartId).getContext('2d');
                     let bgGradient = ctx.createLinearGradient(0, 0, 0, 100);
@@ -465,6 +463,16 @@
                     });
                 }
             });
+
+            // DEBUGGING FALLBACK: Agar phir bhi koi column na milay
+            if (cardsGenerated === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; color: var(--color-red); padding: 40px; font-weight: 700; background: var(--bg-surface); border-radius: 20px;">
+                        Data load hua hai lekin columns map nahi ho sake.<br>
+                        <span style="font-size: 0.8rem; color: var(--text-secondary);">Sheet Columns Found: ${headers.join(', ')}</span>
+                    </div>
+                `;
+            }
         }
 
         window.onload = initApp;
