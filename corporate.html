@@ -243,20 +243,10 @@
         let rawData = [];
         let headers = [];
         let kpiCharts = {};
+        let specificKPIs = []; // Now built dynamically
         
         let colYear = null, colMonth = null, colComp = null, colDept = null;
         let colKPI = null, colAchieved = null;
-
-        // SMART MAPPING: MatchKeys search for values within the 'KPI' column
-        const specificKPIs = [
-            { id: "fatality", title: "Fatality Rate", matchKeys: ["fatality", "death"], calcType: "avg", isPercent: false, gridClass: "span-col-2 span-row-2", color: "#EF4444" },
-            { id: "safety", title: "Safety Training Compliance", matchKeys: ["safety", "training", "compliance"], calcType: "avg", isPercent: true, gridClass: "", color: "#3B82F6" },
-            { id: "risk", title: "Risk Assessment Coverage", matchKeys: ["risk", "assessment", "coverage"], calcType: "avg", isPercent: true, gridClass: "span-col-2", color: "#8B5CF6" },
-            { id: "env", title: "Environmental Non-Compliance", matchKeys: ["environment", "environmental", "non compliance", "non-compliance"], calcType: "sum", isPercent: false, gridClass: "", color: "#F59E0B" },
-            { id: "ltifr", title: "Lost Time Injury (LTIFR)", matchKeys: ["ltifr", "lost time", "lti"], calcType: "avg", isPercent: false, gridClass: "span-row-2", color: "#EC4899" },
-            { id: "trir", title: "Total Recordable (TRIR)", matchKeys: ["trir", "recordable", "incident"], calcType: "avg", isPercent: false, gridClass: "span-col-2", color: "#06B6D4" },
-            { id: "nearmiss", title: "Near-Miss Reporting", matchKeys: ["near miss", "near-miss", "near"], calcType: "avg", isPercent: false, gridClass: "", color: "#10B981" }
-        ];
 
         function parseCSV(str) {
             const arr = []; let quote = false; let row = 0, col = 0;
@@ -276,6 +266,42 @@
 
         function findColumn(keywords) {
             return headers.find(h => keywords.some(kw => h.toLowerCase().includes(kw.toLowerCase())));
+        }
+
+        // --- DYNAMIC KPI GENERATOR ---
+        function generateDynamicKPIs(data) {
+            if (!colKPI) return [];
+            let kpiMap = new Map();
+            
+            // Extract all unique KPI names
+            data.forEach(row => {
+                let kpiName = row[colKPI];
+                if (!kpiName) return;
+                kpiName = kpiName.trim();
+                let key = kpiName.toLowerCase();
+                if (!kpiMap.has(key)) kpiMap.set(key, kpiName);
+            });
+
+            // Premium color palette and Bento Box classes to loop through
+            const colors = ["#EF4444", "#3B82F6", "#8B5CF6", "#F59E0B", "#EC4899", "#06B6D4", "#10B981", "#F97316", "#14B8A6", "#6366F1"];
+            const gridClasses = ["span-col-2 span-row-2", "", "span-col-2", "", "span-row-2", "span-col-2", ""];
+
+            return Array.from(kpiMap.values()).map((name, index) => {
+                const lowerName = name.toLowerCase();
+                // Smart guessing if it should be an Average / Percentage based on keywords
+                const isPercent = lowerName.includes('compliance') || lowerName.includes('rate') || lowerName.includes('%') || lowerName.includes('coverage');
+                const isAvg = isPercent || lowerName.includes('ltifr') || lowerName.includes('trir') || lowerName.includes('average');
+
+                return {
+                    id: "kpi_" + index,
+                    title: name,
+                    matchKeys: [name.toLowerCase()], // Store lowercased exact string for matching
+                    calcType: isAvg ? "avg" : "sum",
+                    isPercent: isPercent,
+                    gridClass: gridClasses[index % gridClasses.length],
+                    color: colors[index % colors.length]
+                };
+            });
         }
 
         async function initApp() {
@@ -299,6 +325,9 @@
                 colDept = findColumn(['department']);
                 colKPI = findColumn(['kpi']);
                 colAchieved = findColumn(['achieved']);
+
+                // Generate specificKPIs dynamically based on what's ACTUALLY in the sheet
+                specificKPIs = generateDynamicKPIs(rawData);
 
                 document.getElementById('loadingMsg').style.display = 'none';
                 populateFilters();
@@ -401,7 +430,8 @@
 
                 filteredData.forEach(row => {
                     let rowKpiName = (row[colKPI] || "").toLowerCase();
-                    let isMatch = kpiDef.matchKeys.some(kw => rowKpiName.includes(kw.toLowerCase()));
+                    // Match against the exact lowercased key generated earlier
+                    let isMatch = kpiDef.matchKeys.includes(rowKpiName);
 
                     if (isMatch) {
                         hasData = true;
