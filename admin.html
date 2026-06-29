@@ -1048,7 +1048,7 @@
                         let stat = monthlyStats[targetKey];
                         let pct = stat.total > 0 ? (stat.yes / stat.total) * 100 : 0;
                         dataPct.push(pct);
-                        bgColors.push(pct >= 95 ? '#10B981' : '#EF4444');
+                        bgColors.push(pct >= 75 ? '#10B981' : '#EF4444');
                     } else {
                         dataPct.push(0);
                         bgColors.push(getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim()); 
@@ -1080,7 +1080,7 @@
                 let pct = overallTotal > 0 ? (overallYes / overallTotal) * 100 : 0;
                 let displayPct = overallTotal > 0 ? pct.toFixed(0) + '%' : '0%';
                 
-                let color = pct >= 95 ? '#10B981' : '#EF4444';
+                let color = pct >= 75 ? '#10B981' : '#EF4444';
                 if(overallTotal === 0) color = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim(); 
 
                 myCharts[prefix] = new Chart(ctx, {
@@ -1161,7 +1161,7 @@
 
                     if (total > 0) {
                         let pct = (yes / total) * 100;
-                        let color = pct >= 95 ? '#10B981' : '#EF4444';
+                        let color = pct >= 75 ? '#10B981' : '#EF4444';
                         
                         htmlContent += `
                             <tr>
