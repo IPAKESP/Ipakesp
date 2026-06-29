@@ -6,7 +6,6 @@
     <title>Transport Dashboard - SLA & Fuel</title>
     <link rel="icon" href="Logo.png" type="image/png">
     
-    <!-- Libraries for Chart & Image Generation -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -352,16 +351,13 @@
             Syncing Live SLA & Fuel Data...
         </div>
 
-        <!-- NEW BENTO STYLE FUEL SECTION (Exactly 2 Lines) -->
         <div id="fuelSection" style="display: none;">
             <h2 class="fuel-section-title">Fleet Fuel Average (km/L)</h2>
             <div id="fuelCardsWrapper" class="fuel-cards-wrapper">
-                <!-- Cards injected via JS -->
-            </div>
+                </div>
         </div>
 
         <div class="dashboard-grid" id="dashboardContent">
-            <!-- Top Row -->
             <div class="kpi-widget">
                 <div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Pool Vehicle</h3></div></div>
                 <div class="chart-wrapper"><canvas id="chart-poolvehicle"></canvas></div>
@@ -377,7 +373,6 @@
                 <div class="chart-wrapper"><canvas id="chart-staffTransportSKP"></canvas></div>
             </div>
 
-            <!-- Bottom Row -->
             <div class="kpi-widget col-span-3">
                 <div class="kpi-header"><span class="dot purple"></span><div class="kpi-title"><h3>Vehicle SLA</h3></div></div>
                 <div class="chart-wrapper"><canvas id="chart-vehicleSLA"></canvas></div>
@@ -864,7 +859,7 @@
                         labels.push(vName);
                         let pct = (stat.yes / stat.total) * 100;
                         dataPct.push(pct);
-                        bgColors.push(pct >= 95 ? '#10B981' : '#EF4444');
+                        bgColors.push(pct >= 75 ? '#10B981' : '#EF4444');
                     }
                 });
 
@@ -921,7 +916,7 @@
                         let stat = monthlyStats[targetKey];
                         let pct = stat.total > 0 ? (stat.yes / stat.total) * 100 : 0;
                         dataPct.push(pct);
-                        bgColors.push(pct >= 95 ? '#10B981' : '#EF4444');
+                        bgColors.push(pct >= 75 ? '#10B981' : '#EF4444');
                     } else {
                         dataPct.push(0);
                         bgColors.push(getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim()); 
@@ -950,7 +945,7 @@
 
                 let pct = overallTotal > 0 ? (overallYes / overallTotal) * 100 : 0;
                 let displayPct = overallTotal > 0 ? pct.toFixed(0) + '%' : '0%';
-                let color = pct >= 95 ? '#10B981' : '#EF4444';
+                let color = pct >= 75 ? '#10B981' : '#EF4444';
                 if(overallTotal === 0) color = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim(); 
 
                 myCharts[prefix] = new Chart(ctx, {
@@ -1028,7 +1023,7 @@
 
                     if (total > 0) {
                         let pct = (yes / total) * 100;
-                        let color = pct >= 95 ? '#10B981' : '#EF4444';
+                        let color = pct >= 75 ? '#10B981' : '#EF4444';
                         
                         htmlContent += `
                             <tr>
