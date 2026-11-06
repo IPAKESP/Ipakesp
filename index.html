@@ -117,6 +117,19 @@ footer{margin-top:50px;text-align:center;color:var(--muted);font-size:12.5px}
 @media (max-width:520px){.search kbd{display:none}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+<script>
+/* Runs on image error (inline), so it never misses the event */
+var LOGO_TRIES=["Logo.png","logo.PNG","LOGO.png","logo.png.png","logo.jpg","logo.jpeg","logo.webp","logo.svg","assets/logo.png","images/logo.png"];
+function logoFail(img){
+  var t=LOGO_TRIES.shift();
+  if(t){ img.src=t; return; }
+  img.onerror=null;
+  var b=document.createElement("div");
+  b.textContent="IPAK";
+  b.style.cssText="width:48px;height:48px;border-radius:13px;display:grid;place-items:center;font-weight:800;font-size:14px;color:#fff;background:linear-gradient(135deg,#14532d,#16a34a);box-shadow:0 10px 24px -12px rgba(20,83,45,.5)";
+  img.replaceWith(b);
+}
+</script>
 </head>
 <body>
 <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
@@ -124,7 +137,7 @@ footer{margin-top:50px;text-align:center;color:var(--muted);font-size:12.5px}
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <img id="logo" src="logo.png" alt="IPAK logo">
+      <img id="logo" src="logo.png" alt="IPAK logo" onerror="logoFail(this)">
       <div><b>IPAK Gateway</b><span>All programs in one place</span></div>
     </div>
     <div class="tools">
@@ -187,19 +200,8 @@ const ICONS = {
 const svg = (p,x="") => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ${x}>${p}</svg>`;
 const $ = id => document.getElementById(id);
 
-/* ---------- logo: try common names, then show text badge ---------- */
-(function(){
-  const img=$("logo"), tries=["Logo.png","logo.PNG","LOGO.png","logo.jpg","logo.jpeg","logo.webp","logo.svg","assets/logo.png","images/logo.png"];
-  img.addEventListener("error",function next(){
-    const t=tries.shift();
-    if(t){ img.src=t; return; }
-    img.removeEventListener("error",next);
-    const b=document.createElement("div");
-    b.textContent="IPAK";
-    b.style.cssText="width:48px;height:48px;border-radius:13px;display:grid;place-items:center;font-weight:800;font-size:14px;color:#fff;background:linear-gradient(135deg,#14532d,#16a34a);box-shadow:var(--shadow)";
-    img.replaceWith(b);
-  });
-})();
+/* logo: handle case where the image already failed before this script ran */
+(function(){ const i=$("logo"); if(i && i.complete && i.naturalWidth===0) logoFail(i); })();
 
 $("yr").textContent=new Date().getFullYear();
 
