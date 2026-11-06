@@ -162,7 +162,7 @@ footer{margin-top:50px;text-align:center;color:var(--muted);font-size:12.5px}
   <main class="grid" id="grid"></main>
   <div class="empty" id="empty">No program matches your search.</div>
 
-  <footer>IPAK &middot; Internal gateway</footer>
+  <footer>&copy; <span id="yr">2026</span> All rights reserved by HR Design Innovation &amp; Systems Department</footer>
 </div>
 
 <script>
@@ -199,6 +199,8 @@ const $ = id => document.getElementById(id);
     img.replaceWith(b);
   });
 })();
+
+$("yr").textContent=new Date().getFullYear();
 
 /* ---------- storage helpers ---------- */
 const store = {
