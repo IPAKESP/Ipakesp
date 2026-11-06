@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Corporate Dashboard - Bento Box</title>
+    <link rel="icon" href="Logo.png" type="image/png">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ---------------------------------
+           PREMIUM THEME VARIABLES
+        --------------------------------- */
+        :root {
+            --color-blue: #3B82F6;
+            --color-red: #EF4444;
+            --color-yellow: #F59E0B;
+            --color-green: #10B981;
+            
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+        }
+
+        /* LIGHT MODE */
+        [data-theme="light"] {
+            --bg-main: #F8FAFC;
+            --bg-surface: #FFFFFF;
+            --text-primary: #0F172A;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --border-hover: #CBD5E1;
+            --grid-line: #F1F5F9;
+            --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+            --bg-input: #F1F5F9;
+            --btn-dim: rgba(15, 23, 42, 0.05);
+
+            /* Glassmorphism Variables */
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --overlay-color: rgba(248, 250, 252, 0.4);
+        }
+
+        /* DARK MODE */
+        [data-theme="dark"] {
+            --bg-main: #09090B;
+            --bg-surface: #121212;
+            --text-primary: #FAFAFA;
+            --text-secondary: #A1A1AA;
+            --border-color: #27272A;
+            --border-hover: #3F3F46;
+            --grid-line: #18181B;
+            --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.5);
+            --bg-input: #18181B;
+            --btn-dim: rgba(250, 250, 250, 0.1);
+
+            /* Glassmorphism Variables */
+            --glass-bg: rgba(18, 18, 18, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --overlay-color: rgba(9, 9, 11, 0.5);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0; background-color: var(--bg-main); color: var(--text-primary);
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        /* ---------------------------------
+           ULTRA PREMIUM PIN AUTH SCREEN
+        --------------------------------- */
+        #pinScreen {
+            position: fixed; inset: 0; 
+            background-color: var(--overlay-color);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            z-index: 9999; display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
+            overflow: hidden;
+        }
+
+        /* Animated Aura Orbs */
+        .auth-bg-shapes { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+        .shape { 
+            position: absolute; filter: blur(80px); border-radius: 50%; 
+            animation: float 12s infinite alternate cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        .shape-1 { background: var(--color-blue); width: 450px; height: 450px; top: -10%; left: -10%; opacity: 0.12; }
+        .shape-2 { background: var(--color-green); width: 400px; height: 400px; bottom: -10%; right: -5%; opacity: 0.12; animation-delay: -4s; }
+        .shape-3 { background: var(--color-yellow); width: 300px; height: 300px; top: 35%; left: 45%; opacity: 0.08; animation-delay: -8s; }
+        
+        [data-theme="dark"] .shape-1 { opacity: 0.25; }
+        [data-theme="dark"] .shape-2 { opacity: 0.25; }
+        [data-theme="dark"] .shape-3 { opacity: 0.15; }
+
+        @keyframes float { 100% { transform: translate(30px, 30px) scale(1.05); } }
+
+        .glass-container {
+            display: flex; width: 85%; max-width: 960px; min-height: 480px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255,255,255,0.4);
+            overflow: hidden;
+            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            
+            /* Entry Animation */
+            opacity: 0; transform: translateY(30px);
+            animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s;
+        }
+
+        @keyframes slideUpFade {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .welcome-section {
+            flex: 1.3; padding: 60px; display: flex; flex-direction: column; justify-content: center;
+            position: relative; overflow: hidden;
+        }
+        
+        .welcome-section::after {
+            content: ''; position: absolute; right: 0; top: 10%; bottom: 10%; width: 1px;
+            background: linear-gradient(to bottom, transparent, var(--border-color), transparent);
+        }
+
+        .welcome-section h1 {
+            font-size: 3rem; font-weight: 800; margin: 0 0 20px 0; line-height: 1.15; letter-spacing: -1.5px;
+            color: var(--text-primary);
+        }
+        
+        .welcome-section .highlight {
+            background: linear-gradient(135deg, var(--color-blue) 0%, var(--color-green) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .welcome-section p { 
+            font-size: 1.1rem; color: var(--text-secondary); margin: 0; font-weight: 500; line-height: 1.6; max-width: 90%;
+        }
+
+        .pin-section {
+            flex: 1; padding: 60px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+        }
+
+        .pin-section img { height: 50px; margin-bottom: 24px; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05)); }
+        .pin-section h2 { margin: 0 0 8px 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text-primary); }
+        .pin-section p { margin: 0 0 35px 0; font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; }
+
+        .pin-inputs { display: flex; gap: 14px; justify-content: center; margin-bottom: 20px; }
+        
+        /* Sleek PIN Boxes */
+        .pin-box {
+            width: 60px; height: 72px; font-size: 2rem; text-align: center;
+            border-radius: 16px; border: 1.5px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.4); color: var(--text-primary);
+            font-family: inherit; font-weight: 800; outline: none; 
+            transition: var(--transition);
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 2px 8px rgba(0,0,0,0.02);
+        }
+        
+        [data-theme="dark"] .pin-box {
+            background: rgba(0, 0, 0, 0.3);
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.05), 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .pin-box:focus { 
+            border-color: var(--color-blue); background: var(--bg-surface);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), 0 8px 20px rgba(0,0,0,0.08); 
+            transform: translateY(-4px); 
+        }
+        
+        .pin-box.error { border-color: var(--color-red); animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+
+        .pin-msg { font-size: 0.85rem; font-weight: 700; color: var(--color-red); min-height: 20px; opacity: 0; transition: opacity 0.3s; }
+
+        .loader-wrapper { display: none; flex-direction: column; align-items: center; gap: 15px; margin: 20px 0; }
+        .spinner { 
+            width: 36px; height: 36px; border: 3px solid var(--border-color); 
+            border-top-color: var(--color-blue); border-radius: 50%; 
+            animation: spin 0.8s linear infinite; 
+        }
+        .loader-text { font-size: 0.85rem; color: var(--color-blue); font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        @media (max-width: 850px) {
+            .glass-container { flex-direction: column; width: 92%; border-radius: 24px; }
+            .welcome-section { padding: 40px 30px; text-align: center; }
+            .welcome-section::after { display: none; }
+            .welcome-section h1 { font-size: 2.2rem; }
+            .welcome-section p { max-width: 100%; }
+            .pin-section { padding: 30px; border-top: 1px solid var(--border-color); }
+        }
+
+        /* ---------------------------------
+           HEADER & NAVIGATION (Rest of the code remains untouched)
+        --------------------------------- */
+        .top-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 30px; background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color); height: 60px;
+            box-sizing: border-box; transition: var(--transition);
+        }
+
+        .header-brand h1 { margin: 0; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.3px; }
+
+        .nav-tabs { display: flex; gap: 8px; align-items: center; }
+        .nav-tabs a {
+            text-decoration: none; padding: 8px 16px; font-size: 0.85rem; font-weight: 600;
+            color: var(--text-secondary); border-radius: 20px; transition: var(--transition);
+        }
+        .nav-tabs a.active { background-color: var(--text-primary); color: var(--bg-surface); }
+        .nav-tabs a:hover:not(.active) { color: var(--text-primary); background-color: var(--bg-input); }
+        
+        .nav-tabs a.home-icon { padding: 8px; display: flex; align-items: center; justify-content: center; }
+        .nav-tabs a.home-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.5; }
+
+        .theme-toggle {
+            background: transparent; border: 1px solid var(--border-color);
+            color: var(--text-primary); padding: 8px 16px; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: var(--transition);
+            display: flex; align-items: center; gap: 6px; margin-left: 15px;
+        }
+        .theme-toggle:hover { border-color: var(--text-secondary); }
+
+        /* ---------------------------------
+           SLEEK FILTER BAR
+        --------------------------------- */
+        .filter-bar {
+            display: flex; align-items: center; gap: 15px; padding: 10px 30px;
+            background-color: var(--bg-main); height: 50px; box-sizing: border-box;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .filter-group { display: flex; align-items: center; gap: 8px; }
+        .filter-group label { font-size: 0.7rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .filter-group select {
+            padding: 6px 28px 6px 12px; border-radius: 20px; border: 1px solid var(--border-color);
+            background-color: var(--bg-surface); color: var(--text-primary); font-size: 0.75rem; font-weight: 600;
+            font-family: inherit; cursor: pointer; outline: none; appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2371717A%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat; background-position: right 10px top 50%; background-size: 8px auto;
+            transition: var(--transition);
+        }
+
+        .clear-btn {
+            background-color: transparent; color: var(--text-secondary); border: 1px solid var(--border-color);
+            padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
+            cursor: pointer; margin-left: auto; transition: var(--transition); font-family: inherit;
+        }
+        .clear-btn:hover { color: var(--text-primary); border-color: var(--text-primary); }
+
+        /* ---------------------------------
+           PREMIUM BENTO GRID
+        --------------------------------- */
+        .workspace {
+            flex: 1; padding: 15px 30px; display: flex; flex-direction: column;
+            height: calc(100vh - 110px); box-sizing: border-box; position: relative;
+        }
+
+        .dashboard-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr);
+            gap: 15px; flex-grow: 1; height: 100%; min-height: 0;
+        }
+
+        .col-span-2 { grid-column: span 2; }
+
+        .kpi-widget {
+            background: var(--bg-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
+            padding: 12px 16px; display: flex; flex-direction: column; 
+            border: 1px solid var(--border-color);
+            transition: var(--transition); overflow: hidden; min-height: 0;
+            position: relative;
+        }
+        
+        .kpi-widget:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+        .kpi-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .dot.blue { background-color: var(--color-blue); box-shadow: 0 0 8px var(--color-blue); }
+        .dot.red { background-color: var(--color-red); box-shadow: 0 0 8px var(--color-red); }
+        .dot.yellow { background-color: var(--color-yellow); box-shadow: 0 0 8px var(--color-yellow); }
+        .dot.green { background-color: var(--color-green); box-shadow: 0 0 8px var(--color-green); }
+
+        .kpi-title h3 { margin: 0; font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .chart-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; min-height: 0; }
+
+        /* CITY VERTICAL INTERACTIVE PILLS */
+        .city-menu {
+            display: flex; flex-direction: column; gap: 6px; justify-content: center;
+            border-right: 1px solid var(--border-color); padding-right: 12px;
+            min-width: 40px; 
+        }
+        .city-btn {
+            background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary);
+            padding: 5px 10px; border-radius: 8px; font-size: 0.65rem; font-weight: 700; cursor: pointer; 
+            transition: var(--transition); font-family: inherit; width: 100%; text-align: center;
+        }
+        .city-btn.active { background: var(--text-primary); color: var(--bg-surface); border-color: var(--text-primary); transform: scale(1.05); }
+        .city-btn:hover:not(.active) { background: var(--btn-dim); color: var(--text-primary); border-color: var(--border-hover); }
+
+        #loadingMsg {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: var(--text-primary); font-weight: 700; background: var(--bg-surface);
+            padding: 15px 30px; border-radius: 30px; border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-card); z-index: 10; font-size: 0.9rem;
+            display: none; 
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ULTRA PREMIUM PIN AUTH SCREEN -->
+    <div id="pinScreen">
+        <!-- Floating Animated Orbs -->
+        <div class="auth-bg-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+        
+        <div class="glass-container">
+            <!-- Left Side: Welcome Branding -->
+            <div class="welcome-section">
+                <h1><span class="highlight">IPAK</span><br>Corporate Dashboard</h1>
+                <p>Seamlessly monitor operations, analyze performance metrics, and manage human resources across all regions with precision.</p>
+            </div>
+            
+            <!-- Right Side: PIN Input -->
+            <div class="pin-section">
+                <img src="Logo.png" alt="Logo" onerror="this.style.display='none'">
+                <h2>Secure Access</h2>
+                <p>Enter your 4-digit PIN to continue</p>
+                
+                <div id="pinInputContainer">
+                    <div class="pin-inputs">
+                        <input type="password" inputmode="numeric" maxlength="1" class="pin-box" autofocus>
+                        <input type="password" inputmode="numeric" maxlength="1" class="pin-box">
+                        <input type="password" inputmode="numeric" maxlength="1" class="pin-box">
+                        <input type="password" inputmode="numeric" maxlength="1" class="pin-box">
+                    </div>
+                    <div id="pinMsg" class="pin-msg"></div>
+                </div>
+
+                <div id="loaderWrapper" class="loader-wrapper">
+                    <div class="spinner"></div>
+                    <div class="loader-text">Authenticating...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <header class="top-header">
+        <div class="header-brand" style="display: flex; align-items: center; gap: 12px;">
+            <img src="Logo.png" alt="Logo" style="height: 35px; width: auto; object-fit: contain;">
+            <h1>HR Corporate Dashboard</h1>
+        </div>
+        <div style="display:flex; align-items:center;">
+            <div class="nav-tabs">
+                <a href="#" class="active">HR OPS</a>
+                <a href="admin.html">Admin</a>
+                <a href="cost.html">Cost Center</a>
+                <a href="transport.html">Transport</a> 
+                <a href="index.html" class="home-icon" title="Home">
+                    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                </a>
+            </div>
+            <button class="theme-toggle" id="themeToggle">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Dark
+            </button>
+        </div>
+    </header>
+
+    <div class="filter-bar">
+        <div class="filter-group"><label>Company</label><select id="filterCompany"><option value="All">All</option></select></div>
+        <div class="filter-group"><label>Year</label><select id="filterYear"><option value="All">All</option></select></div>
+        <div class="filter-group"><label>Month</label><select id="filterMonth"><option value="All">All</option></select></div>
+        <div class="filter-group"><label>Dept</label><select id="filterDept"><option value="All">All</option></select></div>
+        <div class="filter-group"><label>Section</label><select id="filterSection"><option value="All">All</option></select></div>
+        <button id="clearFiltersBtn" class="clear-btn">Reset View</button>
+    </div>
+
+    <div class="workspace">
+        <div id="loadingMsg">Synchronizing Data...</div>
+
+        <!-- Dashboard Skeleton visible behind the blur -->
+        <div class="dashboard-grid" id="dashboardContent" style="display: grid;">
+            
+            <div class="kpi-widget col-span-2" style="display: flex; flex-direction: row; padding: 12px; gap: 10px; overflow: hidden; align-items: stretch;">
+                
+                <div class="city-menu">
+                    <button class="city-btn active" data-city="All">ALL</button>
+                    <button class="city-btn" data-city="KHI">KHI</button>
+                    <button class="city-btn" data-city="LHR">LHR</button>
+                    <button class="city-btn" data-city="SKP">SKP</button>
+                </div>
+
+                <div style="flex: 1; position: relative; height: 100%; min-width: 0; min-height: 0;">
+                    <canvas id="chartHeadcountDoughnut" style="z-index: 2; transition: all 0.3s;"></canvas>
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1;">
+                        <div id="hc-total" style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary); line-height: 1; transition: color 0.3s;">1,021</div>
+                    </div>
+                </div>
+
+                <div style="flex: 1.2; display: flex; flex-direction: column; justify-content: center; gap: 8px; min-width: 0;">
+                    <div class="kpi-header" style="margin-bottom: 2px;">
+                        <span class="dot blue"></span>
+                        <div class="kpi-title"><h3>Headcount</h3></div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 8px; min-width: 0;">
+                        <div style="flex: 1 1 0; background: var(--bg-input); padding: 8px; border-radius: 8px; border-left: 3px solid var(--color-blue); min-width: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="font-size: 0.55rem; color: var(--text-secondary); font-weight: 800; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">PERMANENT</div>
+                            <div id="hc-perm" style="font-size: 1rem; font-weight: 800; color: var(--text-primary); margin-top: 2px; transition: color 0.3s;">656</div>
+                        </div>
+                        <div style="flex: 1 1 0; background: var(--bg-input); padding: 8px; border-radius: 8px; border-left: 3px solid var(--color-yellow); min-width: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="font-size: 0.55rem; color: var(--text-secondary); font-weight: 800; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">THIRD PARTY</div>
+                            <div id="hc-tp" style="font-size: 1rem; font-weight: 800; color: var(--text-primary); margin-top: 2px; transition: color 0.3s;">365</div>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--bg-input); padding: 8px; border-radius: 8px; min-width: 0; display: flex; flex-direction: column; justify-content: center;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.55rem; font-weight: 800; margin-bottom: 6px; white-space: nowrap;">
+                            <span style="color: var(--color-blue); text-transform: uppercase;">MALE</span>
+                            <span style="color: var(--color-red); text-transform: uppercase;">FEMALE</span>
+                        </div>
+                        <div style="height: 24px; width: 100%; display: flex; border-radius: 6px; gap: 4px;">
+                            <div id="male-bar" style="width: 97%; min-width: 35px; background: var(--color-blue); border-radius: 6px; box-shadow: 0 0 8px rgba(59,130,246,0.4); transition: width 0.8s ease-out; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                <span id="male-text" style="color: #FFFFFF; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; white-space: nowrap;">97%</span>
+                            </div>
+                            <div id="female-bar" style="width: 3%; min-width: 35px; background: var(--color-red); border-radius: 6px; box-shadow: 0 0 8px rgba(239,68,68,0.4); transition: width 0.8s ease-out; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                <span id="female-text" style="color: #FFFFFF; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; white-space: nowrap;">3%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Act vs Std Hours %</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartActVsStd"></canvas></div>
+            </div>
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot red"></span><div class="kpi-title"><h3>Total OT Hours</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartOTHours"></canvas></div>
+            </div>
+
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot yellow"></span><div class="kpi-title"><h3>OT Cost</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartOTCost"></canvas></div>
+            </div>
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot green"></span><div class="kpi-title"><h3>OT %</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartOTPercent"></canvas></div>
+            </div>
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>TP Total OT Hours</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartTPOTHours"></canvas></div>
+            </div>
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot red"></span><div class="kpi-title"><h3>TP OT Cost</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartTPOTCost"></canvas></div>
+            </div>
+
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot yellow"></span><div class="kpi-title"><h3>Absenteeism %</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartAbsent"></canvas></div>
+            </div>
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot green"></span><div class="kpi-title"><h3>Leaves %</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartLeave"></canvas></div>
+            </div>
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Late Arrival %</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartLate"></canvas></div>
+            </div>
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot red"></span><div class="kpi-title"><h3>Early Out %</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartEarly"></canvas></div>
+            </div>
+
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot yellow"></span><div class="kpi-title"><h3>Active Employee %</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartActive"></canvas></div>
+            </div>
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot green"></span><div class="kpi-title"><h3>Joiners</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartJoiners"></canvas></div>
+            </div>
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot blue"></span><div class="kpi-title"><h3>Leavers</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartLeavers"></canvas></div>
+            </div>
+            <div class="kpi-widget">
+                <div class="kpi-header"><span class="dot red"></span><div class="kpi-title"><h3>Pending Final Settlement</h3></div></div>
+                <div class="chart-wrapper"><canvas id="chartPending"></canvas></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- PIN AUTHENTICATION LOGIC ---
+        const pinInputs = document.querySelectorAll('.pin-box');
+        const pinMsg = document.getElementById('pinMsg');
+        const loaderWrapper = document.getElementById('loaderWrapper');
+        const pinInputContainer = document.getElementById('pinInputContainer');
+        const pinScreen = document.getElementById('pinScreen');
+        const CORRECT_PIN = '8004';
+
+        pinInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length > 0) {
+                    if (index < pinInputs.length - 1) {
+                        pinInputs[index + 1].focus();
+                    }
+                    validatePin();
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+                    pinInputs[index - 1].focus();
+                }
+            });
+        });
+
+        function validatePin() {
+            let enteredPin = Array.from(pinInputs).map(i => i.value).join('');
+            
+            if (enteredPin.length === 4) {
+                pinInputs.forEach(i => i.disabled = true);
+
+                if (enteredPin === CORRECT_PIN) {
+                    pinMsg.style.opacity = '0';
+                    pinInputContainer.style.display = 'none';
+                    loaderWrapper.style.display = 'flex';
+                    
+                    setTimeout(() => {
+                        pinScreen.style.opacity = '0';
+                        pinScreen.style.visibility = 'hidden';
+                        
+                        document.getElementById('loadingMsg').style.display = 'block';
+                        fetchGoogleSheetData();
+                    }, 1200); // slightly longer to show the beautiful loader
+                } else {
+                    pinInputs.forEach(i => i.classList.add('error'));
+                    pinMsg.innerText = 'Incorrect PIN. Please try again.';
+                    pinMsg.style.opacity = '1';
+                    
+                    setTimeout(() => {
+                        pinInputs.forEach(i => {
+                            i.classList.remove('error');
+                            i.value = '';
+                            i.disabled = false;
+                        });
+                        pinInputs[0].focus();
+                        pinMsg.style.opacity = '0';
+                    }, 500);
+                }
+            }
+        }
+
+        // --- THEME TOGGLE LOGIC ---
+        const themeBtn = document.getElementById('themeToggle');
+        
+        function updateChartThemeColors(isDark) {
+            Chart.defaults.color = isDark ? '#A1A1AA' : '#64748B';
+            const gridColor = isDark ? '#18181B' : '#F1F5F9';
+            const surfaceColor = isDark ? '#121212' : '#FFFFFF';
+            const tooltipBg = isDark ? 'rgba(24, 24, 27, 0.9)' : 'rgba(255, 255, 255, 0.9)';
+            const tooltipText = isDark ? '#FAFAFA' : '#0F172A';
+            const tooltipBorder = isDark ? '#3F3F46' : '#E2E8F0';
+
+            Object.values(charts).forEach(chart => {
+                if(chart.options.scales && chart.options.scales.x) {
+                    chart.options.scales.x.grid.color = gridColor;
+                    chart.options.scales.y.grid.color = gridColor;
+                }
+                
+                chart.options.plugins.tooltip.backgroundColor = tooltipBg;
+                chart.options.plugins.tooltip.titleColor = tooltipText;
+                chart.options.plugins.tooltip.bodyColor = tooltipText;
+                chart.options.plugins.tooltip.borderColor = tooltipBorder;
+                chart.options.plugins.tooltip.borderWidth = 1;
+
+                if(chart.config.type === 'line') {
+                    chart.data.datasets[0].pointBackgroundColor = isDark ? '#FAFAFA' : '#FFFFFF';
+                }
+                
+                if(chart.config.type === 'doughnut') {
+                    chart.data.datasets.forEach(ds => ds.borderColor = surfaceColor);
+                }
+                
+                chart.update();
+            });
+        }
+
+        themeBtn.addEventListener('click', () => {
+            const html = document.documentElement;
+            const isCurrentlyDark = html.getAttribute('data-theme') === 'dark';
+            const newTheme = isCurrentlyDark ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            
+            if(newTheme === 'dark') {
+                themeBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Light`;
+            } else {
+                themeBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Dark`;
+            }
+            
+            updateChartThemeColors(newTheme === 'dark');
+        });
+
+        // --- CORE LOGIC ---
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQPcR5zF9y3FOUxNN1b5aiJDRlCjm-8Di1QzcP4BhzefQaeHpClaGeE4_bKkkPA27LqTOje4MoOKEen/pub?gid=798992094&single=true&output=csv';
+        let sheetData = []; let headers = []; const charts = {};
+
+        function parseCSV(str) {
+            const arr = []; let quote = false; let row = 0, col = 0;
+            for (let c = 0; c < str.length; c++) {
+                let cc = str[c], nc = str[c+1];
+                arr[row] = arr[row] || []; arr[row][col] = arr[row][col] || '';
+                if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
+                if (cc == '"') { quote = !quote; continue; }
+                if (cc == ',' && !quote) { ++col; continue; }
+                if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
+                if (cc == '\n' && !quote) { ++row; col = 0; continue; }
+                if (cc == '\r' && !quote) { ++row; col = 0; continue; }
+                arr[row][col] += cc;
+            }
+            return arr;
+        }
+
+        function findColumn(row, keywords) {
+            if(!row) return null;
+            return Object.keys(row).find(key => keywords.some(kw => key.toLowerCase().includes(kw)));
+        }
+
+        function cleanNumber(val) {
+            if (!val) return 0; if (typeof val === 'number') return val;
+            let cleaned = val.toString().replace(/,/g, '').replace(/%/g, '').replace(/[^\d.-]/g, '');
+            return parseFloat(cleaned) || 0;
+        }
+
+        function formatNum(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toLocaleString('en-US', { maximumFractionDigits: 1 });
+        }
+
+        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+        Chart.defaults.color = '#64748B'; 
+
+        // --- PREMIUM CHART FACTORY ---
+        function createChart(canvasId, type, colorHex, isPercent = false) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            
+            let bgGradient = 'transparent';
+            if (type === 'line') {
+                bgGradient = ctx.createLinearGradient(0, 0, 0, 150);
+                bgGradient.addColorStop(0, colorHex + '35'); 
+                bgGradient.addColorStop(1, colorHex + '00'); 
+            }
+
+            return new Chart(ctx, {
+                type: type,
+                data: { 
+                    labels: [], 
+                    datasets: [{ 
+                        backgroundColor: type === 'bar' ? colorHex : bgGradient, 
+                        borderColor: colorHex, 
+                        borderWidth: 2, 
+                        fill: type === 'line', 
+                        tension: 0.4, 
+                        pointRadius: type === 'line' ? 2 : 0, 
+                        pointBackgroundColor: '#FFFFFF', 
+                        pointBorderColor: colorHex,
+                        pointBorderWidth: 2,
+                        pointHoverRadius: 5,
+                        borderRadius: type === 'bar' ? 4 : 0, 
+                        barPercentage: 0.7,
+                        data: [] 
+                    }] 
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, layout: { padding: { top: 5 } },
+                    animation: { duration: 600, easing: 'easeOutQuart' },
+                    plugins: { 
+                        legend: { display: false }, 
+                        tooltip: { 
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)', 
+                            titleColor: '#0F172A', bodyColor: '#0F172A',
+                            borderColor: '#E2E8F0', borderWidth: 1,
+                            titleFont: { size: 10, family: "'Plus Jakarta Sans', sans-serif" }, 
+                            bodyFont: { size: 13, weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" }, 
+                            padding: 10, cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    let val = formatNum(context.parsed.y);
+                                    return isPercent ? val + '%' : val;
+                                }
+                            }
+                        } 
+                    },
+                    scales: { 
+                        y: { 
+                            display: true, beginAtZero: true, 
+                            grid: { drawBorder: false, color: '#F1F5F9' }, 
+                            ticks: { display: false } 
+                        },
+                        x: { display: true, grid: { display: false }, ticks: { font: { size: 9, weight: '600' }, maxRotation: 0 } }
+                    }
+                }
+            });
+        }
+
+        function initCharts() {
+            const b = '#3B82F6', r = '#EF4444', y = '#F59E0B', g = '#10B981';
+            
+            // --- ADVANCED NESTED DOUGHNUT ---
+            const ctxHc = document.getElementById('chartHeadcountDoughnut').getContext('2d');
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const surfaceColor = isDark ? '#121212' : '#FFFFFF';
+
+            charts.headcount = new Chart(ctxHc, {
+                type: 'doughnut',
+                data: {
+                    labels: ['KHI - Perm', 'KHI - TP', 'LHR - Perm', 'LHR - TP', 'SKP - Perm', 'SKP - TP'],
+                    datasets: [
+                        {
+                            data: [84, 399, 537],
+                            backgroundColor: [b, y, g],
+                            borderWidth: 2, borderColor: surfaceColor, hoverOffset: 4, weight: 1.5,
+                            offset: [0, 0, 0]
+                        },
+                        {
+                            data: [74, 10, 273, 126, 308, 229],
+                            backgroundColor: ['#60A5FA', '#DBEAFE', '#FBBF24', '#FEF3C7', '#34D399', '#D1FAE5'],
+                            borderWidth: 2, borderColor: surfaceColor, weight: 0.8,
+                            offset: [0, 0, 0, 0, 0, 0]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '65%', layout: { padding: 10 },
+                    animation: {
+                        animateScale: true, animateRotate: true, duration: 800, easing: 'easeOutQuart'
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)', titleColor: '#0F172A', bodyColor: '#0F172A',
+                            borderColor: '#E2E8F0', borderWidth: 1, titleFont: { size: 10 }, bodyFont: { weight: 'bold', size: 13 },
+                            padding: 10, cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.datasetIndex === 0 
+                                                ? ['Karachi', 'Lahore', 'Sheikhupura'][context.dataIndex] 
+                                                : context.chart.data.labels[context.dataIndex];
+                                    return ` ${label}: ${context.raw}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // --- STANDARD DYNAMIC CHARTS ---
+            charts.actStd = createChart('chartActVsStd', 'line', b, true);       
+            charts.otHours = createChart('chartOTHours', 'bar', r, false);          
+            charts.otCost = createChart('chartOTCost', 'bar', y, false);       
+            charts.otPct = createChart('chartOTPercent', 'line', g, true);     
+            charts.tpOTHours = createChart('chartTPOTHours', 'bar', b, false);    
+            charts.tpOTCost = createChart('chartTPOTCost', 'bar', r, false);        
+            charts.absent = createChart('chartAbsent', 'line', y, true);     
+            charts.leave = createChart('chartLeave', 'line', g, true);         
+            charts.late = createChart('chartLate', 'line', b, true);             
+            charts.early = createChart('chartEarly', 'line', r, true);             
+            charts.active = createChart('chartActive', 'line', y, true);     
+            charts.joiners = createChart('chartJoiners', 'bar', g, false);      
+            charts.leavers = createChart('chartLeavers', 'bar', b, false);        
+            charts.pending = createChart('chartPending', 'bar', r, false);         
+        }
+
+        // --- NUMBER ROLL/COUNT ANIMATION LOGIC ---
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const easeProgress = 1 - Math.pow(1 - progress, 4);
+                let currentVal = Math.floor(easeProgress * (end - start) + start);
+                obj.innerHTML = currentVal.toLocaleString('en-US');
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // --- GENDER TEXT PERCENTAGE ANIMATION ---
+        function animatePercent(obj, start, end, duration, prefix) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const easeProgress = 1 - Math.pow(1 - progress, 4);
+                let currentVal = Math.floor(easeProgress * (end - start) + start);
+                obj.innerHTML = `${prefix}${currentVal}%`;
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // --- CITY SELECTION INTERACTION LOGIC (WITH POP-OUT & ROLL) ---
+        const hcData = {
+            "All": { total: 1021, perm: 656, tp: 365, male: 97, female: 3 },
+            "KHI": { total: 84, perm: 74, tp: 10, male: 89, female: 11 },
+            "LHR": { total: 399, perm: 273, tp: 126, male: 97, female: 3 },
+            "SKP": { total: 537, perm: 308, tp: 229, male: 99, female: 1 }
+        };
+
+        document.querySelectorAll('.city-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.city-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                const city = e.target.getAttribute('data-city');
+                const data = hcData[city];
+                
+                // 1. Roll Animation for Numbers
+                const elTotal = document.getElementById('hc-total');
+                const elPerm = document.getElementById('hc-perm');
+                const elTp = document.getElementById('hc-tp');
+                
+                const oldTotal = parseInt(elTotal.innerText.replace(/,/g, '')) || 0;
+                const oldPerm = parseInt(elPerm.innerText.replace(/,/g, '')) || 0;
+                const oldTp = parseInt(elTp.innerText.replace(/,/g, '')) || 0;
+
+                animateValue(elTotal, oldTotal, data.total, 800);
+                animateValue(elPerm, oldPerm, data.perm, 800);
+                animateValue(elTp, oldTp, data.tp, 800);
+
+                // --- GENDER BAR UPDATE & ANIMATION ---
+                const maleText = document.getElementById('male-text');
+                const femaleText = document.getElementById('female-text');
+                const maleBar = document.getElementById('male-bar');
+                const femaleBar = document.getElementById('female-bar');
+
+                const oldMale = parseInt(maleText.innerText.replace(/[^\d]/g, '')) || 0;
+                const oldFemale = parseInt(femaleText.innerText.replace(/[^\d]/g, '')) || 0;
+
+                animatePercent(maleText, oldMale, data.male, 800, '');
+                animatePercent(femaleText, oldFemale, data.female, 800, '');
+
+                maleBar.style.width = data.male + '%';
+                femaleBar.style.width = data.female + '%';
+
+                // 2. Chart Pop-out & Dimming Animation
+                if (charts.headcount) {
+                    const dsOuter = charts.headcount.data.datasets[0];
+                    const dsInner = charts.headcount.data.datasets[1];
+                    const b = '#3B82F6', y = '#F59E0B', g = '#10B981';
+
+                    if (city === "All") {
+                        dsOuter.backgroundColor = [b, y, g];
+                        dsInner.backgroundColor = ['#60A5FA', '#DBEAFE', '#FBBF24', '#FEF3C7', '#34D399', '#D1FAE5'];
+                        dsOuter.offset = [0, 0, 0];
+                        dsInner.offset = [0, 0, 0, 0, 0, 0];
+                    } else if (city === "KHI") {
+                        dsOuter.backgroundColor = [b, 'rgba(245, 158, 11, 0.15)', 'rgba(16, 185, 129, 0.15)'];
+                        dsInner.backgroundColor = ['#60A5FA', '#DBEAFE', 'rgba(251, 191, 36, 0.1)', 'rgba(254, 243, 199, 0.1)', 'rgba(52, 211, 153, 0.1)', 'rgba(209, 250, 229, 0.1)'];
+                        dsOuter.offset = [15, 0, 0];
+                        dsInner.offset = [10, 10, 0, 0, 0, 0];
+                    } else if (city === "LHR") {
+                        dsOuter.backgroundColor = ['rgba(59, 130, 246, 0.15)', y, 'rgba(16, 185, 129, 0.15)'];
+                        dsInner.backgroundColor = ['rgba(96, 165, 250, 0.1)', 'rgba(219, 234, 254, 0.1)', '#FBBF24', '#FEF3C7', 'rgba(52, 211, 153, 0.1)', 'rgba(209, 250, 229, 0.1)'];
+                        dsOuter.offset = [0, 15, 0];
+                        dsInner.offset = [0, 0, 10, 10, 0, 0];
+                    } else if (city === "SKP") {
+                        dsOuter.backgroundColor = ['rgba(59, 130, 246, 0.15)', 'rgba(245, 158, 11, 0.15)', g];
+                        dsInner.backgroundColor = ['rgba(96, 165, 250, 0.1)', 'rgba(219, 234, 254, 0.1)', 'rgba(251, 191, 36, 0.1)', 'rgba(254, 243, 199, 0.1)', '#34D399', '#D1FAE5'];
+                        dsOuter.offset = [0, 0, 15];
+                        dsInner.offset = [0, 0, 0, 0, 10, 10];
+                    }
+                    charts.headcount.update();
+                }
+            });
+        });
+
+        function updateSectionDropdown() {
+            const selectedDept = document.getElementById('filterDept').value;
+            const deptCol = findColumn(sheetData[0], ['department', 'dept']);
+            const sectionCol = findColumn(sheetData[0], ['section', 'sec']);
+            if (!sectionCol) return;
+            const sections = new Set();
+            sheetData.forEach(row => {
+                if (selectedDept === "All" || row[deptCol] === selectedDept) { if (row[sectionCol]) sections.add(row[sectionCol]); }
+            });
+            const sectionSelect = document.getElementById('filterSection');
+            const currentSelection = sectionSelect.value;
+            sectionSelect.innerHTML = `<option value="All">All Sections</option>`;
+            sections.forEach(val => { let opt = document.createElement('option'); opt.value = val; opt.innerHTML = val; sectionSelect.appendChild(opt); });
+            sectionSelect.value = sections.has(currentSelection) ? currentSelection : "All";
+        }
+
+        function populateDropdowns() {
+            const compCol = findColumn(sheetData[0], ['company', 'comp']);
+            const yearCol = findColumn(sheetData[0], ['year', 'saal']);
+            const monthCol = findColumn(sheetData[0], ['month', 'mahina']);
+            const deptCol = findColumn(sheetData[0], ['department', 'dept']);
+            const companies = new Set(), years = new Set(), months = new Set(), depts = new Set();
+            sheetData.forEach(row => {
+                let cRaw = compCol ? row[compCol] : null;
+                if (cRaw && cRaw.toLowerCase() !== 'group') companies.add(cRaw.trim());
+                if (yearCol && row[yearCol]) years.add(row[yearCol]);
+                if (monthCol && row[monthCol]) months.add(row[monthCol]);
+                if (deptCol && row[deptCol]) depts.add(row[deptCol]);
+            });
+            const addOptions = (setId, dataSet, label) => {
+                const select = document.getElementById(setId);
+                if(!select) return; select.innerHTML = `<option value="All">All ${label}</option>`;
+                dataSet.forEach(val => { let opt = document.createElement('option'); opt.value = val; opt.innerHTML = val; select.appendChild(opt); });
+            };
+            addOptions('filterCompany', companies, 'Companies'); addOptions('filterYear', years, 'Years');
+            addOptions('filterMonth', months, 'Months'); addOptions('filterDept', depts, 'Departments');
+            updateSectionDropdown();
+        }
+
+        async function fetchGoogleSheetData() {
+            try {
+                const response = await fetch(csvUrl); const csvText = await response.text();
+                const rows = parseCSV(csvText); headers = rows[0].map(h => h.trim());
+                sheetData = rows.slice(1).map(row => { let obj = {}; row.forEach((cell, i) => { obj[headers[i]] = cell ? cell.trim() : ""; }); return obj; });
+                sheetData = sheetData.filter(row => Object.values(row).some(x => x !== ""));
+                
+                document.getElementById('loadingMsg').style.display = 'none';
+                
+                populateDropdowns(); 
+                updateDashboard(); 
+                
+            } catch (error) { document.getElementById('loadingMsg').innerText = "Failed to load data."; }
+        }
+
+        function updateDashboard() {
+            if(sheetData.length === 0) return;
+            const selectedComp = document.getElementById('filterCompany') ? document.getElementById('filterCompany').value : 'All';
+            const selectedYear = document.getElementById('filterYear').value;
+            const selectedMonth = document.getElementById('filterMonth').value;
+            const selectedDept = document.getElementById('filterDept').value;
+            const selectedSection = document.getElementById('filterSection').value;
+
+            const compCol = findColumn(sheetData[0], ['company', 'comp']); const yearCol = findColumn(sheetData[0], ['year']);
+            const monthCol = findColumn(sheetData[0], ['month']); const deptCol = findColumn(sheetData[0], ['department', 'dept']);
+            const sectionCol = findColumn(sheetData[0], ['section', 'sec']);
+
+            let filteredData = sheetData.filter(item => {
+                let match = true;
+                if(selectedComp === "All" && compCol && item[compCol] && item[compCol].toLowerCase() === 'group') return false;
+                if(selectedComp !== "All" && compCol && item[compCol] !== selectedComp) match = false;
+                if(selectedYear !== "All" && yearCol && item[yearCol] !== selectedYear) match = false;
+                if(selectedMonth !== "All" && monthCol && item[monthCol] !== selectedMonth) match = false;
+                if(selectedDept !== "All" && deptCol && item[deptCol] !== selectedDept) match = false;
+                if(selectedSection !== "All" && sectionCol && item[sectionCol] !== selectedSection) match = false;
+                return match;
+            });
+
+            const actVsStdCol = findColumn(sheetData[0], ['actual vs standard', 'actual vs std']);
+            const otHoursCol = findColumn(sheetData[0], ['overtime hours', 'total ot hours']);
+            const otCostCol = findColumn(sheetData[0], ['ot cost', 'overtime cost']);
+            const otPercentCol = findColumn(sheetData[0], ['ot%', 'ot %', 'overtime %']);
+            const tpOTHoursCol = findColumn(sheetData[0], ['tp total ot hours', 'tp ot hour']);
+            const tpOTCostCol = findColumn(sheetData[0], ['tp ot cost', 'tp cost']);
+            const absentCol = findColumn(sheetData[0], ['absenteeism', 'absent']);
+            const leaveCol = findColumn(sheetData[0], ['leaves', 'leave %']);
+            const lateCol = findColumn(sheetData[0], ['late arrival', 'late']);
+            const earlyCol = findColumn(sheetData[0], ['early out', 'early']);
+            const activeEmpCol = findColumn(sheetData[0], ['active employee', 'active %']);
+            const joinersCol = findColumn(sheetData[0], ['joiners', 'join']);
+            const leaversCol = findColumn(sheetData[0], ['leavers', 'leave count']);
+            const pendingCol = findColumn(sheetData[0], ['pending final settlement', 'pending settlement']);
+
+            let groupByCol = monthCol || headers[0]; let groupedStats = {};
+
+            filteredData.forEach(item => {
+                let label = item[groupByCol] || "Unknown";
+                let vActStd = cleanNumber(item[actVsStdCol]), vOtHrs = cleanNumber(item[otHoursCol]), vOtCost = cleanNumber(item[otCostCol]);
+                let vOtPct = cleanNumber(item[otPercentCol]), vTpHrs = cleanNumber(item[tpOTHoursCol]), vTpCost = cleanNumber(item[tpOTCostCol]);
+                let vAbs = cleanNumber(item[absentCol]), vLev = cleanNumber(item[leaveCol]), vLat = cleanNumber(item[lateCol]);
+                let vEar = cleanNumber(item[earlyCol]), vAct = cleanNumber(item[activeEmpCol]), vJoin = cleanNumber(item[joinersCol]);
+                let vLeav = cleanNumber(item[leaversCol]), vPend = cleanNumber(item[pendingCol]);
+
+                if (!groupedStats[label]) {
+                    groupedStats[label] = { otH:0, otC:0, tpH:0, tpC:0, jn:0, lv:0, pnd:0, aS_p:0, aS_c:0, otP_p:0, otP_c:0, ab_p:0, ab_c:0, le_p:0, le_c:0, la_p:0, la_c:0, ea_p:0, ea_c:0, ac_p:0, ac_c:0 };
+                }
+
+                groupedStats[label].otH += vOtHrs; groupedStats[label].otC += vOtCost; groupedStats[label].tpH += vTpHrs; groupedStats[label].tpC += vTpCost;
+                groupedStats[label].jn += vJoin; groupedStats[label].lv += vLeav; groupedStats[label].pnd += vPend;
+
+                if (vActStd > 0) { groupedStats[label].aS_p += vActStd; groupedStats[label].aS_c++; }
+                if (vOtPct > 0) { groupedStats[label].otP_p += vOtPct; groupedStats[label].otP_c++; }
+                if (vAbs > 0) { groupedStats[label].ab_p += vAbs; groupedStats[label].ab_c++; }
+                if (vLev > 0) { groupedStats[label].le_p += vLev; groupedStats[label].le_c++; }
+                if (vLat > 0) { groupedStats[label].la_p += vLat; groupedStats[label].la_c++; }
+                if (vEar > 0) { groupedStats[label].ea_p += vEar; groupedStats[label].ea_c++; }
+                if (vAct > 0) { groupedStats[label].ac_p += vAct; groupedStats[label].ac_c++; }
+            });
+
+            let chartLabels = Object.keys(groupedStats);
+            const monthsMap = { "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6, "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12 };
+            chartLabels.sort((a, b) => (monthsMap[a.toLowerCase().substring(0, 3)] || 99) - (monthsMap[b.toLowerCase().substring(0, 3)] || 99));
+
+            let dActStd=[], dOtHrs=[], dOtCost=[], dOtPct=[], dTpHrs=[], dTpCost=[], dAbs=[], dLev=[], dLat=[], dEar=[], dAct=[], dJoin=[], dLeav=[], dPend=[];
+
+            chartLabels.forEach(lbl => {
+                let s = groupedStats[lbl];
+                dOtHrs.push(s.otH); dOtCost.push(s.otC); dTpHrs.push(s.tpH); dTpCost.push(s.tpC); dJoin.push(s.jn); dLeav.push(s.lv); dPend.push(s.pnd);
+                dActStd.push(s.aS_c > 0 ? (s.aS_p / s.aS_c).toFixed(2) : 0); dOtPct.push(s.otP_c > 0 ? (s.otP_p / s.otP_c).toFixed(2) : 0);
+                dAbs.push(s.ab_c > 0 ? (s.ab_p / s.ab_c).toFixed(2) : 0); dLev.push(s.le_c > 0 ? (s.le_p / s.le_c).toFixed(2) : 0);
+                dLat.push(s.la_c > 0 ? (s.la_p / s.la_c).toFixed(2) : 0); dEar.push(s.ea_c > 0 ? (s.ea_p / s.ea_c).toFixed(2) : 0);
+                dAct.push(s.ac_c > 0 ? (s.ac_p / s.ac_c).toFixed(2) : 0);
+            });
+
+            function updateC(chartInst, lbs, dta) {
+                chartInst.data.labels = lbs; chartInst.data.datasets[0].data = dta; chartInst.update();
+            }
+
+            updateC(charts.actStd, chartLabels, dActStd); updateC(charts.otHours, chartLabels, dOtHrs);
+            updateC(charts.otCost, chartLabels, dOtCost); updateC(charts.otPct, chartLabels, dOtPct);
+            updateC(charts.tpOTHours, chartLabels, dTpHrs); updateC(charts.tpOTCost, chartLabels, dTpCost);
+            updateC(charts.absent, chartLabels, dAbs); updateC(charts.leave, chartLabels, dLev);
+            updateC(charts.late, chartLabels, dLat); updateC(charts.early, chartLabels, dEar);
+            updateC(charts.active, chartLabels, dAct); updateC(charts.joiners, chartLabels, dJoin);
+            updateC(charts.leavers, chartLabels, dLeav); updateC(charts.pending, chartLabels, dPend);
+        }
+
+        document.querySelectorAll('select').forEach(sel => { if(sel) sel.addEventListener('change', () => { if(sel.id === 'filterDept') updateSectionDropdown(); updateDashboard(); }); });
+        document.getElementById('clearFiltersBtn').addEventListener('click', () => { document.querySelectorAll('select').forEach(s => s.value = 'All'); updateSectionDropdown(); updateDashboard(); });
+        
+        // Render empty charts immediately on page load to show behind the blur
+        window.onload = () => { 
+            initCharts(); 
+        };
+    </script>
+</body>
+</html>
